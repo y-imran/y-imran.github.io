@@ -74,7 +74,7 @@
    */
 
   /* font-family */
-  --ff-poppins: var(--font-google-sans, 'Google Sans', sans-serif);
+  --ff-poppins: var(--font-poppins, sans-serif);
 
   /* font-size */
   --fs-0: 31px;
@@ -92,6 +92,7 @@
   --fw-400: 400;
   --fw-500: 500;
   --fw-600: 600;
+  --fw-900: 900;
 
   /**
    * shadow
@@ -157,6 +158,11 @@ input, textarea {
 html { font-family: var(--ff-poppins); }
 
 body { background: var(--smoky-black); }
+
+/* font-weight utilities */
+.font-light   { font-weight: var(--fw-300); }
+.font-regular { font-weight: var(--fw-400); }
+.font-black   { font-weight: var(--fw-900); }
 
 
 
