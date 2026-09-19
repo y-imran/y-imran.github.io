@@ -46,7 +46,7 @@ const timeline: Timeline = {
     },
     {
       title: 'SMB Fatima Jinnah College',
-      subTitle: '2019-2021',
+      subTitle: '2019 — 2021',
       description:
         'Higher Secondary Certificate (HSC) in Pre-Medical',
     },
