@@ -1,0 +1,66 @@
+---
+import timeline from '../data/timeline.ts';
+---
+
+<article class="resume  active" data-page="resume">
+  <header>
+    <h2 class="h2 article-title">Resume</h2>
+  </header>
+
+  <!-- Projects -->
+  <section class="timeline">
+    <div class="title-wrapper">
+      <div class="icon-box">
+        <ion-icon name="book-outline"></ion-icon>
+      </div>
+      <h3 class="h3">Projects</h3>
+    </div>
+    <ol class="timeline-list">
+      {timeline.projects.map((item) => (
+        <li class="timeline-item">
+          <h4 class="h4 timeline-item-title">{item.title}</h4>
+          <span>{item.subTitle}</span>
+          <p class="timeline-text">{item.description}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Achievements -->
+  <section class="timeline">
+    <div class="title-wrapper">
+      <div class="icon-box">
+        <ion-icon name="book-outline"></ion-icon>
+      </div>
+      <h3 class="h3">Achievements</h3>
+    </div>
+    <ol class="timeline-list">
+      {timeline.achievements.map((item) => (
+        <li class="timeline-item">
+          <h4 class="h4 timeline-item-title">{item.title}</h4>
+          <span>{item.subTitle}</span>
+          <p class="timeline-text">{item.description}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Education -->
+  <section class="timeline">
+    <div class="title-wrapper">
+      <div class="icon-box">
+        <ion-icon name="book-outline"></ion-icon>
+      </div>
+      <h3 class="h3">Education</h3>
+    </div>
+    <ol class="timeline-list">
+      {timeline.education.map((item) => (
+        <li class="timeline-item">
+          <h4 class="h4 timeline-item-title">{item.title}</h4>
+          <span>{item.subTitle}</span>
+          <p class="timeline-text">{item.description}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+</article>

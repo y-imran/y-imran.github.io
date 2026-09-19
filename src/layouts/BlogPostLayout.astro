@@ -1,0 +1,113 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  category: string;
+  pubDate: Date;
+  excerpt: string;
+  banner: ImageMetadata;
+}
+
+const { title, category, pubDate, excerpt, banner } = Astro.props;
+
+const formattedDate = pubDate.toLocaleDateString('en-US', {
+  month: 'short',
+  day: '2-digit',
+  year: 'numeric',
+});
+---
+
+<BaseLayout title={`${title} - Yusra Imran`} description={excerpt}>
+  <article class="about  active" data-page="blog">
+    <header>
+      <a href="/blog/" class="navbar-link" style="display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-6); color: var(--orange-yellow-crayola); margin-bottom: 15px;">
+        <ion-icon name="arrow-back"></ion-icon>
+        <span>Back to Blog</span>
+      </a>
+      <h2 class="h2 article-title">{title}</h2>
+    </header>
+
+    <section class="about-text">
+      <div class="blog-meta" style="display: flex; align-items: center; gap: 7px; margin-bottom: 20px;">
+        <p class="blog-category" style="color: var(--light-gray-70); font-size: var(--fs-6); font-weight: var(--fw-300);">{category}</p>
+        <span class="dot" style="background: var(--light-gray-70); width: 4px; height: 4px; border-radius: 4px;"></span>
+        <time datetime={pubDate.toISOString()} style="color: var(--light-gray-70); font-size: var(--fs-6); font-weight: var(--fw-300);">{formattedDate}</time>
+      </div>
+
+      <figure style="margin-bottom: 30px; border-radius: 16px; overflow: hidden;">
+        <img src={banner.src} alt={title} style="width: 100%; display: block;" />
+      </figure>
+
+      <div class="prose" style="color: var(--light-gray); font-size: var(--fs-6); font-weight: var(--fw-300); line-height: 1.6;">
+        <slot />
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .prose h2 {
+    color: var(--white-2);
+    font-size: var(--fs-2);
+    font-weight: var(--fw-500);
+    margin-top: 30px;
+    margin-bottom: 15px;
+  }
+  .prose h3 {
+    color: var(--white-2);
+    font-size: var(--fs-3);
+    font-weight: var(--fw-500);
+    margin-top: 25px;
+    margin-bottom: 12px;
+  }
+  .prose p {
+    margin-bottom: 15px;
+  }
+  .prose ul {
+    margin-bottom: 15px;
+    padding-left: 20px;
+    list-style: disc;
+  }
+  .prose ol {
+    margin-bottom: 15px;
+    padding-left: 20px;
+    list-style: decimal;
+  }
+  .prose li {
+    margin-bottom: 8px;
+  }
+  .prose img {
+    border-radius: 12px;
+    margin: 20px 0;
+    width: 100%;
+  }
+  .prose a {
+    color: var(--orange-yellow-crayola);
+    text-decoration: underline;
+  }
+  .prose blockquote {
+    border-left: 3px solid var(--orange-yellow-crayola);
+    padding-left: 15px;
+    margin: 20px 0;
+    font-style: italic;
+  }
+  .prose code {
+    background: var(--onyx);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+  .prose pre {
+    background: var(--eerie-black-1);
+    padding: 15px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 20px 0;
+  }
+  .prose pre code {
+    background: none;
+    padding: 0;
+  }
+</style>

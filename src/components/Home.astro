@@ -1,0 +1,15 @@
+---
+import about from '../data/about.ts';
+---
+
+<article class="about  active" data-page="home">
+  <header>
+    <p class="hero-subtitle">Welcome</p>
+    <h1 class="h1 article-title">I'm Yusra Imran</h1>
+  </header>
+
+  <section class="about-text">
+    {about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </section>
+
+</article>

@@ -1,0 +1,25 @@
+---
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Resume', href: '/resume/' },
+  { label: 'Portfolio', href: '/portfolio/' },
+  { label: 'Blog', href: '/blog/' },
+];
+
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string) {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+}
+---
+
+<nav class="navbar">
+  <ul class="navbar-list">
+    {navItems.map((item) => (
+      <li class="navbar-item">
+        <a href={item.href} class={`navbar-link${isActive(item.href) ? ' active' : ''}`}>{item.label}</a>
+      </li>
+    ))}
+  </ul>
+</nav>

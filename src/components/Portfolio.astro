@@ -1,0 +1,116 @@
+---
+import projects, { ProjectCategory } from '../data/projects.ts';
+
+const filterCategories = ['All', ...Object.values(ProjectCategory)];
+---
+
+<article class="portfolio  active" data-page="portfolio">
+  <header>
+    <h2 class="h2 article-title">Portfolio</h2>
+  </header>
+
+  <section class="projects">
+    <!-- Desktop filter -->
+    <ul class="filter-list">
+      {filterCategories.map((category, index) => (
+        <li class="filter-item">
+          <button class={index === 0 ? 'active' : ''} data-filter-btn>{category}</button>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Mobile filter -->
+    <div class="filter-select-box">
+      <button class="filter-select" data-select>
+        <div class="select-value" data-selecct-value>All</div>
+        <div class="select-icon">
+          <ion-icon name="chevron-down"></ion-icon>
+        </div>
+      </button>
+      <ul class="select-list">
+        {filterCategories.map((category) => (
+          <li class="select-item">
+            <button data-select-item>{category}</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <!-- Project list -->
+    <ul class="project-list">
+      {projects.map((project) => (
+        <li
+          class="project-item  active"
+          data-filter-item
+          data-category={project.category}
+        >
+          <a href={project.url} target="_blank" rel="noopener noreferrer">
+            <figure class="project-img">
+              <div class="project-item-icon-box">
+                <ion-icon name="eye-outline"></ion-icon>
+              </div>
+              <img
+                src={project.image.src}
+                alt={project.title.toLowerCase()}
+                loading="lazy"
+              />
+            </figure>
+            <h3 class="project-title">{project.title}</h3>
+            <p class="project-category">
+              {project.category}
+            </p>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</article>
+
+<script>
+  // Portfolio filter
+  const select = document.querySelector<HTMLElement>('[data-select]');
+  const selectItems = document.querySelectorAll<HTMLElement>('[data-select-item]');
+  const selectValue = document.querySelector<HTMLElement>('[data-selecct-value]');
+  const filterBtn = document.querySelectorAll<HTMLElement>('[data-filter-btn]');
+  const filterItems = document.querySelectorAll<HTMLElement>('[data-filter-item]');
+
+  function filterFunc(selectedValue: string) {
+    filterItems.forEach((item) => {
+      if (selectedValue === 'all') {
+        item.classList.add('active');
+      } else if (selectedValue === item.dataset.category?.toLowerCase()) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  }
+
+  if (select) {
+    select.addEventListener('click', function (this: HTMLElement) {
+      this.classList.toggle('active');
+    });
+  }
+
+  selectItems.forEach((item) => {
+    item.addEventListener('click', function (this: HTMLElement) {
+      const selectedValue = this.innerText.toLowerCase();
+      if (selectValue) selectValue.innerText = this.innerText;
+      if (select) select.classList.toggle('active');
+      filterFunc(selectedValue);
+    });
+  });
+
+  let lastClickedBtn: HTMLElement | undefined = filterBtn[0];
+  filterBtn.forEach((btn) => {
+    btn.addEventListener('click', function (this: HTMLElement) {
+      const selectedValue = this.innerText.toLowerCase();
+      if (selectValue) selectValue.innerText = this.innerText;
+      filterFunc(selectedValue);
+
+      if (lastClickedBtn) lastClickedBtn.classList.remove('active');
+      this.classList.add('active');
+      lastClickedBtn = this;
+    });
+  });
+</script>

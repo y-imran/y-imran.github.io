@@ -1,0 +1,78 @@
+import pakistanFlag from '@portfolio/pakistan_flag.png';
+import deadliestAnimals from '@portfolio/deadliest_animals.png'
+import businessDashboard from '@portfolio/business_dashboard.png'
+import patientDashboard from '@portfolio/patient_dashboard.png'
+import ufoSightings from '@portfolio/ufo_sightings.png'
+import sydneyForest from '@portfolio/sydney_forest.png'
+import containersFlags from '@portfolio/containers_flags.png'
+import launchExplorer from '@portfolio/launch_explorer.png'
+import parkinsonsDisease from '@portfolio/parkinsons_disease.png'
+
+export enum ProjectCategory {
+  TABLEAU = 'Tableau',
+  PYTHON = 'Python',
+}
+
+export interface Project {
+  image: ImageMetadata;
+  title: string;
+  category: ProjectCategory;
+  url: string;
+}
+
+const projects: Project[] = [
+  {
+    image: ufoSightings,
+    title: "Makeover Monday W25 2026: UFO sightings #VOTD",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/UFOSightingPatterns/Dashboard'
+  },
+    {
+    image: launchExplorer,
+    title: "Makeover Monday W26 2026: Global space launches explorer",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalLaunchExplorer/Dashboard1'
+  },
+  {
+    image: deadliestAnimals,
+    title: "Makeover Monday W37 2026: World's deadlist animals",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/TheWorldsDeadliestAnimals/Dashboard'
+  },
+  {
+    image: sydneyForest,
+    title: "Real trees data: The living forest of Sydney, Australia",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/TheLivingForestofSydney/Dashboard'
+  },
+  {
+    image: businessDashboard,
+    title: "Business dashboard: Superstore executive performance",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/SuperstoreExecutivePerformanceDashboard_17779194205120/Dashboard1'
+  }, {
+    image: patientDashboard,
+    title: "Healthcare fake data: Laboratory management system",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/LaboratoryManagementSystem/Overview'
+  }, {
+    image: containersFlags,
+    title: "Mathematical art: Country flags by containers",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/FlagsByContainers/Dashboard1'
+  },
+  {
+    image: pakistanFlag,
+    title: "Mathematical art: Parametric construction of the Pakistan flag",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/Celebrating78YearsOfIndependence/Flag'
+  },
+    {
+    image: parkinsonsDisease,
+    title: "Parkinson's disease: Features comparative analysis",
+    category: ProjectCategory.PYTHON,
+    url: 'https://github.com/y-imran/Parkinson-Disease-Analysis'
+  },
+];
+
+export default projects;
