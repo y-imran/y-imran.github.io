@@ -18,9 +18,10 @@ export default defineConfig({
   fonts: [
     {
       provider: fontProviders.google(),
-      name: 'Google Sans',
-      cssVariable: '--font-google-sans',
-      weights: [400, 500, 600, 700],
+      name: 'Poppins',
+      cssVariable: '--font-poppins',
+      // [font-light, font-normal, font-medium, font-bold, font-black]
+      weights: [300, 400, 500, 700, 900],
       styles: ['normal'],
       subsets: ['latin'],
     },

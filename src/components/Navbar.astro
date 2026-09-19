@@ -1,9 +1,9 @@
 ---
 const navItems = [
-  { label: 'Home', href: '/' },
-  { label: 'Resume', href: '/resume/' },
-  { label: 'Portfolio', href: '/portfolio/' },
-  { label: 'Blog', href: '/blog/' },
+  { label: 'Home', href: '/', icon: '/icons/home.svg' },
+  { label: 'Resume', href: '/resume/', icon: '/icons/resume.svg' },
+  { label: 'Portfolio', href: '/portfolio/', icon: '/icons/portfolio.svg' },
+  { label: 'Blog', href: '/blog/', icon: '/icons/blog.svg' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -18,7 +18,10 @@ function isActive(href: string) {
   <ul class="navbar-list">
     {navItems.map((item) => (
       <li class="navbar-item">
-        <a href={item.href} class={`navbar-link${isActive(item.href) ? ' active' : ''}`}>{item.label}</a>
+        <a href={item.href} class={`navbar-link${isActive(item.href) ? ' active' : ''}`}>
+          <span class="navbar-icon" style={`mask-image: url('${item.icon}'); -webkit-mask-image: url('${item.icon}');`}></span>
+          <span class="navbar-text">{item.label}</span>
+        </a>
       </li>
     ))}
   </ul>
