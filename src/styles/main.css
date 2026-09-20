@@ -1,0 +1,394 @@
+/*-----------------------------------*\
+  #main.css
+\*-----------------------------------*/
+
+@import "tailwindcss";
+
+/*-----------------------------------*\
+  #THEME (Tailwind design tokens)
+\*-----------------------------------*/
+
+@theme {
+  /* Colors */
+  --color-jet: hsl(0, 0%, 22%);
+  --color-onyx: hsl(240, 1%, 17%);
+  --color-eerie-black-1: hsl(240, 2%, 13%);
+  --color-eerie-black-2: hsl(240, 2%, 12%);
+  --color-smoky-black: hsl(0, 0%, 7%);
+  --color-white-1: hsl(0, 0%, 100%);
+  --color-white-2: hsl(0, 0%, 98%);
+  --color-orange-yellow-crayola: hsl(192, 85%, 47%);
+  --color-vegas-gold: hsl(192, 85%, 57%);
+  --color-light-gray: hsl(0, 0%, 84%);
+  --color-light-gray-70: hsla(0, 0%, 84%, 0.7);
+  --color-bittersweet-shimmer: hsl(192, 55%, 55%);
+
+  /* Breakpoints */
+  --breakpoint-sm: 450px;
+  --breakpoint-md: 580px;
+  --breakpoint-lg: 768px;
+  --breakpoint-xl: 1024px;
+  --breakpoint-2xl: 1250px;
+}
+
+/*-----------------------------------*\
+  #CUSTOM PROPERTIES
+\*-----------------------------------*/
+
+:root {
+  /* Gradients */
+  --bg-gradient-onyx: linear-gradient(
+    to bottom right,
+    hsl(240, 1%, 25%) 3%,
+    hsl(0, 0%, 19%) 97%
+  );
+  --bg-gradient-jet: linear-gradient(
+    to bottom right,
+    hsla(240, 1%, 18%, 0.251) 0%,
+    hsla(240, 2%, 11%, 0) 100%
+  ),
+  hsl(240, 2%, 13%);
+  --bg-gradient-yellow-1: linear-gradient(
+    to bottom right,
+    hsl(192, 85%, 47%) 0%,
+    hsla(210, 90%, 65%, 0) 50%
+  );
+  --bg-gradient-yellow-2: linear-gradient(
+    135deg,
+    hsla(192, 85%, 47%, 0.251) 0%,
+    hsla(210, 90%, 65%, 0) 59.86%
+  ),
+  hsl(240, 2%, 13%);
+  --border-gradient-onyx: linear-gradient(
+    to bottom right,
+    hsl(0, 0%, 25%) 0%,
+    hsla(0, 0%, 25%, 0) 50%
+  );
+  --text-gradient-yellow: linear-gradient(
+    to right,
+    hsl(192, 85%, 47%),
+    hsl(210, 90%, 65%)
+  );
+
+  /* Font sizes */
+  --fs-0: 31px;
+  --fs-1: 24px;
+  --fs-2: 18px;
+  --fs-3: 17px;
+  --fs-4: 16px;
+  --fs-5: 15px;
+  --fs-6: 14px;
+  --fs-7: 13px;
+  --fs-8: 11px;
+
+  /* Font weights */
+  --fw-300: 300;
+  --fw-400: 400;
+  --fw-500: 500;
+  --fw-600: 600;
+  --fw-900: 900;
+
+  /* Shadows */
+  --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.25);
+  --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.25);
+  --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.25);
+  --shadow-4: 0 25px 50px hsla(0, 0%, 0%, 0.15);
+  --shadow-5: 0 24px 80px hsla(0, 0%, 0%, 0.25);
+
+  /* Transitions */
+  --transition-1: 0.25s ease;
+  --transition-2: 0.5s ease-in-out;
+
+  /* Font family */
+  --ff-poppins: var(--font-poppins, sans-serif);
+}
+
+/* Responsive font sizes (580px) */
+@media (min-width: 580px) {
+  :root {
+    --fs-0: 41px;
+    --fs-1: 32px;
+    --fs-2: 24px;
+    --fs-3: 26px;
+    --fs-4: 18px;
+    --fs-6: 15px;
+    --fs-7: 15px;
+    --fs-8: 12px;
+  }
+}
+
+/* Responsive shadows (1024px) */
+@media (min-width: 1024px) {
+  :root {
+    --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.125);
+    --shadow-2: 0 16px 30px hsla(0, 0%, 0%, 0.125);
+    --shadow-3: 0 16px 40px hsla(0, 0%, 0%, 0.125);
+  }
+}
+
+/*-----------------------------------*\
+  #BASE (global resets)
+\*-----------------------------------*/
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  img,
+  ion-icon,
+  a,
+  button,
+  time,
+  span {
+    display: block;
+  }
+
+  button {
+    font: inherit;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  input,
+  textarea {
+    display: block;
+    width: 100%;
+    background: none;
+    font: inherit;
+  }
+
+  ::selection {
+    background: var(--color-orange-yellow-crayola);
+    color: var(--color-smoky-black);
+  }
+
+  :focus {
+    outline-color: var(--color-orange-yellow-crayola);
+  }
+
+  html {
+    font-family: var(--ff-poppins);
+  }
+
+  body {
+    background: var(--color-smoky-black);
+  }
+
+  @media (min-width: 1250px) {
+    body::-webkit-scrollbar {
+      width: 20px;
+    }
+
+    body::-webkit-scrollbar-track {
+      background: var(--color-smoky-black);
+    }
+
+    body::-webkit-scrollbar-thumb {
+      border: 5px solid var(--color-smoky-black);
+      background: hsla(0, 0%, 100%, 0.1);
+      border-radius: 20px;
+      box-shadow: inset 1px 1px 0 hsla(0, 0%, 100%, 0.11),
+        inset -1px -1px 0 hsla(0, 0%, 100%, 0.11);
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+      background: hsla(0, 0%, 100%, 0.15);
+    }
+
+    body::-webkit-scrollbar-button {
+      height: 60px;
+    }
+  }
+}
+
+/*-----------------------------------*\
+  #KEYFRAMES
+\*-----------------------------------*/
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(0.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/*-----------------------------------*\
+  #SHARED COMPONENT STYLES
+\*-----------------------------------*/
+
+@layer components {
+  /* Article base */
+  article {
+    background: var(--color-eerie-black-2);
+    border: 1px solid var(--color-jet);
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: var(--shadow-1);
+    z-index: 1;
+    display: none;
+  }
+
+  article.active {
+    display: block;
+    animation: fade 0.5s ease backwards;
+  }
+
+  @media (min-width: 580px) {
+    article {
+      width: 520px;
+      margin-inline: auto;
+      padding: 30px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    article {
+      width: 700px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    article {
+      width: 950px;
+      box-shadow: var(--shadow-5);
+    }
+  }
+
+  @media (min-width: 1250px) {
+    article {
+      width: auto;
+      min-height: 100%;
+    }
+  }
+
+  /* Article title */
+  .article-title {
+    position: relative;
+    padding-bottom: 7px;
+  }
+
+  .article-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 30px;
+    height: 3px;
+    background: var(--text-gradient-yellow);
+    border-radius: 3px;
+  }
+
+  @media (min-width: 580px) {
+    .article-title {
+      font-weight: var(--fw-600);
+      padding-bottom: 15px;
+    }
+
+    .article-title::after {
+      width: 40px;
+      height: 5px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .article-title {
+      padding-bottom: 20px;
+    }
+  }
+
+  /* Headings */
+  .h1,
+  .h2,
+  .h3,
+  .h4,
+  .h5 {
+    color: var(--color-white-2);
+    text-transform: capitalize;
+    font-weight: 700;
+  }
+
+  .h1 {
+    font-size: var(--fs-0);
+  }
+
+  .h2 {
+    font-size: var(--fs-1);
+  }
+
+  .h3 {
+    font-size: var(--fs-2);
+  }
+
+  .h4 {
+    font-size: var(--fs-4);
+  }
+
+  .h5 {
+    font-size: var(--fs-7);
+    font-weight: var(--fw-500);
+  }
+
+  /* Icon box */
+  .icon-box {
+    position: relative;
+    background: var(--border-gradient-onyx);
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: var(--color-orange-yellow-crayola);
+    box-shadow: var(--shadow-1);
+    z-index: 1;
+  }
+
+  .icon-box::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: var(--color-eerie-black-1);
+    border-radius: inherit;
+    z-index: -1;
+  }
+
+  .icon-box ion-icon {
+    --ionicon-stroke-width: 35px;
+  }
+
+  @media (min-width: 580px) {
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 18px;
+    }
+  }
+}

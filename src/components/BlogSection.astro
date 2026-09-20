@@ -5,28 +5,39 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<article class="blog  active" data-page="blog">
+<article class="blog active" data-page="blog">
   <header>
-    <h2 class="h2 article-title">Blog</h2>
+    <h2 class="h2 article-title mb-[30px]">Blog</h2>
   </header>
 
-  <section class="blog-posts">
-    <ul class="blog-posts-list">
+  <section class="blog-posts mb-[10px]">
+    <ul class="blog-posts-list grid grid-cols-1 gap-[20px] md:gap-[30px] lg:grid-cols-2">
       {posts.map((post) => (
         <li class="blog-post-item">
-          <a href={`/blog/${post.id}/`}>
-            <figure class="blog-banner-box">
+          <a
+            href={`/blog/${post.id}/`}
+            class="group relative block bg-[image:var(--border-gradient-onyx)] h-full shadow-[var(--shadow-4)] rounded-[16px] z-[1]"
+          >
+            <figure
+              class="blog-banner-box w-full h-[200px] rounded-[12px] overflow-hidden sm:h-auto md:rounded-[16px] xl:h-[230px]"
+            >
               <img
                 src={post.data.banner.src}
                 alt={post.data.title}
                 loading="lazy"
+                class="w-full h-full object-cover transition-all duration-[250ms] ease group-hover:scale-110"
               />
             </figure>
-            <div class="blog-content">
-              <div class="blog-meta">
-                <p class="blog-category">{post.data.category}</p>
-                <span class="dot"></span>
-                <time datetime={post.data.pubDate.toISOString()}>
+            <div class="blog-content p-[15px] md:p-[25px]">
+              <div class="blog-meta flex justify-start items-center gap-[7px] mb-[10px]">
+                <p class="blog-category text-light-gray-70 text-[length:var(--fs-6)] font-light">
+                  {post.data.category}
+                </p>
+                <span class="dot bg-light-gray-70 w-1 h-1 rounded-[4px]"></span>
+                <time
+                  datetime={post.data.pubDate.toISOString()}
+                  class="text-light-gray-70 text-[length:var(--fs-6)] font-light"
+                >
                   {post.data.pubDate.toLocaleDateString('en-US', {
                     month: 'short',
                     day: '2-digit',
@@ -34,8 +45,14 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
                   })}
                 </time>
               </div>
-              <h3 class="h3 blog-item-title">{post.data.title}</h3>
-              <p class="blog-text">{post.data.excerpt}</p>
+              <h3
+                class="h3 blog-item-title mb-[10px] leading-[1.3] transition-colors duration-[250ms] ease group-hover:text-orange-yellow-crayola"
+              >
+                {post.data.title}
+              </h3>
+              <p class="blog-text text-light-gray text-[length:var(--fs-6)] font-light leading-[1.6]">
+                {post.data.excerpt}
+              </p>
             </div>
           </a>
         </li>
@@ -43,3 +60,15 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     </ul>
   </section>
 </article>
+
+<style>
+  /* Blog post card — gradient border inner layer */
+  .blog-post-item > a::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: var(--color-eerie-black-1);
+    z-index: -1;
+  }
+</style>

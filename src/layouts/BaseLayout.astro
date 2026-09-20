@@ -1,6 +1,6 @@
 ---
 import { Font } from 'astro:assets';
-import '../styles/style.css';
+import '@src/styles/main.css';
 import Sidebar from '@components/Sidebar.astro';
 import Navbar from '@components/Navbar.astro';
 
@@ -35,9 +35,17 @@ const { title = 'Home - Yusra Imran', description } = Astro.props;
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
   </head>
   <body>
-    <main>
+    <main
+      class="mt-[15px] mx-3 mb-[75px] min-w-[259px]
+             md:mt-[60px] md:mb-[100px]
+             xl:mb-[60px]
+             2xl:max-w-[1200px] 2xl:mx-auto 2xl:flex 2xl:justify-center 2xl:items-stretch 2xl:gap-[25px]"
+    >
       <Sidebar />
-      <div class="main-content">
+      <div
+        class="xl:relative xl:w-max xl:m-auto
+               2xl:min-w-[75%] 2xl:w-[75%] 2xl:m-0"
+      >
         <Navbar />
         <slot />
       </div>

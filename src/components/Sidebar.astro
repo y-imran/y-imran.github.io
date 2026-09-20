@@ -1,62 +1,183 @@
 ---
-import profile from '../data/profile.ts';
+import profile from '@src/data/profile.ts';
 ---
 
-<aside class="sidebar" data-sidebar>
-  <div class="sidebar-info">
-    <figure class="avatar-box">
-      <img src={profile.avatar} alt={profile.name} width="80" />
+<aside
+  class="sidebar bg-eerie-black-2 border border-jet rounded-[20px] p-[15px] shadow-[var(--shadow-1)] z-[1]
+         mb-[15px] max-h-[112px] overflow-hidden transition-all duration-500 ease-in-out
+         md:w-[520px] md:mx-auto md:p-[30px] md:max-h-[180px] md:mb-[30px]
+         xl:w-[950px] xl:shadow-[var(--shadow-5)]
+         2xl:w-auto 2xl:sticky 2xl:top-[60px] 2xl:max-h-max 2xl:h-full 2xl:mb-0 2xl:pt-[60px]"
+  data-sidebar
+>
+  <div
+    class="sidebar-info relative flex justify-start items-center gap-[15px] md:gap-[25px] 2xl:flex-col"
+  >
+    <figure
+      class="avatar-box bg-[image:var(--bg-gradient-onyx)] rounded-full flex justify-center items-center overflow-hidden"
+    >
+      <img
+        src={profile.avatar}
+        alt={profile.name}
+        width="80"
+        class="object-cover rounded-full md:w-[120px] md:h-[120px] 2xl:w-[150px] 2xl:h-[150px]"
+      />
     </figure>
 
     <div class="info-content">
-      <h1 class="name" title={profile.name}>{profile.name}</h1>
-      <p class="title">{profile.title}</p>
+      <h1
+        class="name text-white-2 text-[length:var(--fs-3)] font-medium tracking-[-0.25px] mb-[10px] md:mb-[15px] 2xl:whitespace-nowrap 2xl:text-center"
+        title={profile.name}
+      >
+        {profile.name}
+      </h1>
+      <p
+        class="title text-white-1 bg-onyx text-[length:var(--fs-8)] font-light w-max px-3 py-[3px] rounded-lg md:px-[18px] md:py-[5px] 2xl:mx-auto"
+      >
+        {profile.title}
+      </p>
     </div>
 
-    <button class="info_more-btn" data-sidebar-btn>
-      <span>Show Contacts</span>
-      <ion-icon name="chevron-down"></ion-icon>
+    <button
+      class="info_more-btn absolute top-[-15px] right-[-15px] rounded-tr-[15px] rounded-bl-[15px] text-[13px] text-orange-yellow-crayola bg-[image:var(--border-gradient-onyx)] p-[10px] shadow-[var(--shadow-2)] transition-all duration-[250ms] ease z-[1] md:top-[-30px] md:right-[-30px] md:px-[15px] md:py-[10px] 2xl:hidden"
+      data-sidebar-btn
+    >
+      <span class="hidden md:block md:text-[length:var(--fs-8)]">Show Contacts</span>
+      <ion-icon name="chevron-down" class="md:hidden"></ion-icon>
     </button>
   </div>
 
-  <div class="sidebar-info_more">
+  <div
+    class="sidebar-info_more opacity-0 invisible transition-all duration-500 ease-in-out 2xl:opacity-100 2xl:visible"
+  >
     <div class="separator"></div>
 
-    <ul class="contacts-list">
-      <li class="contact-item">
+    <ul class="contacts-list grid grid-cols-1 gap-[16px] md:grid-cols-2 md:gap-y-[30px] md:gap-x-[15px] 2xl:grid-cols-1">
+      <li class="contact-item min-w-full flex items-center gap-[16px]">
         <div class="icon-box">
           <ion-icon name="mail-outline"></ion-icon>
         </div>
-        <div class="contact-info">
-          <p class="contact-title">Email</p>
-          <a href={`mailto:${profile.contacts.email}`} class="contact-link">{profile.contacts.email}</a>
+        <div
+          class="contact-info max-w-[calc(100%-46px)] w-[calc(100%-46px)] md:max-w-[calc(100%-64px)] md:w-[calc(100%-64px)]"
+        >
+          <p class="contact-title text-light-gray-70 text-[length:var(--fs-8)] uppercase mb-[2px]">Email</p>
+          <a
+            href={`mailto:${profile.contacts.email}`}
+            class="contact-link text-white-2 text-[length:var(--fs-7)] 2xl:whitespace-nowrap 2xl:overflow-hidden 2xl:text-ellipsis 2xl:text-[14px] 2xl:font-light"
+          >
+            {profile.contacts.email}
+          </a>
         </div>
       </li>
 
-      <li class="contact-item">
+      <li class="contact-item min-w-full flex items-center gap-[16px]">
         <div class="icon-box">
           <ion-icon name="location-outline"></ion-icon>
         </div>
-        <div class="contact-info">
-          <p class="contact-title">Location</p>
-          <address>{profile.contacts.location}</address>
+        <div
+          class="contact-info max-w-[calc(100%-46px)] w-[calc(100%-46px)] md:max-w-[calc(100%-64px)] md:w-[calc(100%-64px)]"
+        >
+          <p class="contact-title text-light-gray-70 text-[length:var(--fs-8)] uppercase mb-[2px]">Location</p>
+          <address class="text-white-2 text-[length:var(--fs-7)] not-italic 2xl:text-[14px] 2xl:font-light">
+            {profile.contacts.location}
+          </address>
         </div>
       </li>
     </ul>
 
     <div class="separator"></div>
 
-    <ul class="social-list">
+    <ul class="social-list flex justify-start items-center gap-[15px] pb-[4px] pl-[7px] 2xl:justify-center">
       {profile.socials.map((social) => (
         <li class="social-item">
-          <a href={social.url} class="social-link" aria-label={social.name} target="_blank" rel="noopener noreferrer">
-            <img src={social.icon} alt={social.name} width="18" height="18" />
+          <a
+            href={social.url}
+            class="social-link group text-light-gray-70 text-[18px]"
+            aria-label={social.name}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={social.icon}
+              alt={social.name}
+              width="18"
+              height="18"
+              class="opacity-70 transition-all duration-[250ms] ease group-hover:opacity-100"
+            />
           </a>
         </li>
       ))}
     </ul>
   </div>
 </aside>
+
+<style>
+  /* Sidebar active state — max-height transitions */
+  .sidebar.active {
+    max-height: 405px;
+  }
+
+  @media (min-width: 580px) {
+    .sidebar.active {
+      max-height: 584px;
+    }
+  }
+
+  @media (min-width: 1250px) {
+    .sidebar.active {
+      max-height: max-content;
+    }
+  }
+
+  /* Info more button — gradient layer pseudo-element */
+  .info_more-btn::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: var(--bg-gradient-jet);
+    transition: var(--transition-1);
+    z-index: -1;
+  }
+
+  .info_more-btn:hover,
+  .info_more-btn:focus {
+    background: var(--bg-gradient-yellow-1);
+  }
+
+  .info_more-btn:hover::before,
+  .info_more-btn:focus::before {
+    background: var(--bg-gradient-yellow-2);
+  }
+
+  /* Sidebar info more — visibility toggle on active */
+  .sidebar.active .sidebar-info_more {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Separator */
+  .separator {
+    width: 100%;
+    height: 1px;
+    background: var(--color-jet);
+    margin: 16px 0;
+  }
+
+  @media (min-width: 580px) {
+    .separator {
+      margin: 32px 0;
+    }
+  }
+
+  /* Separator — last one fades out at 2xl */
+  @media (min-width: 1250px) {
+    .separator:last-of-type {
+      margin: 15px 0;
+      opacity: 0;
+    }
+  }
+</style>
 
 <script>
   // Sidebar toggle functionality for mobile

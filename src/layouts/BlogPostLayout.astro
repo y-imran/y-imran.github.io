@@ -1,5 +1,5 @@
 ---
-import BaseLayout from './BaseLayout.astro';
+import BaseLayout from '@src/layouts/BaseLayout.astro';
 
 interface Props {
   title: string;
@@ -19,27 +19,35 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
 ---
 
 <BaseLayout title={`${title} - Yusra Imran`} description={excerpt}>
-  <article class="about  active" data-page="blog">
+  <article class="about active" data-page="blog">
     <header>
-      <a href="/blog/" class="navbar-link" style="display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-6); color: var(--orange-yellow-crayola); margin-bottom: 15px;">
+      <a
+        href="/blog/"
+        class="inline-flex items-center gap-1.5 text-[length:var(--fs-6)] text-orange-yellow-crayola mb-[15px]"
+      >
         <ion-icon name="arrow-back"></ion-icon>
         <span>Back to Blog</span>
       </a>
-      <h2 class="h2 article-title">{title}</h2>
+      <h2 class="h2 article-title mb-[30px]">{title}</h2>
     </header>
 
-    <section class="about-text">
-      <div class="blog-meta" style="display: flex; align-items: center; gap: 7px; margin-bottom: 20px;">
-        <p class="blog-category" style="color: var(--light-gray-70); font-size: var(--fs-6); font-weight: var(--fw-300);">{category}</p>
-        <span class="dot" style="background: var(--light-gray-70); width: 4px; height: 4px; border-radius: 4px;"></span>
-        <time datetime={pubDate.toISOString()} style="color: var(--light-gray-70); font-size: var(--fs-6); font-weight: var(--fw-300);">{formattedDate}</time>
+    <section class="about-text text-light-gray text-[length:var(--fs-6)] font-light leading-[1.6] md:mb-[40px]">
+      <div class="blog-meta flex items-center gap-[7px] mb-[20px]">
+        <p class="text-light-gray-70 text-[length:var(--fs-6)] font-light">{category}</p>
+        <span class="bg-light-gray-70 w-1 h-1 rounded-[4px]"></span>
+        <time
+          datetime={pubDate.toISOString()}
+          class="text-light-gray-70 text-[length:var(--fs-6)] font-light"
+        >
+          {formattedDate}
+        </time>
       </div>
 
-      <figure style="margin-bottom: 30px; border-radius: 16px; overflow: hidden;">
-        <img src={banner.src} alt={title} style="width: 100%; display: block;" />
+      <figure class="mb-[30px] rounded-[16px] overflow-hidden">
+        <img src={banner.src} alt={title} class="w-full" />
       </figure>
 
-      <div class="prose" style="color: var(--light-gray); font-size: var(--fs-6); font-weight: var(--fw-300); line-height: 1.6;">
+      <div class="prose">
         <slot />
       </div>
     </section>
@@ -48,14 +56,14 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
 
 <style>
   .prose h2 {
-    color: var(--white-2);
+    color: var(--color-white-2);
     font-size: var(--fs-2);
     font-weight: var(--fw-500);
     margin-top: 30px;
     margin-bottom: 15px;
   }
   .prose h3 {
-    color: var(--white-2);
+    color: var(--color-white-2);
     font-size: var(--fs-3);
     font-weight: var(--fw-500);
     margin-top: 25px;
@@ -83,24 +91,24 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
     width: 100%;
   }
   .prose a {
-    color: var(--orange-yellow-crayola);
+    color: var(--color-orange-yellow-crayola);
     text-decoration: underline;
   }
   .prose blockquote {
-    border-left: 3px solid var(--orange-yellow-crayola);
+    border-left: 3px solid var(--color-orange-yellow-crayola);
     padding-left: 15px;
     margin: 20px 0;
     font-style: italic;
   }
   .prose code {
-    background: var(--onyx);
+    background: var(--color-onyx);
     padding: 2px 6px;
     border-radius: 4px;
     font-family: monospace;
     font-size: 0.9em;
   }
   .prose pre {
-    background: var(--eerie-black-1);
+    background: var(--color-eerie-black-1);
     padding: 15px;
     border-radius: 12px;
     overflow-x: auto;

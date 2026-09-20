@@ -1,66 +1,108 @@
 ---
-import timeline from '../data/timeline.ts';
+import timeline from '@src/data/timeline.ts';
 ---
 
-<article class="resume  active" data-page="resume">
+<article class="resume active" data-page="resume">
   <header>
-    <h2 class="h2 article-title">Resume</h2>
+    <h2 class="h2 article-title mb-[30px]">Resume</h2>
   </header>
 
   <!-- Projects -->
-  <section class="timeline">
-    <div class="title-wrapper">
+  <section class="timeline mb-[30px]">
+    <div class="title-wrapper flex items-center gap-[15px] mb-[25px]">
       <div class="icon-box">
         <ion-icon name="book-outline"></ion-icon>
       </div>
       <h3 class="h3">Projects</h3>
     </div>
-    <ol class="timeline-list">
+    <ol class="timeline-list text-[length:var(--fs-6)] ml-[45px] md:ml-[65px]">
       {timeline.projects.map((item) => (
-        <li class="timeline-item">
-          <h4 class="h4 timeline-item-title">{item.title}</h4>
-          <span>{item.subTitle}</span>
-          <p class="timeline-text">{item.description}</p>
+        <li class="timeline-item relative">
+          <h4 class="h4 timeline-item-title text-[length:var(--fs-6)] leading-[1.3] mb-[7px]">{item.title}</h4>
+          <span class="text-vegas-gold font-normal leading-[1.6]">{item.subTitle}</span>
+          <p class="timeline-text text-light-gray font-light leading-[1.6] 2xl:max-w-[700px]">{item.description}</p>
         </li>
       ))}
     </ol>
   </section>
 
   <!-- Achievements -->
-  <section class="timeline">
-    <div class="title-wrapper">
+  <section class="timeline mb-[30px]">
+    <div class="title-wrapper flex items-center gap-[15px] mb-[25px]">
       <div class="icon-box">
         <ion-icon name="book-outline"></ion-icon>
       </div>
       <h3 class="h3">Achievements</h3>
     </div>
-    <ol class="timeline-list">
+    <ol class="timeline-list text-[length:var(--fs-6)] ml-[45px] md:ml-[65px]">
       {timeline.achievements.map((item) => (
-        <li class="timeline-item">
-          <h4 class="h4 timeline-item-title">{item.title}</h4>
-          <span>{item.subTitle}</span>
-          <p class="timeline-text">{item.description}</p>
+        <li class="timeline-item relative">
+          <h4 class="h4 timeline-item-title text-[length:var(--fs-6)] leading-[1.3] mb-[7px]">{item.title}</h4>
+          <span class="text-vegas-gold font-normal leading-[1.6]">{item.subTitle}</span>
+          <p class="timeline-text text-light-gray font-light leading-[1.6] 2xl:max-w-[700px]">{item.description}</p>
         </li>
       ))}
     </ol>
   </section>
 
   <!-- Education -->
-  <section class="timeline">
-    <div class="title-wrapper">
+  <section class="timeline mb-[30px]">
+    <div class="title-wrapper flex items-center gap-[15px] mb-[25px]">
       <div class="icon-box">
         <ion-icon name="book-outline"></ion-icon>
       </div>
       <h3 class="h3">Education</h3>
     </div>
-    <ol class="timeline-list">
+    <ol class="timeline-list text-[length:var(--fs-6)] ml-[45px] md:ml-[65px]">
       {timeline.education.map((item) => (
-        <li class="timeline-item">
-          <h4 class="h4 timeline-item-title">{item.title}</h4>
-          <span>{item.subTitle}</span>
-          <p class="timeline-text">{item.description}</p>
+        <li class="timeline-item relative">
+          <h4 class="h4 timeline-item-title text-[length:var(--fs-6)] leading-[1.3] mb-[7px]">{item.title}</h4>
+          <span class="text-vegas-gold font-normal leading-[1.6]">{item.subTitle}</span>
+          <p class="timeline-text text-light-gray font-light leading-[1.6] 2xl:max-w-[700px]">{item.description}</p>
         </li>
       ))}
     </ol>
   </section>
 </article>
+
+<style>
+  /* Timeline — vertical line connector */
+  .timeline-item:not(:last-child) {
+    margin-bottom: 20px;
+  }
+
+  .timeline-item:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: -25px;
+    left: -30px;
+    width: 1px;
+    height: calc(100% + 50px);
+    background: var(--color-jet);
+  }
+
+  /* Timeline — gradient dot marker */
+  .timeline-item::after {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: -33px;
+    height: 6px;
+    width: 6px;
+    background: var(--text-gradient-yellow);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--color-jet);
+  }
+
+  @media (min-width: 580px) {
+    .timeline-item:not(:last-child)::before {
+      left: -40px;
+    }
+
+    .timeline-item::after {
+      height: 8px;
+      width: 8px;
+      left: -43px;
+    }
+  }
+</style>

@@ -14,15 +14,41 @@ function isActive(href: string) {
 }
 ---
 
-<nav class="navbar">
-  <ul class="navbar-list">
+<nav
+  class="navbar fixed bottom-0 left-0 w-full bg-[hsla(240,1%,17%,0.75)] backdrop-blur-[10px] border border-jet rounded-t-[12px] shadow-[var(--shadow-2)] z-[5]
+         md:rounded-t-[20px]
+         xl:absolute xl:bottom-auto xl:top-0 xl:left-auto xl:right-0 xl:w-max xl:rounded-tl-none xl:rounded-tr-[20px] xl:rounded-br-none xl:rounded-bl-[20px] xl:px-[20px] xl:shadow-none"
+>
+  <ul
+    class="navbar-list flex flex-wrap justify-center items-center gap-[15px] px-[10px] md:gap-[20px] xl:gap-[30px] xl:px-[20px]"
+  >
     {navItems.map((item) => (
       <li class="navbar-item">
-        <a href={item.href} class={`navbar-link${isActive(item.href) ? ' active' : ''}`}>
-          <span class="navbar-icon" style={`mask-image: url('${item.icon}'); -webkit-mask-image: url('${item.icon}');`}></span>
+        <a
+          href={item.href}
+          class={`navbar-link text-light-gray text-[length:var(--fs-8)] py-5 px-[7px] flex flex-col items-center gap-1.5 transition-colors duration-[250ms] ease hover:text-light-gray-70 focus:text-light-gray-70 lg:text-[15px] xl:flex-row xl:gap-0${isActive(item.href) ? ' active' : ''}`}
+        >
+          <span
+            class="navbar-icon w-[24px] h-[24px] flex-shrink-0 bg-current [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:center] xl:hidden"
+            style={`mask-image: url('${item.icon}'); -webkit-mask-image: url('${item.icon}');`}
+          ></span>
           <span class="navbar-text">{item.label}</span>
         </a>
       </li>
     ))}
   </ul>
 </nav>
+
+<style>
+  /* Active nav link */
+  .navbar-link.active {
+    color: var(--color-orange-yellow-crayola);
+  }
+
+  /* Medium font-weight on desktop */
+  @media (min-width: 1024px) {
+    .navbar-link {
+      font-weight: 500;
+    }
+  }
+</style>
