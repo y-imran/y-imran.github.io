@@ -3,6 +3,7 @@ import { Font } from 'astro:assets';
 import '@src/styles/main.css';
 import Sidebar from '@components/Sidebar.astro';
 import Navbar from '@components/Navbar.astro';
+import Footer from '@components/ui/Footer.astro';
 
 interface Props {
   title?: string;
@@ -48,6 +49,7 @@ const { title = 'Home - Yusra Imran', description } = Astro.props;
       >
         <Navbar />
         <slot />
+        <Footer />
       </div>
     </main>
   </body>
