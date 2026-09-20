@@ -1,0 +1,157 @@
+---
+import type { TableauVisualization } from '@src/data/tableau-visualizations.ts';
+import TableauTimelineCalendar from './TableauTimelineCalendar.astro';
+import TableauVisualizationPreview from './TableauVisualizationPreview.astro';
+
+interface Props {
+  visualizations: TableauVisualization[];
+}
+
+const { visualizations } = Astro.props;
+
+const totalVisualizations = visualizations.length;
+const votdCount = visualizations.filter((viz) => viz.isVotd).length;
+---
+
+<section class="tv-root" data-tv-root aria-labelledby="tv-heading">
+  <p class="tv-eyebrow">Tableau work</p>
+  <h2 class="tv-heading article-title" id="tv-heading">Tableau Visualization Timeline</h2>
+  <p class="tv-description">
+    A visual record of my Tableau work, showing when each visualization was published.
+  </p>
+
+  <div class="tv-stats">
+    <div class="tv-stat">
+      <span class="tv-stat-value">{totalVisualizations}</span>
+      <span class="tv-stat-label">Vizs</span>
+    </div>
+    <div class="tv-stat">
+      <span class="tv-stat-value tv-stat-value-votd">{votdCount}</span>
+      <span class="tv-stat-label">VOTD</span>
+    </div>
+  </div>
+
+  <TableauTimelineCalendar visualizations={visualizations} />
+
+  <div class="tv-legend" aria-label="Timeline legend">
+    <div class="tv-legend-item">
+      <span class="tv-legend-swatch tv-cell-viz"></span>
+      <span>Visualization</span>
+    </div>
+    <div class="tv-legend-item">
+      <span class="tv-legend-swatch tv-cell-votd"></span>
+      <span>Viz of the Day (VOTD)</span>
+    </div>
+  </div>
+
+  <TableauVisualizationPreview />
+</section>
+
+<style>
+  .tv-root {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tv-eyebrow {
+    color: var(--color-orange-yellow-crayola);
+    font-size: var(--fs-7);
+    font-weight: var(--fw-500);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .tv-heading {
+    margin-bottom: 0;
+    color: var(--color-white-2);
+    font-size: var(--fs-2);
+    font-weight: var(--fw-500);
+    text-transform: capitalize;
+  }
+
+  .tv-description {
+    color: var(--color-light-gray);
+    font-size: var(--fs-6);
+    font-weight: var(--fw-300);
+    line-height: 1.6;
+    margin-top: 14px;
+  }
+
+  .tv-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+    margin-bottom: 28px;
+  }
+
+  .tv-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 22px;
+    border-radius: 14px;
+    background: var(--color-eerie-black-1);
+    border: 1px solid var(--color-jet);
+    min-width: 110px;
+  }
+
+  .tv-stat-value {
+    color: var(--color-white-2);
+    font-size: var(--fs-1);
+    font-weight: var(--fw-900);
+    line-height: 1;
+  }
+
+  .tv-stat-value-votd {
+    color: var(--color-orange-yellow-crayola);
+  }
+
+  .tv-stat-label {
+    color: var(--color-light-gray-70);
+    font-size: var(--fs-8);
+    font-weight: var(--fw-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tv-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 22px;
+    align-items: center;
+  }
+
+  .tv-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--color-light-gray-70);
+    font-size: var(--fs-8);
+    font-weight: var(--fw-400);
+  }
+
+  .tv-legend-swatch {
+    width: 13px;
+    height: 13px;
+    border-radius: 3px;
+    display: inline-block;
+    border: 1px solid var(--color-jet);
+  }
+
+  .tv-legend-swatch.tv-cell-viz {
+    background: color-mix(
+      in srgb,
+      var(--color-orange-yellow-crayola) 38%,
+      var(--color-eerie-black-1)
+    );
+    border-color: transparent;
+  }
+  .tv-legend-swatch.tv-cell-votd {
+    background: var(--color-orange-yellow-crayola);
+    border-color: transparent;
+  }
+</style>

@@ -1,0 +1,323 @@
+---
+import type { TableauVisualization } from '@src/data/tableau-visualizations.ts';
+import TableauVizCard from './TableauVizCard.astro';
+
+interface Props {
+  visualizations: TableauVisualization[];
+}
+
+const { visualizations } = Astro.props;
+
+const byDate = new Map<string, TableauVisualization[]>();
+for (const viz of visualizations) {
+  const list = byDate.get(viz.publishedDate) ?? [];
+  list.push(viz);
+  byDate.set(viz.publishedDate, list);
+}
+
+for (const list of byDate.values()) {
+  list.sort((a, b) => {
+    const av = a.isVotd ? 1 : 0;
+    const bv = b.isVotd ? 1 : 0;
+    if (av !== bv) return bv - av;
+    return a.title.localeCompare(b.title);
+  });
+}
+
+const sortedDates = [...byDate.keys()].sort();
+
+const parseISO = (s: string): Date => {
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+const isoOf = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const monthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fullMonth = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const fullWeekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+let weeks: Date[][] = [];
+let monthLabels: { label: string; col: number }[] = [];
+
+if (sortedDates.length > 0) {
+  const minDate = parseISO(sortedDates[0]);
+  const maxDate = parseISO(sortedDates[sortedDates.length - 1]);
+
+  const start = new Date(minDate);
+  start.setDate(start.getDate() - start.getDay());
+  const end = new Date(maxDate);
+  end.setDate(end.getDate() + (6 - end.getDay()));
+  const FUTURE_PADDING_WEEKS = 2;
+  end.setDate(end.getDate() + FUTURE_PADDING_WEEKS * 7);
+
+  const cursor = new Date(start);
+  weeks = [];
+  while (cursor <= end) {
+    const week: Date[] = [];
+    for (let i = 0; i < 7; i++) {
+      week.push(new Date(cursor));
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    weeks.push(week);
+  }
+
+  const placed = new Set<number>();
+  weeks.forEach((week, col) => {
+    const firstOfMonth = week.find((d) => d.getDate() === 1);
+    if (firstOfMonth) {
+      const key = firstOfMonth.getFullYear() * 12 + firstOfMonth.getMonth();
+      if (!placed.has(key)) {
+        placed.add(key);
+        monthLabels.push({ label: monthAbbr[firstOfMonth.getMonth()], col });
+      }
+    }
+  });
+}
+
+const weekdayRows = [0, 1, 2, 3, 4, 5, 6];
+const weekdayLabels: Record<number, string> = { 1: 'Mon', 3: 'Wed', 5: 'Fri' };
+
+const formatDate = (date: Date) =>
+  `${fullMonth[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+const buildAriaLabel = (date: Date, vizes: TableauVisualization[]): string => {
+  const titles = vizes.map((v) => v.title).join('; ');
+  const votd = vizes.some((v) => v.isVotd);
+  return `${formatDate(date)} — ${titles}${votd ? ' — VOTD' : ''}`;
+};
+
+const cellStateClass = (vizes?: TableauVisualization[]): string => {
+  if (!vizes) return 'tv-cell tv-cell-empty';
+  return vizes.some((v) => v.isVotd) ? 'tv-cell tv-cell-votd' : 'tv-cell tv-cell-viz';
+};
+---
+
+{
+  sortedDates.length === 0 ? (
+    <p class="tv-empty">No visualizations published yet.</p>
+  ) : (
+    <div class="tv-viewport" data-tv-viewport>
+      <div
+        class="tv-grid"
+        style={`grid-template-columns: var(--tv-wd) repeat(${weeks.length}, var(--tv-cell)); grid-template-rows: var(--tv-month-h) repeat(7, var(--tv-cell));`}
+      >
+        <div class="tv-corner" aria-hidden="true" />
+        {
+          monthLabels.map((m) => (
+            <div class="tv-month-label" style={`grid-column: ${m.col + 2};`}>
+              {m.label}
+            </div>
+          ))
+        }
+
+        {weekdayRows.map((d) => (
+          <>
+            <div
+              class="tv-weekday-label"
+              style={`grid-row: ${d + 2};`}
+              aria-hidden={weekdayLabels[d] ? 'false' : 'true'}
+            >
+              {weekdayLabels[d] ?? ''}
+            </div>
+            {weeks.map((week, col) => {
+              const date = week[d];
+              const iso = isoOf(date);
+              const vizes = byDate.get(iso);
+              const tplId = `tv-tpl-${iso}`;
+              const interactive = !!vizes;
+              return interactive ? (
+                <button
+                  type="button"
+                  class={cellStateClass(vizes)}
+                  style={`grid-column: ${col + 2}; grid-row: ${d + 2};`}
+                  data-tv-cell=""
+                  data-tv-tpl={tplId}
+                  aria-label={buildAriaLabel(date, vizes!)}
+                >
+                  {vizes!.some((v) => v.isVotd) && (
+                    <span class="tv-cell-star" aria-hidden="true">
+                      <ion-icon name="star" />
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <div
+                  class={cellStateClass(undefined)}
+                  style={`grid-column: ${col + 2}; grid-row: ${d + 2};`}
+                  aria-hidden="true"
+                />
+              );
+            })}
+          </>
+        ))}
+      </div>
+
+      {[...byDate.entries()].map(([iso, vizes]) => (
+        <template id={`tv-tpl-${iso}`}>
+          <TableauVizCard date={iso} visualizations={vizes} />
+        </template>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .tv-viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+
+  .tv-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tv-grid {
+    --tv-cell: 13px;
+    --tv-gap: 3px;
+    --tv-wd: 38px;
+    --tv-month-h: 22px;
+
+    display: grid;
+    width: max-content;
+    column-gap: var(--tv-gap);
+    row-gap: var(--tv-gap);
+  }
+
+  .tv-corner {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    background: var(--color-eerie-black-2);
+  }
+
+  .tv-month-label {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--color-eerie-black-2);
+    height: var(--tv-month-h, 22px);
+    display: flex;
+    align-items: center;
+    color: var(--color-light-gray-70);
+    font-size: var(--fs-8);
+    font-weight: var(--fw-500);
+    white-space: nowrap;
+    overflow: visible;
+  }
+
+  .tv-weekday-label {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--color-eerie-black-2);
+    width: var(--tv-wd, 38px);
+    height: var(--tv-cell, 13px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    overflow: visible;
+    color: var(--color-light-gray-70);
+    font-size: var(--fs-8);
+    font-weight: var(--fw-500);
+    line-height: 1;
+  }
+
+  .tv-cell {
+    width: var(--tv-cell, 13px);
+    height: var(--tv-cell, 13px);
+    border-radius: 3px;
+    padding: 0;
+    border: 1px solid var(--color-jet);
+    position: relative;
+    transition: transform var(--transition-1), box-shadow var(--transition-1);
+  }
+
+  .tv-cell-empty {
+    background: var(--color-eerie-black-1);
+  }
+
+  .tv-cell-viz {
+    background: color-mix(
+      in srgb,
+      var(--color-orange-yellow-crayola) 38%,
+      var(--color-eerie-black-1)
+    );
+    border-color: transparent;
+    cursor: pointer;
+  }
+
+  .tv-cell-votd {
+    background: var(--color-orange-yellow-crayola);
+    border-color: transparent;
+    cursor: pointer;
+  }
+
+  .tv-cell-viz:hover,
+  .tv-cell-votd:hover {
+    transform: scale(1.35);
+    z-index: 1;
+  }
+
+  .tv-cell:focus-visible {
+    outline: 2px solid var(--color-orange-yellow-crayola);
+    outline-offset: 1px;
+  }
+
+  .tv-cell-star {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-smoky-black);
+    font-size: 8px;
+    pointer-events: none;
+  }
+
+  .tv-cell-star ion-icon {
+    font-size: 8px;
+  }
+
+  .tv-empty {
+    color: var(--color-light-gray-70);
+    font-size: var(--fs-6);
+    font-weight: var(--fw-300);
+    padding: 20px 0;
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tv-cell {
+      transition: none;
+    }
+    .tv-cell-viz:hover,
+    .tv-cell-votd:hover {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  function scrollTimelineToEnd() {
+    const viewport = document.querySelector<HTMLElement>('[data-tv-viewport]');
+    if (!viewport) return;
+    requestAnimationFrame(() => {
+      viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scrollTimelineToEnd);
+  } else {
+    scrollTimelineToEnd();
+  }
+</script>

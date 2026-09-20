@@ -1,0 +1,369 @@
+<div class="tv-popover" data-tv-popover hidden>
+  <div class="tv-popover-content" data-tv-popover-content></div>
+</div>
+
+<div class="tv-sheet-backdrop" data-tv-sheet-backdrop hidden></div>
+<div
+  class="tv-sheet"
+  data-tv-sheet
+  role="dialog"
+  aria-modal="true"
+  aria-label="Tableau visualization details"
+  hidden
+>
+  <div class="tv-sheet-handle" aria-hidden="true"></div>
+  <button class="tv-sheet-close" type="button" data-tv-sheet-close aria-label="Close details">
+    <ion-icon name="close-outline"></ion-icon>
+  </button>
+  <div class="tv-sheet-content" data-tv-sheet-content></div>
+</div>
+
+<style>
+  .tv-popover {
+    position: fixed;
+    z-index: 50;
+    width: 280px;
+    max-width: calc(100vw - 16px);
+    padding: 14px;
+    border-radius: 16px;
+    background: var(--color-eerie-black-1);
+    border: 1px solid var(--color-jet);
+    box-shadow: var(--shadow-3);
+    pointer-events: auto;
+  }
+
+  .tv-popover[hidden] {
+    display: none;
+  }
+
+  .tv-popover::before {
+    content: '';
+    position: absolute;
+    left: var(--tv-arrow-x, 50%);
+    bottom: -6px;
+    width: 12px;
+    height: 12px;
+    background: var(--color-eerie-black-1);
+    border-right: 1px solid var(--color-jet);
+    border-bottom: 1px solid var(--color-jet);
+    border-bottom-right-radius: 3px;
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .tv-popover[data-placement='bottom']::before {
+    bottom: auto;
+    top: -6px;
+    border-right: none;
+    border-bottom: none;
+    border-bottom-right-radius: 0;
+    border-top: 1px solid var(--color-jet);
+    border-left: 1px solid var(--color-jet);
+    border-top-left-radius: 3px;
+  }
+
+  .tv-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: hsla(0, 0%, 0%, 0.6);
+    backdrop-filter: blur(2px);
+  }
+
+  .tv-sheet-backdrop[hidden] {
+    display: none;
+  }
+
+  .tv-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 61;
+    max-height: 82vh;
+    overflow-y: auto;
+    padding: 10px 16px 24px;
+    border-radius: 20px 20px 0 0;
+    background: var(--color-eerie-black-1);
+    border-top: 1px solid var(--color-jet);
+    box-shadow: var(--shadow-5);
+    transform: translateY(100%);
+    transition: transform var(--transition-2);
+  }
+
+  .tv-sheet[hidden] {
+    display: none;
+  }
+
+  .tv-sheet[data-open] {
+    transform: translateY(0);
+  }
+
+  .tv-sheet-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-jet);
+    margin: 0 auto 16px;
+  }
+
+  .tv-sheet-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--color-light-gray-70);
+    background: var(--color-onyx);
+    border: 1px solid var(--color-jet);
+    font-size: 18px;
+    transition: color var(--transition-1);
+  }
+
+  .tv-sheet-close:hover,
+  .tv-sheet-close:focus-visible {
+    color: var(--color-white-2);
+  }
+
+  .tv-sheet-content {
+    padding-top: 24px;
+  }
+
+  @media (min-width: 768px) {
+    .tv-sheet {
+      max-width: 420px;
+      left: 50%;
+      right: auto;
+      transform: translate(-50%, 100%);
+    }
+    .tv-sheet[data-open] {
+      transform: translate(-50%, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tv-sheet {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function initTableauPreview() {
+    const root = document.querySelector<HTMLElement>('[data-tv-root]');
+    if (!root) return;
+
+    const cells = Array.from(root.querySelectorAll<HTMLElement>('[data-tv-cell]'));
+    if (cells.length === 0) return;
+
+    const popover = root.querySelector<HTMLElement>('[data-tv-popover]');
+    const popoverContent = root.querySelector<HTMLElement>('[data-tv-popover-content]');
+    const sheet = root.querySelector<HTMLElement>('[data-tv-sheet]');
+    const sheetContent = root.querySelector<HTMLElement>('[data-tv-sheet-content]');
+    const backdrop = root.querySelector<HTMLElement>('[data-tv-sheet-backdrop]');
+    const closeBtn = root.querySelector<HTMLElement>('[data-tv-sheet-close]');
+
+    if (!popover || !popoverContent || !sheet || !sheetContent || !backdrop || !closeBtn) return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isDesktop = () => window.matchMedia('(min-width: 768px)').matches;
+
+    let hideTimer: number | undefined;
+    let lastFocusedCell: HTMLElement | null = null;
+
+    const cloneTemplate = (id: string): DocumentFragment | null => {
+      const tpl = document.getElementById(id);
+      return tpl ? (tpl.content.cloneNode(true) as DocumentFragment) : null;
+    };
+
+    const showPopover = (cell: HTMLElement) => {
+      const tplId = cell.dataset.tvTpl;
+      if (!tplId) return;
+      const clone = cloneTemplate(tplId);
+      if (!clone) return;
+      popoverContent.replaceChildren(clone);
+      popover.removeAttribute('hidden');
+      positionPopover(cell);
+    };
+
+    const hidePopover = () => {
+      popover.setAttribute('hidden', '');
+      popoverContent.replaceChildren();
+    };
+
+    const positionPopover = (cell: HTMLElement) => {
+      const rect = cell.getBoundingClientRect();
+      const pw = popover.offsetWidth;
+      const ph = popover.offsetHeight;
+      const pad = 8;
+      const gap = 8;
+
+      let left = rect.left + rect.width / 2 - pw / 2;
+      if (left < pad) left = pad;
+      if (left + pw > window.innerWidth - pad) left = window.innerWidth - pw - pad;
+
+      let top = rect.top - ph - gap;
+      let placement = 'top';
+      if (top < pad) {
+        top = rect.bottom + gap;
+        placement = 'bottom';
+      }
+
+      popover.style.left = `${left}px`;
+      popover.style.top = `${top}px`;
+      popover.dataset.placement = placement;
+
+      const arrowX = rect.left + rect.width / 2 - left;
+      const clampedArrowX = Math.max(16, Math.min(pw - 16, arrowX));
+      popover.style.setProperty('--tv-arrow-x', `${clampedArrowX}px`);
+    };
+
+    const openSheet = (cell: HTMLElement) => {
+      const tplId = cell.dataset.tvTpl;
+      if (!tplId) return;
+      const clone = cloneTemplate(tplId);
+      if (!clone) return;
+      sheetContent.replaceChildren(clone);
+      backdrop.removeAttribute('hidden');
+      sheet.removeAttribute('hidden');
+      if (!prefersReduced) {
+        requestAnimationFrame(() => sheet.setAttribute('data-open', ''));
+      } else {
+        sheet.setAttribute('data-open', '');
+      }
+      document.body.style.overflow = 'hidden';
+      lastFocusedCell = cell;
+      closeBtn.focus();
+    };
+
+    const closeSheet = () => {
+      sheet.removeAttribute('data-open');
+      const finish = () => {
+        sheet.setAttribute('hidden', '');
+        backdrop.setAttribute('hidden', '');
+        sheetContent.replaceChildren();
+        document.body.style.overflow = '';
+        if (lastFocusedCell) {
+          lastFocusedCell.focus();
+          lastFocusedCell = null;
+        }
+      };
+      if (prefersReduced) {
+        finish();
+      } else {
+        window.setTimeout(finish, 520);
+      }
+    };
+
+    cells.forEach((cell) => {
+      cell.addEventListener('mouseenter', () => {
+        if (!isDesktop()) return;
+        if (hideTimer) {
+          window.clearTimeout(hideTimer);
+          hideTimer = undefined;
+        }
+        showPopover(cell);
+      });
+
+      cell.addEventListener('focus', () => {
+        if (!isDesktop()) return;
+        if (hideTimer) {
+          window.clearTimeout(hideTimer);
+          hideTimer = undefined;
+        }
+        showPopover(cell);
+      });
+
+      cell.addEventListener('mouseleave', () => {
+        if (!isDesktop()) return;
+        hideTimer = window.setTimeout(() => {
+          if (!popover.matches(':hover')) hidePopover();
+        }, 90);
+      });
+
+      cell.addEventListener('blur', (event) => {
+        if (!isDesktop()) return;
+        const next = event.relatedTarget as HTMLElement | null;
+        if (next && popover.contains(next)) return;
+        hidePopover();
+      });
+
+      cell.addEventListener('click', () => {
+        if (isDesktop()) {
+          showPopover(cell);
+        } else {
+          openSheet(cell);
+        }
+      });
+
+      cell.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          if (isDesktop()) {
+            showPopover(cell);
+          } else {
+            openSheet(cell);
+          }
+        }
+      });
+    });
+
+    popover.addEventListener('mouseenter', () => {
+      if (hideTimer) {
+        window.clearTimeout(hideTimer);
+        hideTimer = undefined;
+      }
+    });
+    popover.addEventListener('mouseleave', () => {
+      hidePopover();
+    });
+
+    popover.addEventListener('focusin', () => {
+      if (hideTimer) {
+        window.clearTimeout(hideTimer);
+        hideTimer = undefined;
+      }
+    });
+    popover.addEventListener('focusout', (event) => {
+      const next = event.relatedTarget as HTMLElement | null;
+      if (next && (popover.contains(next) || cells.includes(next))) return;
+      hidePopover();
+    });
+
+    closeBtn.addEventListener('click', closeSheet);
+    backdrop.addEventListener('click', closeSheet);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (!sheet.hasAttribute('hidden')) {
+        closeSheet();
+      } else if (!popover.hasAttribute('hidden')) {
+        hidePopover();
+      }
+    });
+
+    let lastCell: HTMLElement | null = null;
+    const reposition = () => {
+      const activeCell = document.activeElement as HTMLElement | null;
+      if (activeCell && activeCell.dataset.tvCell !== undefined) {
+        positionPopover(activeCell);
+      } else if (lastCell && !popover.hasAttribute('hidden')) {
+        positionPopover(lastCell);
+      }
+    };
+    cells.forEach((cell) => {
+      cell.addEventListener('focus', () => (lastCell = cell));
+    });
+    window.addEventListener('resize', reposition);
+    window.addEventListener('scroll', reposition, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTableauPreview);
+  } else {
+    initTableauPreview();
+  }
+</script>

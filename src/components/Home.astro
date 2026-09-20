@@ -1,5 +1,7 @@
 ---
 import about from '@src/data/about.ts';
+import tableauVisualizations from '@src/data/tableau-visualizations.ts';
+import TableauVisualizationTimeline from '@components/ui/tableau/TableauVisualizationTimeline.astro';
 ---
 
 <article class="about active" data-page="home">
@@ -11,4 +13,6 @@ import about from '@src/data/about.ts';
   <section class="about-text text-light-gray text-[length:var(--fs-6)] font-light leading-[1.6] md:mb-[40px]">
     {about.paragraphs.map((paragraph) => <p class="mb-[15px]">{paragraph}</p>)}
   </section>
+
+  <TableauVisualizationTimeline visualizations={tableauVisualizations} />
 </article>
