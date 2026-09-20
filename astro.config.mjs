@@ -9,6 +9,7 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
+        '@src': '/src',
         '@portfolio': '/src/assets/portfolio',
         '@blog': '/src/assets/blog',
         '@components': '/src/components',
