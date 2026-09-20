@@ -1,0 +1,50 @@
+---
+/**
+ * Footer
+ * Displays a credit line and the technology/hosting icons
+ * (Astro & GitHub) used to build and host this website.
+ */
+---
+
+<footer
+  class="footer bg-eerie-black-2 border border-jet rounded-[20px] p-[15px] shadow-[var(--shadow-1)] flex flex-col items-center justify-center gap-[10px] text-center mt-[15px] md:w-[520px] md:mx-auto md:mt-[30px] md:p-[20px] xl:w-[950px] xl:mt-[40px] xl:shadow-[var(--shadow-5)] 2xl:w-full"
+>
+  <p
+    class="footer-text text-light-gray-70 text-[length:var(--fs-8)] font-light leading-[1.6] md:text-[length:var(--fs-7)] xl:text-[length:var(--fs-8)] flex items-center justify-center gap-[3px] flex-wrap"
+  >
+    Created with
+    <span class="text-light-gray">Astro</span>
+    and hosted on
+    <span class="text-light-gray">GitHub Pages</span>.
+  </p>
+
+  <div class="footer-icons flex items-center justify-center gap-[14px]">
+    <img
+      src="/icons/astro.svg"
+      alt="Astro"
+      width="18"
+      height="18"
+      class="footer-icon transition-[transform] duration-[250ms] ease hover:scale-110 md:w-[20px] md:h-[20px]"
+    />
+    <img
+      src="/icons/github.svg"
+      alt="GitHub Pages"
+      width="18"
+      height="18"
+      class="footer-icon transition-[transform] duration-[250ms] ease hover:scale-110 md:w-[20px] md:h-[20px]"
+    />
+  </div>
+</footer>
+
+<style>
+  /* Footer icons — keep white SVGs subtle so they don't compete with the bottom nav on mobile */
+  .footer-icon {
+    opacity: 0.25;
+    object-fit: contain;
+  }
+
+  /* Reveal full colour on hover */
+  .footer-icon:hover {
+    opacity: 1;
+  }
+</style>
