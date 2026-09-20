@@ -1,9 +1,4 @@
 ---
-/**
- * Footer
- * Displays a credit line and the technology/hosting icons
- * (Astro & GitHub) used to build and host this website.
- */
 ---
 
 <footer
@@ -15,36 +10,19 @@
     Created with
     <span class="text-light-gray">Astro</span>
     and hosted on
-    <span class="text-light-gray">GitHub Pages</span>.
+    <span class="text-light-gray">GitHub Pages</span>
   </p>
 
-  <div class="footer-icons flex items-center justify-center gap-[14px]">
+  <div class="footer-icons flex items-center justify-center gap-[0.5rem]">
     <img
       src="/icons/astro.svg"
       alt="Astro"
-      width="18"
-      height="18"
-      class="footer-icon transition-[transform] duration-[250ms] ease hover:scale-110 md:w-[20px] md:h-[20px]"
+      class="md:w-[19px] md:h-[19px] opacity-20"
     />
     <img
       src="/icons/github.svg"
       alt="GitHub Pages"
-      width="18"
-      height="18"
-      class="footer-icon transition-[transform] duration-[250ms] ease hover:scale-110 md:w-[20px] md:h-[20px]"
+      class="md:w-[19px] md:h-[19px] opacity-20"
     />
   </div>
 </footer>
-
-<style>
-  /* Footer icons — keep white SVGs subtle so they don't compete with the bottom nav on mobile */
-  .footer-icon {
-    opacity: 0.25;
-    object-fit: contain;
-  }
-
-  /* Reveal full colour on hover */
-  .footer-icon:hover {
-    opacity: 1;
-  }
-</style>

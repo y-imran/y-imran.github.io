@@ -39,10 +39,9 @@ const isoOf = (date: Date): string => {
 
 const monthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const fullMonth = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const fullWeekday = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 let weeks: Date[][] = [];
-let monthLabels: { label: string; col: number }[] = [];
+let monthLabels: { label: string; col: number; yearMonth: string }[] = [];
 
 if (sortedDates.length > 0) {
   const minDate = parseISO(sortedDates[0]);
@@ -52,8 +51,6 @@ if (sortedDates.length > 0) {
   start.setDate(start.getDate() - start.getDay());
   const end = new Date(maxDate);
   end.setDate(end.getDate() + (6 - end.getDay()));
-  const FUTURE_PADDING_WEEKS = 2;
-  end.setDate(end.getDate() + FUTURE_PADDING_WEEKS * 7);
 
   const cursor = new Date(start);
   weeks = [];
@@ -73,7 +70,11 @@ if (sortedDates.length > 0) {
       const key = firstOfMonth.getFullYear() * 12 + firstOfMonth.getMonth();
       if (!placed.has(key)) {
         placed.add(key);
-        monthLabels.push({ label: monthAbbr[firstOfMonth.getMonth()], col });
+        monthLabels.push({
+          label: monthAbbr[firstOfMonth.getMonth()],
+          col,
+          yearMonth: `${firstOfMonth.getFullYear()}-${String(firstOfMonth.getMonth() + 1).padStart(2, '0')}`
+        });
       }
     }
   });
@@ -103,12 +104,13 @@ const cellStateClass = (vizes?: TableauVisualization[]): string => {
     <div class="tv-viewport" data-tv-viewport>
       <div
         class="tv-grid"
+        data-tv-grid
         style={`grid-template-columns: var(--tv-wd) repeat(${weeks.length}, var(--tv-cell)); grid-template-rows: var(--tv-month-h) repeat(7, var(--tv-cell));`}
       >
         <div class="tv-corner" aria-hidden="true" />
         {
           monthLabels.map((m) => (
-            <div class="tv-month-label" style={`grid-column: ${m.col + 2};`}>
+            <div class="tv-month-label" data-month={m.yearMonth} style={`grid-column: ${m.col + 2};`}>
               {m.label}
             </div>
           ))
@@ -148,6 +150,7 @@ const cellStateClass = (vizes?: TableauVisualization[]): string => {
                 <div
                   class={cellStateClass(undefined)}
                   style={`grid-column: ${col + 2}; grid-row: ${d + 2};`}
+                  data-date={iso}
                   aria-hidden="true"
                 />
               );
@@ -245,6 +248,19 @@ const cellStateClass = (vizes?: TableauVisualization[]): string => {
     background: var(--color-eerie-black-1);
   }
 
+  .tv-cell-future {
+    background:
+      repeating-linear-gradient(
+        45deg,
+        var(--color-eerie-black-1),
+        var(--color-eerie-black-1) 2px,
+        color-mix(in srgb, var(--color-jet) 80%, var(--color-eerie-black-1)) 2px,
+        color-mix(in srgb, var(--color-jet) 80%, var(--color-eerie-black-1)) 4px
+      );
+    border-color: color-mix(in srgb, var(--color-jet) 70%, transparent);
+    opacity: 0.75;
+  }
+
   .tv-cell-viz {
     background: color-mix(
       in srgb,
@@ -315,9 +331,128 @@ const cellStateClass = (vizes?: TableauVisualization[]): string => {
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scrollTimelineToEnd);
-  } else {
+  function markFutureCells() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const cells = document.querySelectorAll<HTMLElement>('[data-tv-viewport] [data-date]');
+    cells.forEach((cell) => {
+      const iso = cell.getAttribute('data-date');
+      if (!iso) return;
+      const [y, m, d] = iso.split('-').map(Number);
+      const cellDate = new Date(y, m - 1, d);
+      if (cellDate > today) {
+        cell.classList.remove('tv-cell-empty');
+        cell.classList.add('tv-cell-future');
+      }
+    });
+  }
+
+  function extendGridToToday() {
+    const grid = document.querySelector<HTMLElement>('[data-tv-grid]');
+    if (!grid) return;
+
+    const sampleCell = grid.querySelector<HTMLElement>('[data-date]');
+    if (!sampleCell) return;
+    const scopeAttr = sampleCell.getAttributeNames().find((n) => n.startsWith('data-astro-cid-'));
+
+    const allCells = Array.from(grid.querySelectorAll<HTMLElement>('[data-date]'));
+    let maxCol = 0;
+    let lastDateStr = '';
+    allCells.forEach((cell) => {
+      const col = parseInt(cell.style.gridColumn, 10);
+      if (col > maxCol) maxCol = col;
+      const iso = cell.getAttribute('data-date');
+      if (iso && (lastDateStr === '' || iso > lastDateStr)) lastDateStr = iso;
+    });
+    if (!lastDateStr) return;
+
+    const [ly, lm, ld] = lastDateStr.split('-').map(Number);
+    const lastDate = new Date(ly, lm - 1, ld);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const targetEnd = new Date(today);
+    targetEnd.setDate(targetEnd.getDate() + (6 - targetEnd.getDay()) + 7);
+
+    if (targetEnd <= lastDate) return;
+
+    const labeledMonths = new Set<string>();
+    grid.querySelectorAll<HTMLElement>('.tv-month-label').forEach((label) => {
+      const m = label.getAttribute('data-month');
+      if (m) labeledMonths.add(m);
+    });
+
+    const mAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const isoOf = (date: Date) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    };
+
+    const cursor = new Date(lastDate);
+    cursor.setDate(cursor.getDate() + 1);
+
+    let col = maxCol + 1;
+    const fragment = document.createDocumentFragment();
+
+    while (cursor <= targetEnd) {
+      for (let d = 0; d < 7; d++) {
+        const checkDate = new Date(cursor);
+        checkDate.setDate(checkDate.getDate() + d);
+        if (checkDate.getDate() === 1) {
+          const yearMonth = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}`;
+          if (!labeledMonths.has(yearMonth)) {
+            labeledMonths.add(yearMonth);
+            const label = document.createElement('div');
+            label.className = 'tv-month-label';
+            label.setAttribute('data-month', yearMonth);
+            label.style.gridColumn = String(col);
+            label.textContent = mAbbr[checkDate.getMonth()];
+            if (scopeAttr) label.setAttribute(scopeAttr, '');
+            fragment.appendChild(label);
+          }
+        }
+      }
+
+      for (let d = 0; d < 7; d++) {
+        const cellDate = new Date(cursor);
+        cellDate.setDate(cellDate.getDate() + d);
+        if (cellDate > targetEnd) break;
+
+        const cell = document.createElement('div');
+        cell.className = 'tv-cell tv-cell-empty';
+        cell.style.gridColumn = String(col);
+        cell.style.gridRow = String(d + 2);
+        cell.setAttribute('data-date', isoOf(cellDate));
+        cell.setAttribute('aria-hidden', 'true');
+        if (scopeAttr) cell.setAttribute(scopeAttr, '');
+        fragment.appendChild(cell);
+      }
+
+      cursor.setDate(cursor.getDate() + 7);
+      col++;
+    }
+
+    grid.appendChild(fragment);
+
+    const totalWeeks = col - 1;
+    grid.style.gridTemplateColumns = grid.style.gridTemplateColumns.replace(
+      /repeat\(\d+/,
+      `repeat(${totalWeeks}`
+    );
+  }
+
+  function initTimeline() {
+    extendGridToToday();
+    markFutureCells();
     scrollTimelineToEnd();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTimeline);
+  } else {
+    initTimeline();
   }
 </script>
