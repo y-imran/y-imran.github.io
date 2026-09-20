@@ -60,7 +60,7 @@ const hasVotd = visualizations.some((viz) => viz.isVotd);
               class="tv-card-link"
             >
               View on Tableau Public
-              <span aria-hidden="true" class="tv-card-link-arrow">↗</span>
+              <ion-icon name="open-outline" aria-hidden="true" class="tv-card-link-icon"></ion-icon>
               <span class="sr-only">(opens in a new tab)</span>
             </a>
           </li>
@@ -187,8 +187,8 @@ const hasVotd = visualizations.some((viz) => viz.isVotd);
     opacity: 0.8;
   }
 
-  .tv-card-link-arrow {
-    font-size: 12px;
+  .tv-card-link-icon {
+    font-size: 14px;
   }
 
   .sr-only {

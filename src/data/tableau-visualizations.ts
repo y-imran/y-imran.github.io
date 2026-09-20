@@ -20,146 +20,146 @@ export interface TableauVisualization {
 
 export const tableauVisualizations: TableauVisualization[] = [
   {
-    id: 'renewable-energy-transition',
-    publishedDate: '2025-01-20',
-    title: 'Makeover Monday W3 2025: Global renewable energy transition',
+    id: 'the-worlds-deadliest-animals',
+    publishedDate: '2026-09-18',
+    title: "The World's Deadliest Animals",
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/RenewableEnergyTransition/Dashboard',
-  },
-  {
-    id: 'olympic-medals-by-nation',
-    publishedDate: '2025-02-10',
-    title: 'Makeover Monday W6 2025: Olympic medals by nation',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/OlympicMedalsByNation/Dashboard',
-  },
-  {
-    id: 'coffee-production-worldwide',
-    publishedDate: '2025-03-03',
-    title: 'Makeover Monday W10 2025: Coffee production worldwide',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/CoffeeProductionWorldwide/Dashboard',
-  },
-  {
-    id: 'plastic-waste-in-oceans',
-    publishedDate: '2025-03-24',
-    title: 'Makeover Monday W12 2025: Plastic waste in oceans',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/PlasticWasteInOceans/Dashboard',
-  },
-  {
-    id: 'air-quality-index-trends',
-    publishedDate: '2025-04-14',
-    title: 'Makeover Monday W15 2025: Air quality index trends',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/AirQualityIndexTrends/Dashboard',
-  },
-  {
-    id: 'superstore-executive-performance',
-    publishedDate: '2025-05-10',
-    title: 'Superstore executive performance dashboard',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/SuperstoreExecutivePerformanceDashboard_17779194205120/Dashboard1',
-    thumbnail: businessDashboard,
-  },
-  {
-    id: 'global-shipping-routes',
-    publishedDate: '2025-05-26',
-    title: 'Makeover Monday W21 2025: Global shipping routes',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalShippingRoutes/Dashboard',
+      'https://public.tableau.com/app/profile/yusra.imran/viz/TheWorldsDeadliestAnimals/Dashboard',
+    thumbnail: deadliestAnimals
   },
   {
     id: 'laboratory-management-system',
-    publishedDate: '2025-06-21',
-    title: 'Healthcare fake data: Laboratory management system',
+    publishedDate: '2026-09-14',
+    title: 'Laboratory Management System',
     tableauUrl:
       'https://public.tableau.com/app/profile/yusra.imran/viz/LaboratoryManagementSystem/Overview',
-    thumbnail: patientDashboard,
-  },
-  {
-    id: 'world-population-density',
-    publishedDate: '2025-07-14',
-    title: 'Makeover Monday W28 2025: World population density',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/WorldPopulationDensity/Dashboard',
-  },
-  {
-    id: 'pakistan-flag-parametric',
-    publishedDate: '2025-08-14',
-    title: 'Mathematical art: Parametric construction of the Pakistan flag',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/Celebrating78YearsOfIndependence/Flag',
-    thumbnail: pakistanFlag,
-  },
-  {
-    id: 'flags-by-containers',
-    publishedDate: '2025-08-20',
-    title: 'Mathematical art: Country flags by containers',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/FlagsByContainers/Dashboard1',
-    thumbnail: containersFlags,
-  },
-  {
-    id: 'living-forest-of-sydney',
-    publishedDate: '2025-09-15',
-    title: 'Real trees data: The living forest of Sydney, Australia',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/TheLivingForestofSydney/Dashboard',
-    thumbnail: sydneyForest,
-  },
-  {
-    id: 'nobel-laureates-by-country',
-    publishedDate: '2025-10-13',
-    title: 'Makeover Monday W41 2025: Nobel laureates by country',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/NobelLaureatesByCountry/Dashboard',
-  },
-  {
-    id: 'internet-adoption-rates',
-    publishedDate: '2025-11-17',
-    title: 'Makeover Monday W46 2025: Internet adoption rates',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/InternetAdoptionRates/Dashboard',
-  },
-  {
-    id: 'global-temperature-anomalies',
-    publishedDate: '2025-12-15',
-    title: 'Makeover Monday W50 2025: Global temperature anomalies',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalTemperatureAnomalies/Dashboard',
-  },
-  {
-    id: 'wildlife-population-decline',
-    publishedDate: '2026-01-19',
-    title: 'Makeover Monday W3 2026: Wildlife population decline',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/WildlifePopulationDecline/Dashboard',
-  },
-  {
-    id: 'ufo-sighting-patterns',
-    publishedDate: '2026-06-15',
-    title: 'Makeover Monday W25 2026: UFO sighting patterns',
-    tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/UFOSightingPatterns/Dashboard',
-    thumbnail: ufoSightings,
-    isVotd: true,
+    thumbnail: patientDashboard
   },
   {
     id: 'global-launch-explorer',
-    publishedDate: '2026-06-22',
-    title: 'Makeover Monday W26 2026: Global space launches explorer',
+    publishedDate: '2026-07-07',
+    title: 'Global Launch Explorer',
     tableauUrl:
       'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalLaunchExplorer/Dashboard1',
-    thumbnail: launchExplorer,
+    thumbnail: launchExplorer
   },
   {
-    id: 'worlds-deadliest-animals',
-    publishedDate: '2026-09-07',
-    title: "Makeover Monday W37 2026: World's deadliest animals",
+    id: 'ufo-sighting-patterns',
+    publishedDate: '2026-06-24',
+    title: 'UFO Sighting Patterns',
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/TheWorldsDeadliestAnimals/Dashboard',
-    thumbnail: deadliestAnimals,
+      'https://public.tableau.com/app/profile/yusra.imran/viz/UFOSightingPatterns/Dashboard',
+    thumbnail: ufoSightings,
+    isVotd: true
+  },
+  {
+    id: 'the-living-forest-of-sydney',
+    publishedDate: '2026-06-15',
+    title: 'The Living Forest of Sydney',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/TheLivingForestofSydney/Dashboard',
+    thumbnail: sydneyForest
+  },
+  {
+    id: 'bmi-calculator',
+    publishedDate: '2026-05-18',
+    title: 'BMI Calculator',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/BMICalculator_17791069428940/FirstScreen',
+  },
+  {
+    id: 'superstore-executive-performance-dashboard',
+    publishedDate: '2026-05-04',
+    title: 'Superstore Executive Performance Dashboard',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/SuperstoreExecutivePerformanceDashboard_17779194205120/Dashboard1',
+    thumbnail: businessDashboard
+  },
+  {
+    id: 'global-events-and-awareness-calendar',
+    publishedDate: '2026-04-19',
+    title: 'Global Events And Awareness Calendar',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalEventsAndAwarenessCalendar/EventsDashboard'
+  },
+  {
+    id: 'natural-gas-reserves',
+    publishedDate: '2026-01-27',
+    title: 'Natural Gas Reserves',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/NaturalGasReserves/Dashboard1'
+  },
+  {
+    id: 'global-antibiotic-resistance',
+    publishedDate: '2026-01-01',
+    title: 'Global Antibiotic Resistance',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalAntibioticResistance/Dashboard1',
+  },
+  {
+    id: 'live-analog-clock',
+    publishedDate: '2025-11-06',
+    title: 'Live Analog Clock',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/LiveAnalogClock/AnalogClock',
+  },
+  {
+    id: 'smoking-patterns-by-gender',
+    publishedDate: '2025-10-25',
+    title: 'Smoking Patterns by Gender',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/SmokingPatternsbyGender/GlobleSmokers',
+  },
+  {
+    id: 'waffle-chart-of-global-smoking-rates',
+    publishedDate: '2025-10-19',
+    title: 'Waffle Chart of Global Smoking Rates',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/WaffleChartofGlobalSmokingRates/Dashboard1'
+  },
+  {
+    id: 'flag-of-european-union',
+    publishedDate: '2025-10-03',
+    title: 'Flag Of European Union',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/FlagOfEuropeanUnion/EUFlag'
+  },
+  {
+    id: 'flag-of-turkiye',
+    publishedDate: '2025-08-18',
+    title: 'Flag Of Türkiye',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/TurkeyFlag/Flag'
+  },
+  {
+    id: 'celebrating-78-years-of-independence',
+    publishedDate: '2025-08-15',
+    title: 'Celebrating 78 Years Of Independence',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/Celebrating78YearsOfIndependence/Flag',
+    thumbnail: pakistanFlag
+  },
+  {
+    id: 'august-my-birthday-month',
+    publishedDate: '2025-08-03',
+    title: 'August - My Birthday Month',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/August-MyBirthdayMonth/Canvas'
+  },
+  {
+    id: 'periodic-table',
+    publishedDate: '2025-07-22',
+    title: "Periodic Table",
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/PeriodicTable_17531961381580/Dashboard1'
+  },
+  {
+    id: 'flags-by-containers',
+    publishedDate: '2025-07-14',
+    title: 'Flags By Containers',
+    tableauUrl:
+      'https://public.tableau.com/app/profile/yusra.imran/viz/FlagsByContainers/Dashboard1',
+    thumbnail: containersFlags
   },
 ];
 
