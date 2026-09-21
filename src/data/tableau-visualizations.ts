@@ -8,6 +8,17 @@ import sydneyForest from '@portfolio/sydney_forest.png';
 import ufoSightings from '@portfolio/ufo_sightings.png';
 import launchExplorer from '@portfolio/launch_explorer.png';
 import deadliestAnimals from '@portfolio/deadliest_animals.png';
+import analogClock from '@portfolio/analog_clock.png';
+import antibioticDashboard from '@portfolio/antibiotic_dashboard.png';
+import birthdayMonth from '@portfolio/birthday_month.png';
+import bmiCalculator from '@portfolio/bmi_calculator.png';
+import euFlag from '@portfolio/eu_flag.png';
+import globalSmokers from '@portfolio/global_smokers.png';
+import naturalGas from '@portfolio/natural_gas.png';
+import periodicTable from '@portfolio/periodic_table.png';
+import turkiyeFlag from '@portfolio/turkiye_flag.png';
+import waffleChart from '@portfolio/waffle_chart.png';
+import yearlyEvents from '@portfolio/yearly_events.png';
 
 export interface TableauVisualization {
   id: string;
@@ -66,6 +77,7 @@ export const tableauVisualizations: TableauVisualization[] = [
     title: 'BMI Calculator',
     tableauUrl:
       'https://public.tableau.com/app/profile/yusra.imran/viz/BMICalculator_17791069428940/FirstScreen',
+    thumbnail: bmiCalculator
   },
   {
     id: 'superstore-executive-performance-dashboard',
@@ -80,14 +92,16 @@ export const tableauVisualizations: TableauVisualization[] = [
     publishedDate: '2026-04-19',
     title: 'Global Events And Awareness Calendar',
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalEventsAndAwarenessCalendar/EventsDashboard'
+      'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalEventsAndAwarenessCalendar/EventsDashboard',
+    thumbnail: yearlyEvents
   },
   {
     id: 'natural-gas-reserves',
     publishedDate: '2026-01-27',
     title: 'Natural Gas Reserves',
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/NaturalGasReserves/Dashboard1'
+      'https://public.tableau.com/app/profile/yusra.imran/viz/NaturalGasReserves/Dashboard1',
+    thumbnail: naturalGas
   },
   {
     id: 'global-antibiotic-resistance',
@@ -95,6 +109,7 @@ export const tableauVisualizations: TableauVisualization[] = [
     title: 'Global Antibiotic Resistance',
     tableauUrl:
       'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalAntibioticResistance/Dashboard1',
+    thumbnail: antibioticDashboard
   },
   {
     id: 'live-analog-clock',
@@ -102,6 +117,7 @@ export const tableauVisualizations: TableauVisualization[] = [
     title: 'Live Analog Clock',
     tableauUrl:
       'https://public.tableau.com/app/profile/yusra.imran/viz/LiveAnalogClock/AnalogClock',
+    thumbnail: analogClock
   },
   {
     id: 'smoking-patterns-by-gender',
@@ -109,27 +125,31 @@ export const tableauVisualizations: TableauVisualization[] = [
     title: 'Smoking Patterns by Gender',
     tableauUrl:
       'https://public.tableau.com/app/profile/yusra.imran/viz/SmokingPatternsbyGender/GlobleSmokers',
+    thumbnail: globalSmokers
   },
   {
     id: 'waffle-chart-of-global-smoking-rates',
     publishedDate: '2025-10-19',
     title: 'Waffle Chart of Global Smoking Rates',
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/WaffleChartofGlobalSmokingRates/Dashboard1'
+      'https://public.tableau.com/app/profile/yusra.imran/viz/WaffleChartofGlobalSmokingRates/Dashboard1',
+    thumbnail: waffleChart
   },
   {
     id: 'flag-of-european-union',
     publishedDate: '2025-10-03',
     title: 'Flag Of European Union',
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/FlagOfEuropeanUnion/EUFlag'
+      'https://public.tableau.com/app/profile/yusra.imran/viz/FlagOfEuropeanUnion/EUFlag',
+    thumbnail: euFlag
   },
   {
     id: 'flag-of-turkiye',
     publishedDate: '2025-08-18',
     title: 'Flag Of Türkiye',
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/TurkeyFlag/Flag'
+      'https://public.tableau.com/app/profile/yusra.imran/viz/TurkeyFlag/Flag',
+    thumbnail: turkiyeFlag
   },
   {
     id: 'celebrating-78-years-of-independence',
@@ -144,14 +164,16 @@ export const tableauVisualizations: TableauVisualization[] = [
     publishedDate: '2025-08-03',
     title: 'August - My Birthday Month',
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/August-MyBirthdayMonth/Canvas'
+      'https://public.tableau.com/app/profile/yusra.imran/viz/August-MyBirthdayMonth/Canvas',
+    thumbnail: birthdayMonth
   },
   {
     id: 'periodic-table',
     publishedDate: '2025-07-22',
     title: "Periodic Table",
     tableauUrl:
-      'https://public.tableau.com/app/profile/yusra.imran/viz/PeriodicTable_17531961381580/Dashboard1'
+      'https://public.tableau.com/app/profile/yusra.imran/viz/PeriodicTable_17531961381580/Dashboard1',
+    thumbnail: periodicTable
   },
   {
     id: 'flags-by-containers',
