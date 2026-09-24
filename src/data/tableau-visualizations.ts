@@ -19,6 +19,7 @@ import periodicTable from '@portfolio/periodic_table.png';
 import turkiyeFlag from '@portfolio/turkiye_flag.png';
 import waffleChart from '@portfolio/waffle_chart.png';
 import yearlyEvents from '@portfolio/yearly_events.png';
+import bloomYear from '@portfolio/bloom_year.png';
 
 export interface TableauVisualization {
   id: string;
@@ -30,6 +31,13 @@ export interface TableauVisualization {
 }
 
 export const tableauVisualizations: TableauVisualization[] = [
+  {
+    id: 'bloom-through-the-seasons',
+    publishedDate: '2026-09-24',
+    title: "Bloom Through the Seasons",
+    tableauUrl: 'https://public.tableau.com/app/profile/yusra.imran/viz/BloomThroughtheSeasons/Dashboard1',
+    thumbnail: bloomYear
+  },
   {
     id: 'the-worlds-deadliest-animals',
     publishedDate: '2026-09-18',
