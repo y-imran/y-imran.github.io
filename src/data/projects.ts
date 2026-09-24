@@ -7,6 +7,7 @@ import sydneyForest from '@portfolio/sydney_forest.png'
 import containersFlags from '@portfolio/containers_flags.png'
 import launchExplorer from '@portfolio/launch_explorer.png'
 import parkinsonsDisease from '@portfolio/parkinsons_disease.png'
+import bloomYear from '@portfolio/bloom_year.png';
 
 export enum ProjectCategory {
   TABLEAU = 'Tableau',
@@ -27,7 +28,7 @@ const projects: Project[] = [
     category: ProjectCategory.TABLEAU,
     url: 'https://public.tableau.com/app/profile/yusra.imran/viz/UFOSightingPatterns/Dashboard'
   },
-    {
+  {
     image: launchExplorer,
     title: "Makeover Monday W26 2026: Global space launches explorer",
     category: ProjectCategory.TABLEAU,
@@ -50,12 +51,20 @@ const projects: Project[] = [
     title: "Business dashboard: Superstore executive performance",
     category: ProjectCategory.TABLEAU,
     url: 'https://public.tableau.com/app/profile/yusra.imran/viz/SuperstoreExecutivePerformanceDashboard_17779194205120/Dashboard1'
-  }, {
+  }, 
+  {
     image: patientDashboard,
     title: "Healthcare fake data: Laboratory management system",
     category: ProjectCategory.TABLEAU,
     url: 'https://public.tableau.com/app/profile/yusra.imran/viz/LaboratoryManagementSystem/Overview'
-  }, {
+  },
+  {
+    image: bloomYear,
+    title: "Back 2 Viz Basics W18 2026: U.S. Seasonal Flower Blooms",
+    category: ProjectCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/BloomThroughtheSeasons/Dashboard1'
+  },
+  {
     image: containersFlags,
     title: "Mathematical art: Country flags by containers",
     category: ProjectCategory.TABLEAU,
@@ -67,7 +76,7 @@ const projects: Project[] = [
     category: ProjectCategory.TABLEAU,
     url: 'https://public.tableau.com/app/profile/yusra.imran/viz/Celebrating78YearsOfIndependence/Flag'
   },
-    {
+  {
     image: parkinsonsDisease,
     title: "Parkinson's disease: Features comparative analysis",
     category: ProjectCategory.PYTHON,
