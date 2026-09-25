@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
@@ -29,7 +30,10 @@ export default defineConfig({
       subsets: ['latin'],
     },
   ],
-  integrations: [mdx()],
+  integrations: [
+    mdx(),
+    sitemap(),
+  ],
   devToolbar: {
     enabled: false
   }
