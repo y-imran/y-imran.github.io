@@ -15,21 +15,21 @@ function isActive(href: string) {
 ---
 
 <nav
-  class="navbar fixed bottom-0 left-0 w-full bg-[hsla(240,1%,17%,0.75)] backdrop-blur-[10px] border border-jet rounded-t-[12px] shadow-[var(--shadow-2)] z-[5]
-         md:rounded-t-[20px]
-         xl:absolute xl:bottom-auto xl:top-0 xl:left-auto xl:right-0 xl:w-max xl:rounded-tl-none xl:rounded-tr-[20px] xl:rounded-br-none xl:rounded-bl-[20px] xl:px-[20px] xl:shadow-none"
+  class="navbar fixed bottom-4 left-1/2 right-auto w-max max-w-[calc(100vw-32px)] bg-[hsla(240,1%,17%,0.75)] backdrop-blur-[10px] border border-jet rounded-[32px] shadow-[var(--shadow-2)] z-[5]
+         md:rounded-[36px]
+         xl:absolute xl:bottom-auto xl:top-0 xl:left-auto xl:right-0 xl:w-max xl:max-w-none xl:rounded-tl-none xl:rounded-tr-[20px] xl:rounded-br-none xl:rounded-bl-[20px] xl:px-[20px] xl:shadow-none"
 >
   <ul
-    class="navbar-list flex flex-wrap justify-center items-center gap-[15px] px-[10px] md:gap-[20px] xl:gap-[30px] xl:px-[20px]"
+    class="navbar-list flex flex-wrap justify-center items-center gap-[10px] px-2 md:gap-[14px] xl:gap-[30px] xl:px-[20px]"
   >
     {navItems.map((item) => (
       <li class="navbar-item">
         <a
           href={item.href}
-          class={`navbar-link text-light-gray text-[length:var(--fs-8)] py-5 px-[7px] flex flex-col items-center gap-1.5 transition-colors duration-[250ms] ease hover:text-light-gray-70 focus:text-light-gray-70 lg:text-[15px] xl:flex-row xl:gap-0${isActive(item.href) ? ' active' : ''}`}
+          class={`navbar-link text-light-gray text-[length:var(--fs-8)] py-5 px-[7px] flex flex-col items-center gap-1 transition-colors duration-[250ms] ease hover:text-light-gray-70 focus:text-light-gray-70 lg:text-[15px] xl:flex-row xl:gap-0${isActive(item.href) ? ' active' : ''}`}
         >
           <span
-            class="navbar-icon w-[24px] h-[24px] flex-shrink-0 bg-current [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:center] xl:hidden"
+            class="navbar-icon w-5 h-5 flex-shrink-0 bg-current [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:center] xl:hidden"
             style={`mask-image: url('${item.icon}'); -webkit-mask-image: url('${item.icon}');`}
           ></span>
           <span class="navbar-text">{item.label}</span>
@@ -51,4 +51,67 @@ function isActive(href: string) {
       font-weight: 500;
     }
   }
+
+  @media (max-width: 1023px) {
+    .navbar-link {
+      padding-block: 6px;
+      padding-inline: 12px;
+    }
+
+    .navbar {
+      transform: translateX(-50%) translateY(0);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    .navbar.navbar-hidden {
+      transform: translateX(-50%) translateY(calc(100% + 30px));
+    }
+  }
 </style>
+
+<script>
+  const navbar = document.querySelector('.navbar');
+
+  if (navbar) {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+    const mobileMQ = window.matchMedia('(max-width: 1023px)');
+
+    function handleScroll() {
+      if (!mobileMQ.matches) {
+        navbar.classList.remove('navbar-hidden');
+        ticking = false;
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY <= 10) {
+        navbar.classList.remove('navbar-hidden');
+      } else if (currentScrollY > lastScrollY + 4) {
+        navbar.classList.add('navbar-hidden');
+      } else if (currentScrollY < lastScrollY - 4) {
+        navbar.classList.remove('navbar-hidden');
+      }
+
+      lastScrollY = currentScrollY;
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(handleScroll);
+        ticking = true;
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    mobileMQ.addEventListener('change', (e) => {
+      if (!e.matches) {
+        navbar.classList.remove('navbar-hidden');
+      }
+    });
+  }
+</script>
