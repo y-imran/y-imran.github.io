@@ -1,13 +1,13 @@
-import pakistanFlag from '@portfolio/pakistan_flag.png';
-import deadliestAnimals from '@portfolio/deadliest_animals.png'
-import businessDashboard from '@portfolio/business_dashboard.png'
-import patientDashboard from '@portfolio/patient_dashboard.png'
-import ufoSightings from '@portfolio/ufo_sightings.png'
-import sydneyForest from '@portfolio/sydney_forest.png'
-import containersFlags from '@portfolio/containers_flags.png'
-import launchExplorer from '@portfolio/launch_explorer.png'
-import parkinsonsDisease from '@portfolio/parkinsons_disease.png'
-import bloomYear from '@portfolio/bloom_year.png';
+import pakistanFlag from '@assets/portfolio/pakistan_flag.png';
+import deadliestAnimals from '@assets/portfolio/deadliest_animals.png'
+import businessDashboard from '@assets/portfolio/business_dashboard.png'
+import patientDashboard from '@assets/portfolio/patient_dashboard.png'
+import ufoSightings from '@assets/portfolio/ufo_sightings.png'
+import sydneyForest from '@assets/portfolio/sydney_forest.png'
+import containersFlags from '@assets/portfolio/containers_flags.png'
+import launchExplorer from '@assets/portfolio/launch_explorer.png'
+import parkinsonsDisease from '@assets/portfolio/parkinsons_disease.png'
+import bloomYear from '@assets/portfolio/bloom_year.png';
 
 export enum ProjectCategory {
   TABLEAU = 'Tableau',
