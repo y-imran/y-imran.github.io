@@ -175,7 +175,7 @@
     let lastFocusedCell: HTMLElement | null = null;
 
     const cloneTemplate = (id: string): DocumentFragment | null => {
-      const tpl = document.getElementById(id);
+      const tpl = document.getElementById(id) as HTMLTemplateElement | null;
       return tpl ? (tpl.content.cloneNode(true) as DocumentFragment) : null;
     };
 
