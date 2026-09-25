@@ -13,9 +13,8 @@ const totalVisualizations = visualizations.length;
 const votdCount = visualizations.filter((viz) => viz.isVotd).length;
 ---
 
-<section class="tv-root" data-tv-root aria-labelledby="tv-heading">
-  <p class="tv-eyebrow">Tableau work</p>
-  <h2 class="tv-heading article-title" id="tv-heading">Tableau Visualization Timeline</h2>
+<section class="tv-root" data-tv-root>
+  <p class="eyebrow eyebrow-underline">Tableau Vizzes Timeline</p>
   <p class="tv-description">
     A visual record of my Tableau work, showing when each visualization was published.
   </p>
@@ -52,23 +51,6 @@ const votdCount = visualizations.filter((viz) => viz.isVotd).length;
     margin-top: 40px;
     display: flex;
     flex-direction: column;
-  }
-
-  .tv-eyebrow {
-    color: var(--color-orange-yellow-crayola);
-    font-size: var(--fs-7);
-    font-weight: var(--fw-500);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-  }
-
-  .tv-heading {
-    margin-bottom: 0;
-    color: var(--color-white-2);
-    font-size: var(--fs-2);
-    font-weight: var(--fw-500);
-    text-transform: capitalize;
   }
 
   .tv-description {
