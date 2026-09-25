@@ -12,10 +12,9 @@ export default defineConfig({
     resolve: {
       alias: {
         '@src': '/src',
-        '@portfolio': '/src/assets/portfolio',
-        '@blog': '/src/assets/blog',
-        '@certification': '/src/assets/certification',
         '@components': '/src/components',
+        '@assets': '/src/assets',
+        '@data': '/src/data',
       },
     },
   },

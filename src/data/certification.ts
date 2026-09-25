@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
 
-import salesforceTableauDesktopFoundation from '@certification/salesforce_tableau_desktop_foundation.png';
+import salesforceTableauDesktopFoundation from '@assets/certification/salesforce_tableau_desktop_foundation.png';
 
 export interface Certification {
   title: string;

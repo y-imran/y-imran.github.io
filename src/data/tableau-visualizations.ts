@@ -1,25 +1,25 @@
 import type { ImageMetadata } from 'astro';
 
-import businessDashboard from '@portfolio/business_dashboard.png';
-import patientDashboard from '@portfolio/patient_dashboard.png';
-import containersFlags from '@portfolio/containers_flags.png';
-import pakistanFlag from '@portfolio/pakistan_flag.png';
-import sydneyForest from '@portfolio/sydney_forest.png';
-import ufoSightings from '@portfolio/ufo_sightings.png';
-import launchExplorer from '@portfolio/launch_explorer.png';
-import deadliestAnimals from '@portfolio/deadliest_animals.png';
-import analogClock from '@portfolio/analog_clock.png';
-import antibioticDashboard from '@portfolio/antibiotic_dashboard.png';
-import birthdayMonth from '@portfolio/birthday_month.png';
-import bmiCalculator from '@portfolio/bmi_calculator.png';
-import euFlag from '@portfolio/eu_flag.png';
-import globalSmokers from '@portfolio/global_smokers.png';
-import naturalGas from '@portfolio/natural_gas.png';
-import periodicTable from '@portfolio/periodic_table.png';
-import turkiyeFlag from '@portfolio/turkiye_flag.png';
-import waffleChart from '@portfolio/waffle_chart.png';
-import yearlyEvents from '@portfolio/yearly_events.png';
-import bloomYear from '@portfolio/bloom_year.png';
+import businessDashboard from '@assets/portfolio/business_dashboard.png';
+import patientDashboard from '@assets/portfolio/patient_dashboard.png';
+import containersFlags from '@assets/portfolio/containers_flags.png';
+import pakistanFlag from '@assets/portfolio/pakistan_flag.png';
+import sydneyForest from '@assets/portfolio/sydney_forest.png';
+import ufoSightings from '@assets/portfolio/ufo_sightings.png';
+import launchExplorer from '@assets/portfolio/launch_explorer.png';
+import deadliestAnimals from '@assets/portfolio/deadliest_animals.png';
+import analogClock from '@assets/portfolio/analog_clock.png';
+import antibioticDashboard from '@assets/portfolio/antibiotic_dashboard.png';
+import birthdayMonth from '@assets/portfolio/birthday_month.png';
+import bmiCalculator from '@assets/portfolio/bmi_calculator.png';
+import euFlag from '@assets/portfolio/eu_flag.png';
+import globalSmokers from '@assets/portfolio/global_smokers.png';
+import naturalGas from '@assets/portfolio/natural_gas.png';
+import periodicTable from '@assets/portfolio/periodic_table.png';
+import turkiyeFlag from '@assets/portfolio/turkiye_flag.png';
+import waffleChart from '@assets/portfolio/waffle_chart.png';
+import yearlyEvents from '@assets/portfolio/yearly_events.png';
+import bloomYear from '@assets/portfolio/bloom_year.png';
 
 export interface TableauVisualization {
   id: string;

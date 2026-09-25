@@ -1,5 +1,5 @@
 ---
-import timeline from '@src/data/timeline.ts';
+import timeline from '@data/timeline.ts';
 ---
 
 <article class="resume active" data-page="resume">
@@ -66,7 +66,6 @@ import timeline from '@src/data/timeline.ts';
 </article>
 
 <style>
-  /* Timeline — vertical line connector */
   .timeline-item:not(:last-child) {
     margin-bottom: 20px;
   }
@@ -81,7 +80,6 @@ import timeline from '@src/data/timeline.ts';
     background: var(--color-jet);
   }
 
-  /* Timeline — gradient dot marker */
   .timeline-item::after {
     content: "";
     position: absolute;
