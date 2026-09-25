@@ -15,7 +15,6 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
 }).format(new Date(`${date}T00:00:00`));
 
 const thumbnailViz = visualizations.find((viz) => viz.thumbnail);
-const hasVotd = visualizations.some((viz) => viz.isVotd);
 ---
 
 <div class="tv-card">
