@@ -7,9 +7,11 @@ interface Props {
   pubDate: Date;
   excerpt: string;
   banner: ImageMetadata;
+  tags?: string[];
+  slug?: string;
 }
 
-const { title, category, pubDate, excerpt, banner } = Astro.props;
+const { title, category, pubDate, excerpt, banner, tags, slug } = Astro.props;
 
 const formattedDate = pubDate.toLocaleDateString('en-US', {
   month: 'short',
@@ -18,7 +20,22 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
 });
 ---
 
-<BaseLayout title={`${title} - Yusra Imran`} description={excerpt}>
+<BaseLayout
+  title={`${title} - Yusra Imran`}
+  description={excerpt}
+  image={banner}
+  type="article"
+  article={{
+    publishedTime: pubDate,
+    section: category,
+    tags: tags,
+  }}
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog/' },
+    { name: title, path: `/blog/${slug ?? ''}/` },
+  ]}
+>
   <article class="about active" data-page="blog">
     <header>
       <a

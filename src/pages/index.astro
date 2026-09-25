@@ -3,6 +3,10 @@ import BaseLayout from '@src/layouts/BaseLayout.astro';
 import Home from '@components/Home.astro';
 ---
 
-<BaseLayout title="Home - Yusra Imran">
+<BaseLayout
+  title="Home - Yusra Imran"
+  description="Yusra Imran's personal portfolio — data visualizations, blog posts, and professional resume."
+  breadcrumbs={[{ name: 'Home', path: '/' }]}
+>
   <Home />
 </BaseLayout>

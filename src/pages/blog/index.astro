@@ -3,6 +3,13 @@ import BaseLayout from '@src/layouts/BaseLayout.astro';
 import BlogSection from '@components/BlogSection.astro';
 ---
 
-<BaseLayout title="Blog - Yusra Imran">
+<BaseLayout
+  title="Blog - Yusra Imran"
+  description="Articles on data visualization, Tableau, and analytics by Yusra Imran."
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog/' },
+  ]}
+>
   <BlogSection />
 </BaseLayout>
