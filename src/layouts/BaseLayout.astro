@@ -4,13 +4,37 @@ import '@src/styles/main.css';
 import Sidebar from '@components/Sidebar.astro';
 import Navbar from '@components/Navbar.astro';
 import Footer from '@components/ui/Footer.astro';
+import SEO from '@components/head/SEO.astro';
+import type { BreadcrumbItem } from '@components/head/SEO.astro';
+import type { ImageMetadata } from 'astro';
 
 interface Props {
   title?: string;
   description?: string;
+  image?: ImageMetadata | string;
+  type?: 'website' | 'article';
+  article?: {
+    publishedTime?: Date;
+    modifiedTime?: Date;
+    author?: string;
+    section?: string;
+    tags?: string[];
+  };
+  canonical?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  noindex?: boolean;
 }
 
-const { title = 'Home - Yusra Imran', description } = Astro.props;
+const {
+  title = 'Home - Yusra Imran',
+  description,
+  image,
+  type = 'website',
+  article,
+  canonical,
+  breadcrumbs,
+  noindex,
+} = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -21,13 +45,20 @@ const { title = 'Home - Yusra Imran', description } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
-    {description && <meta name="description" content={description} />}
 
-    <!-- Poppins font (optimized by Astro) -->
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+      article={article}
+      canonical={canonical}
+      breadcrumbs={breadcrumbs}
+      noindex={noindex}
+    />
+
     <Font cssVariable="--font-poppins" preload />
 
-    <!-- Ionicons -->
     <script
       type="module"
       src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
