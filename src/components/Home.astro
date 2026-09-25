@@ -1,6 +1,8 @@
 ---
 import about from '@src/data/about.ts';
+import certifications from '@src/data/certification.ts';
 import tableauVisualizations from '@src/data/tableau-visualizations.ts';
+import Certification from '@components/ui/home/Certification.astro';
 import TableauVisualizationTimeline from '@components/ui/tableau/TableauVisualizationTimeline.astro';
 ---
 
@@ -13,6 +15,8 @@ import TableauVisualizationTimeline from '@components/ui/tableau/TableauVisualiz
   <section class="about-text text-light-gray text-[length:var(--fs-6)] font-light leading-[1.6] md:mb-[40px]">
     {about.paragraphs.map((paragraph) => <p class="mb-[15px]">{paragraph}</p>)}
   </section>
+
+  <Certification certifications={certifications} />
 
   <TableauVisualizationTimeline visualizations={tableauVisualizations} />
 </article>

@@ -14,6 +14,7 @@ export default defineConfig({
         '@src': '/src',
         '@portfolio': '/src/assets/portfolio',
         '@blog': '/src/assets/blog',
+        '@certification': '/src/assets/certification',
         '@components': '/src/components',
       },
     },

@@ -286,6 +286,42 @@
     }
   }
 
+  .eyebrow {
+    color: var(--color-orange-yellow-crayola);
+    font-size: var(--fs-7);
+    font-weight: var(--fw-500);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .eyebrow-underline {
+    position: relative;
+    padding-bottom: 7px;
+  }
+
+  .eyebrow-underline::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 30px;
+    height: 3px;
+    background: var(--text-gradient-yellow);
+    border-radius: 3px;
+  }
+
+  @media (min-width: 580px) {
+    .eyebrow-underline {
+      padding-bottom: 15px;
+    }
+
+    .eyebrow-underline::after {
+      width: 40px;
+      height: 5px;
+    }
+  }
+
   /* Article title */
   .article-title {
     position: relative;
