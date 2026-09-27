@@ -29,10 +29,14 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
               />
             </figure>
             <div class="blog-content p-[15px] md:p-[25px]">
-              <div class="blog-meta flex justify-start items-center gap-[7px] mb-[10px]">
+              <div class="blog-meta text-xs md:text-sm flex justify-start items-center gap-[7px] mb-[10px] uppercase font-light tracking-wide">
+                <p class="text-light-gray-70">
+                  {post.data.category}
+                </p>
+                <span class="dot bg-light-gray-70 w-1 h-1 rounded-[4px]"></span>
                 <time
                   datetime={post.data.pubDate.toISOString()}
-                  class="text-light-gray-70 text-[length:var(--fs-6)] font-light"
+                  class="text-light-gray-70"
                 >
                   {post.data.pubDate.toLocaleDateString('en-US', {
                     month: 'short',
@@ -41,8 +45,8 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
                   })}
                 </time>
                 <span class="dot bg-light-gray-70 w-1 h-1 rounded-[4px]"></span>
-                <p class="text-light-gray-70 text-[length:var(--fs-6)] font-light">
-                  {post.data.readTimeMins} minutes read
+                <p class="text-light-gray-70">
+                  {post.data.readTimeMins} mins
                 </p>
               </div>
               <h3

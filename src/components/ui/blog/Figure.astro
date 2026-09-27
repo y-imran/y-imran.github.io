@@ -1,0 +1,20 @@
+---
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+
+<figure class="my-5">
+  <div class="p-4 rounded-[14px] bg-eerie-black-1 border border-jet">
+    <div class="w-full rounded-[10px] overflow-hidden bg-onyx border border-jet">
+      <img src={src.src} alt={alt} loading="lazy" class="w-full h-auto block" />
+    </div>
+    {caption && (
+      <figcaption class="text-light-gray-70 text-xs md:text-sm font-[var(--fw-300)] text-left mt-3">{caption}</figcaption>
+    )}
+  </div>
+</figure>
