@@ -1,0 +1,13 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="text-light-gray text-base md:text-xl font-light leading-[1.6] mb-[15px] list-disc list-inside space-y-1 pl-6">
+  {items.map((item) => (
+    <li class="list-disc list-inside">{item}</li>
+  ))}
+</ul>

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@src/layouts/BaseLayout.astro';
+import H1 from '@src/components/ui/blog/H1.astro';
 
 interface Props {
   title: string;
@@ -21,31 +22,23 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
 <BaseLayout title={`${title} - Yusra Imran`} description={excerpt}>
   <article class="about active" data-page="blog">
     <header>
-      <a
-        href="/blog/"
-        class="inline-flex items-center gap-1.5 text-[length:var(--fs-6)] text-orange-yellow-crayola mb-[15px]"
+      <time
+        datetime={pubDate.toISOString()}
+        class="block text-light-gray-70 text-[length:var(--fs-6)] font-light mt-[30px] mb-[15px]"
       >
-        <ion-icon name="arrow-back"></ion-icon>
-        <span>Back to Blog</span>
-      </a>
-      <h2 class="h2 article-title mb-[30px]">{title}</h2>
+        {formattedDate}
+      </time>
+      <h1 class="h1 article-title mb-[30px]">{title}</h1>
     </header>
 
-    <section class="about-text text-light-gray text-[length:var(--fs-6)] font-light leading-[1.6] md:mb-[40px]">
-      <div class="blog-meta flex items-center gap-[7px] mb-[20px]">
-        <p class="text-light-gray-70 text-[length:var(--fs-6)] font-light">{category}</p>
-        <span class="bg-light-gray-70 w-1 h-1 rounded-[4px]"></span>
-        <time
-          datetime={pubDate.toISOString()}
-          class="text-light-gray-70 text-[length:var(--fs-6)] font-light"
-        >
-          {formattedDate}
-        </time>
-      </div>
-
+    <section class="about-text text-light-gray font-light leading-[1.6] md:mb-[40px]">
       <figure class="mb-[30px] rounded-[16px] overflow-hidden">
         <img src={banner.src} alt={title} class="w-full" />
       </figure>
+
+      <p class="text-left text-lg md:text-2xl font-light mb-[30px] border-l-4 pl-4">
+        {excerpt}
+      </p>
 
       <div class="prose">
         <slot />

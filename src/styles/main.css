@@ -364,7 +364,6 @@
   .h4,
   .h5 {
     color: var(--color-white-2);
-    text-transform: capitalize;
     font-weight: 700;
   }
 
