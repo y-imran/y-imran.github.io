@@ -15,6 +15,7 @@ import Highlight from '@src/components/ui/blog/Highlight.astro';
 import H1 from '@src/components/ui/blog/H1.astro';
 import H2 from '@src/components/ui/blog/H2.astro';
 import NumberList from '@src/components/ui/blog/NumberList.astro';
+import BulletList from '@src/components/ui/blog/BulletList.astro';
 import Link from '@src/components/ui/blog/Link.astro';
 
 {/* Images imports */}
@@ -43,7 +44,7 @@ By the end, we'll put it all together to build the <Highlight>flag of Finland</H
 </Paragraph>
 
 <Paragraph>
-Before we build let's discuss:
+Before we build let's answer few questions.
 </Paragraph>
 
 <H1>What are Containers?</H1>
@@ -62,7 +63,7 @@ In Tableau, we mainly work with two types of containers:
 ]}/>
 
 
-<Figure src={ObjectPanel} caption='Horizontal and Vertical containers in Tableau’s dashboard object pane'/>
+<Figure src={ObjectPanel} caption='Horizontal and Vertical containers in Tableau’s dashboard Objects pane'/>
 
 <H2>Horizontal Container</H2>
 
@@ -75,7 +76,7 @@ A horizontal container in Tableau allows us to align dashboard objects like char
 <H2>Vertical Container</H2>
 
 <Paragraph>
-A vertical container in Tableau stacks dashboard objects like worksheets, filters, or text boxes on <Highlight>top of one another in a single column</Highlight>.
+A vertical container places dashboard objects one below another, creating a <Highlight>top-to-bottom</Highlight> layout.
 </Paragraph>
 
 <Figure src={VerticalContainer} caption='A vertical container with three nested vertical containers, illustrating the top-to-bottom layout direction.'/>
@@ -139,16 +140,14 @@ By combining these simple ideas, we can create something surprisingly creative, 
 We've talked about what containers can do. Now we'll put everything together to build the <Highlight>flag of Finland</Highlight>.
 </Paragraph>
 
-<H2>Dimension of the Flag:</H2>
+<H2>Dimension of the Flag</H2>
 
 <Paragraph>
 The <Highlight>Finnish flag</Highlight> has an overall width-to-height ratio of <Highlight>18:11</Highlight>.
 </Paragraph>
 
 <Paragraph>
-The <Highlight>width</Highlight> is divided into three sections with a ratio of <Highlight>5:3:10</Highlight>
-
-The <Highlight>height</Highlight> is divided into three sections with a ratio of <Highlight>4:3:4</Highlight>
+The <Highlight>width</Highlight> is divided into three sections with a ratio of <Highlight>5:3:10</Highlight>. The <Highlight>height</Highlight> is divided into three sections with a ratio of <Highlight>4:3:4</Highlight>.
 </Paragraph>
 
 <Figure src={FinnishFlagDimensions} caption='The Finnish flag with its official proportions and dimensions (18:11)'/>
@@ -157,10 +156,21 @@ The <Highlight>height</Highlight> is divided into three sections with a ratio of
 To maintain the <Highlight>18:11</Highlight> aspect ratio and to make calculations of the strips easier, we'll use a width of <Highlight>900</Highlight> and a height of <Highlight>550</Highlight> pixels.
 </Paragraph>
 
+{/*Make the following para in panel*/}
+<Paragraph>
+Throughout the construction process, we will keep <Highlight>Distribute Contents Evenly</Highlight> disabled for all containers.
+</Paragraph>
+
+<H2>Colours Hex Codes</H2>
+
+<Paragraph>
+The Finnish flag uses two main colours: pure white <Highlight>#FFFFFF</Highlight> and a deep blue <Highlight>#002F6C</Highlight>.
+</Paragraph>
+
 <H2>01 — Start With the Foundation</H2>
 
 <Paragraph>
-First, we add a horizontal container as our main container.
+First, we add a <Highlight>horizontal container</Highlight> as our main container.
 </Paragraph>
 
 <Paragraph>
@@ -176,11 +186,18 @@ It gives us the basic left-to-right structure we need for the Finnish flag.
 <H2>02 — Divide the Flag Into Three </H2>
 
 <Paragraph>
-Inside our main horizontal container, we add three pieces.
+Inside the main horizontal container, we add <Highlight>three vertical containers</Highlight> to create the <Highlight>left</Highlight>,
+<Highlight>middle blue</Highlight>, and <Highlight>right</Highlight> sections of the flag.
 </Paragraph>
 
 <Paragraph>
-The two <Highlight>vertical containers</Highlight> will handle the left and right strips, while the <Highlight>horizontal container</Highlight> in the middle creates the blue strip running across the flag. 
+The reason we chose a <Highlight>900px</Highlight> width becomes clear here. 
+We need to divide the width in a 5:3:10 ratio, and 900px fits this proportion perfectly, giving us <Highlight>250px</Highlight>, 
+<Highlight>150px</Highlight> and <Highlight>500px</Highlight> for the three sections.
+</Paragraph>
+
+<Paragraph>
+We’ll set the background colour of each container to match the corresponding colours of the Finnish flag.
 </Paragraph>
 
 <Figure src={SecondStep} caption='The main horizontal container divided into three sections to build the blue and white strips of Finnish flag'/>
@@ -196,11 +213,11 @@ Now let's work on the left side of the flag.
 </Paragraph>
 
 <Paragraph>
-We start with a first <Highlight>vertical container</Highlight> and nest three more vertical containers inside it.
+We start with a first vertical container and nest <Highlight>three more vertical containers</Highlight> inside it.
 </Paragraph>
 
 <Paragraph>
-Each container represents one section of the Finnish flag: 
+Each container represents one section of the Finnish flag.
 </Paragraph>
 
 <Paragraph>
@@ -209,6 +226,12 @@ Each container represents one section of the Finnish flag:
 <Highlight>Middle</Highlight>&nbsp;&rarr; Blue
 
 <Highlight>Bottom</Highlight>&nbsp;&rarr; White
+</Paragraph>
+
+<Paragraph>
+Again, the reason for choosing a <Highlight>550px</Highlight> height comes in handy here.
+We need to divide the height in a 4:3:4 ratio, and 550px fits this proportion perfectly, giving us <Highlight>200px</Highlight>,
+<Highlight>150px</Highlight> and <Highlight>200px</Highlight> for the three sections.
 </Paragraph>
 
 <Figure src={ThirdStep} caption='A left vertical container divided into three sections white, blue, and white to form the left side of the Finnish flag'/>
@@ -224,21 +247,17 @@ Now we repeat the same idea on the right.
 </Paragraph>
 
 <Paragraph>
-In second <Highlight>vertical container</Highlight>, we’ll nest three vertical containers inside it
+In the last vertical container, we’ll nest <Highlight>three more vertical containers</Highlight> inside it.
 </Paragraph>
 
 <Paragraph>
 Now both sides have their own three-part structure, leaving the middle blue container to complete the cross.
 </Paragraph>
 
-<Paragraph>
-Our main horizontal container is now doing exactly what we designed it to do.
-</Paragraph>
-
-<Figure src={ForthStep} caption='A right vertical container divided into three sections white, blue, and white to form the right side of the Finnish flag'/>
+<Figure src={ForthStep} caption='The most right vertical container divided into three sections white, blue, and white'/>
 
 <Paragraph>
-The nested containers control the details inside the left and right sections, while the middle container creates the blue horizontal strip. 
+The nested containers control the details inside the left and right sections, while the middle container creates the blue vertical strip. 
 </Paragraph>
 
 <H2>06 — The Final Result</H2>
@@ -252,17 +271,18 @@ No image.
 
 No custom shapes.
 
-Just <Highlight>containers, nesting, proportions, and a little creativity</Highlight>. 
+Just <Highlight>containers</Highlight>, <Highlight>nesting</Highlight>, <Highlight>proportions</Highlight> and little <Highlight>creativity</Highlight>.
 </Paragraph>
 
-<H1>The Final Collection</H1>
+<H1>Let's Conclude</H1>
 
 <Paragraph>
 We started with something as simple as a container.
 </Paragraph>
 
 <Paragraph>
-By combining horizontal and vertical layouts, nesting, distribution, and a little control over proportions, we can turn those simple building blocks into something much more creative.
+By combining horizontal and vertical containers, nesting, distribution, and a little control over proportions,
+we can turn those simple building blocks into something much more creative.
 </Paragraph>
 
 <Paragraph>
