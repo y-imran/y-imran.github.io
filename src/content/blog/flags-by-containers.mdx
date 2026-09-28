@@ -8,11 +8,16 @@ readTimeMins: 5
 banner: "../../assets/blog/flags-by-container/thumbnail.png"
 ---
 
+{/* Components imports */}
 import Paragraph from '@components/ui/blog/Paragraph.astro';
 import Figure from '@components/ui/blog/Figure.astro'
 import Highlight from '@src/components/ui/blog/Highlight.astro';
 import H1 from '@src/components/ui/blog/H1.astro';
 import H2 from '@src/components/ui/blog/H2.astro';
+import NumberList from '@src/components/ui/blog/NumberList.astro';
+import Link from '@src/components/ui/blog/Link.astro';
+
+{/* Images imports */}
 import ObjectPanel from "../../assets/blog/flags-by-container/1-object-panel.png"
 import HorizontalContainer from "../../assets/blog/flags-by-container/2-horizontal-container.png"
 import VerticalContainer from "../../assets/blog/flags-by-container/3-vertical-container.png"
@@ -49,9 +54,12 @@ A Tableau dashboard is essentially a space where different <Highlight>objects</H
 
 <Paragraph>
 In Tableau, we mainly work with two types of containers:
-1. Horizontal Container
-2. Vertical Container
 </Paragraph>
+
+<NumberList items={[
+    "Horizontal Container",
+    "Vertical Container"
+]}/>
 
 
 <Figure src={ObjectPanel} caption='Horizontal and Vertical containers in Tableau’s dashboard object pane'/>
@@ -104,11 +112,7 @@ Now we can adjust the <Highlight>width</Highlight> if it is a horizontal contain
 <H1>When One Container Isn't Enough</H1>
 
 <Paragraph>
-So far, we've been working with one container at a time. 
-</Paragraph>
-
-<Paragraph>
-But what if we need <Highlight>different layouts within a single layout?</Highlight> 
+So far, we've been working with one container at a time. But what if we need <Highlight>different layouts within a single layout?</Highlight>
 </Paragraph>
 
 <Paragraph>
@@ -171,7 +175,7 @@ Think of it as the frame that will hold everything together.
 It gives us the basic left-to-right structure we need for the Finnish flag.
 </Paragraph>
 
-<Figure src={FirstStep} caption='A 900 × 550 px empty horizontal container serving as the main base for the Finnish flag'/>
+<Figure src={FirstStep} caption='A 900 × 550 pixels empty horizontal container serving as the main base for the Finnish flag'/>
 
 <H2>02 — Divide the Flag Into Three </H2>
 
@@ -204,11 +208,11 @@ Each container represents one section of the Finnish flag:
 </Paragraph>
 
 <Paragraph>
-<Highlight>Top:</Highlight> White
+<Highlight>Top</Highlight>&nbsp;&rarr; White
 
-<Highlight>Middle:</Highlight> Blue
+<Highlight>Middle</Highlight>&nbsp;&rarr; Blue
 
-<Highlight>Bottom:</Highlight> White
+<Highlight>Bottom</Highlight>&nbsp;&rarr; White
 </Paragraph>
 
 <Figure src={ThirdStep} caption='A left vertical container divided into three sections white, blue, and white to form the left side of the Finnish flag'/>
@@ -274,3 +278,7 @@ Here’s a collection of the country flags we built in Tableau — using contain
 </Paragraph>
 
 <Figure src={Flags} caption='A collection of flags recreated in Tableau using nested containers and precise layout proportions'/>
+
+<Paragraph>
+You can download the <Link url='https://public.tableau.com/app/profile/yusra.imran/viz/FlagsByContainers/Dashboard1' linkText='workbook from Tableau Public'/> to explore how these flags were created.
+</Paragraph>

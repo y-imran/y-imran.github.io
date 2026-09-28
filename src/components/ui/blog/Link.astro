@@ -1,0 +1,10 @@
+---
+interface Props {
+  url: string;
+  linkText: string;
+}
+
+const { url, linkText } = Astro.props;
+---
+
+<a href={url} target="_blank" rel="noopener noreferrer" class="text-orange-yellow-crayola underline underline-offset-4 decoration-2 inline">{linkText}</a>
