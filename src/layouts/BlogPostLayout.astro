@@ -17,7 +17,13 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
 });
 ---
 
-<BaseLayout title={`${title} - Yusra Imran`} description={excerpt}>
+<BaseLayout
+  title={`${title} - Yusra Imran`}
+  description={excerpt}
+  image={banner.src}
+  type="article"
+  publishedTime={pubDate}
+>
   <article class="about active" data-page="blog">
     <header>
       <time

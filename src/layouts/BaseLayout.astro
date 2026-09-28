@@ -4,13 +4,23 @@ import '@src/styles/main.css';
 import Sidebar from '@components/ui/common/Sidebar.astro';
 import Navbar from '@components/ui/common/Navbar.astro';
 import Footer from '@components/ui/common/Footer.astro';
+import SEO from '@components/ui/common/SEO.astro';
 
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
 }
 
-const { title = 'Home - Yusra Imran', description } = Astro.props;
+const {
+  title = 'Home - Yusra Imran',
+  description = 'Personal website of Yusra Imran, a medical laboratory technologist turned data analyst in Karachi, Pakistan. Tableau dashboards, data projects, and blog posts.',
+  image,
+  type = 'website',
+  publishedTime,
+} = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -24,7 +34,13 @@ const { title = 'Home - Yusra Imran', description } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <title>{title}</title>
-    {description && <meta name="description" content={description} />}
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+      publishedTime={publishedTime}
+    />
 
     <!-- Poppins font (optimized by Astro) -->
     <Font cssVariable="--font-poppins" preload />
