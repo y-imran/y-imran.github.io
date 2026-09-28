@@ -1,16 +1,14 @@
 ---
 import BaseLayout from '@src/layouts/BaseLayout.astro';
-import H1 from '@src/components/ui/blog/H1.astro';
 
 interface Props {
   title: string;
-  category: string;
   pubDate: Date;
   excerpt: string;
   banner: ImageMetadata;
 }
 
-const { title, category, pubDate, excerpt, banner } = Astro.props;
+const { title, pubDate, excerpt, banner } = Astro.props;
 
 const formattedDate = pubDate.toLocaleDateString('en-US', {
   month: 'short',
