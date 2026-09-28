@@ -4,7 +4,7 @@ title: Country Flags Using Tableau Containers
 category: tableau
 pubDate: 2026-09-26
 excerpt: What if a Tableau container could be more than a way to organize a dashboard?
-readTimeMins: 5
+readTimeMins: 8
 banner: "../../assets/blog/flags-by-container/thumbnail.png"
 ---
 
@@ -72,7 +72,7 @@ In Tableau, we mainly work with two types of containers:
 A horizontal container in Tableau allows us to align dashboard objects like charts, filters, text and even more containers <Highlight>side by side in a single row</Highlight>.
 </Paragraph>
 
-<Figure src={HorizontalContainer} caption='A horizontal container with three nested horizontal containers, illustrating the left-to-right layout direction.'/>
+<Figure src={HorizontalContainer} caption='A horizontal container with three nested horizontal containers, illustrating the left-to-right layout direction'/>
 
 <H2>Vertical Container</H2>
 
@@ -80,7 +80,7 @@ A horizontal container in Tableau allows us to align dashboard objects like char
 A vertical container places dashboard objects one below another, creating a <Highlight>top-to-bottom</Highlight> layout.
 </Paragraph>
 
-<Figure src={VerticalContainer} caption='A vertical container with three nested vertical containers, illustrating the top-to-bottom layout direction.'/>
+<Figure src={VerticalContainer} caption='A vertical container with three nested vertical containers, illustrating the top-to-bottom layout direction'/>
 
 <H1>Equal Space or Your Own Rules?</H1>
 
@@ -98,14 +98,14 @@ Sometimes we want Tableau to keep things <Highlight>even</Highlight>, and someti
 When <Highlight>Distribute Contents Evenly</Highlight> is enabled, the objects inside the container share the available space equally.
 </Paragraph>
 
-<Figure src={DistributeEvenly} caption='A vertical container evenly distributing space using Distribute Contents Evenly.'/>
+<Figure src={DistributeEvenly} caption='A vertical container evenly distributing space using Distribute Contents Evenly'/>
 <H2>Or... Let's Break the Balance</H2>
 
 <Paragraph>
 Turn it off, and we can take control of the proportions ourselves.
 </Paragraph>
 
-<Figure src={DistributeUnevenly} caption='A vertical container with unevenly distributed contents, allowing manual control over the space between each section.'/>
+<Figure src={DistributeUnevenly} caption='A vertical container with unevenly distributed contents, allowing manual control over the space between each section'/>
 
 <Paragraph>
 Now we can adjust the <Highlight>width</Highlight> if it is a horizontal container or <Highlight>height</Highlight> if it is a vertical container of each object to create the layout we want. 
@@ -151,14 +151,14 @@ The <Highlight>Finnish flag</Highlight> has an overall width-to-height ratio of 
 The <Highlight>width</Highlight> is divided into three sections with a ratio of <Highlight>5:3:10</Highlight>. The <Highlight>height</Highlight> is divided into three sections with a ratio of <Highlight>4:3:4</Highlight>.
 </Paragraph>
 
-<Figure src={FinnishFlagDimensions} caption='The Finnish flag with its official proportions and dimensions (18:11)'/>
+<Figure src={FinnishFlagDimensions} caption='The Finnish flag with its official proportions and dimensions. The width-to-height ratio of 18:11'/>
 
 <Paragraph>
 To maintain the <Highlight>18:11</Highlight> aspect ratio and to make calculations of the strips easier, we'll use a width of <Highlight>900</Highlight> and a height of <Highlight>550</Highlight> pixels.
 </Paragraph>
 
 <Panel type='info'>
-Throughout the construction process, we will keep <Highlight>Distribute Contents Evenly</Highlight> disabled for all containers.
+Throughout the construction process, we will keep Distribute Contents Evenly <Highlight>disabled</Highlight> for all containers.
 </Panel>
 
 <H2>Colours Hex Codes</H2>
@@ -197,10 +197,10 @@ We need to divide the width in a 5:3:10 ratio, and 900px fits this proportion pe
 </Paragraph>
 
 <Paragraph>
-We’ll set the background colour of each container to match the corresponding colours of the Finnish flag.
+We’ll set the <Highlight>background colour</Highlight> of each container to match the corresponding colours of the Finnish flag.
 </Paragraph>
 
-<Figure src={SecondStep} caption='The main horizontal container divided into three sections to build the blue and white strips of Finnish flag'/>
+<Figure src={SecondStep} caption='The main horizontal container divided into three sections to create the blue and white strips of the Finnish flag'/>
 
 <Paragraph>
 Now we have the basic skeleton of our cross.
@@ -234,7 +234,7 @@ We need to divide the height in a 4:3:4 ratio, and 550px fits this proportion pe
 <Highlight>150px</Highlight> and <Highlight>200px</Highlight> for the three sections.
 </Paragraph>
 
-<Figure src={ThirdStep} caption='A left vertical container divided into three sections white, blue, and white to form the left side of the Finnish flag'/>
+<Figure src={ThirdStep} caption='A left vertical container divided into three sections white, blue, and white'/>
 
 <Paragraph>
 By stacking these three containers vertically, we create the left side of the flag and establish the proportions we need for the cross. 
@@ -257,21 +257,12 @@ Now both sides have their own three-part structure, leaving the middle blue cont
 <Figure src={ForthStep} caption='The most right vertical container divided into three sections white, blue, and white'/>
 
 <Paragraph>
-The nested containers control the details inside the left and right sections, while the middle container creates the blue vertical strip. 
-</Paragraph>
-
-<H2>06 — The Final Result</H2>
-
-<Paragraph>
-What started as a few empty containers has turned into the <Highlight>flag of Finland</Highlight>. 
+The nested containers control the details inside the left and right sections, while the middle container creates the blue vertical strip.
 </Paragraph>
 
 <Paragraph>
-No image.
-
-No custom shapes.
-
-Just <Highlight>containers</Highlight>, <Highlight>nesting</Highlight>, <Highlight>proportions</Highlight> and little <Highlight>creativity</Highlight>.
+<Highlight>That's it</Highlight>.
+This is our Finnish flag. No images, no custom shapes, just a set of nested containers with background colors.
 </Paragraph>
 
 <H1>Let's Conclude</H1>
@@ -292,5 +283,9 @@ Here’s a collection of the country flags I built in Tableau using containers.
 <Figure src={Flags} caption='A collection of flags recreated in Tableau using nested containers and precise layout proportions'/>
 
 <Paragraph>
-You can download the <Link url='https://public.tableau.com/app/profile/yusra.imran/viz/FlagsByContainers/Dashboard1' linkText='workbook from Tableau Public'/> to explore how these flags were created.
+You can download my workbook from Tableau Public to explore how these flags were created.
+</Paragraph>
+
+<Paragraph>
+<Link url='https://public.tableau.com/app/profile/yusra.imran/viz/FlagsByContainers/Dashboard1' linkText='Link to the workbook'/>
 </Paragraph>

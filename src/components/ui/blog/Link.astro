@@ -7,7 +7,6 @@ interface Props {
 const { url, linkText } = Astro.props;
 ---
 
-<a href={url} target="_blank" rel="noopener noreferrer" class="text-orange-yellow-crayola underline underline-offset-4 decoration-2 inline-flex items-center gap-1">
+<a href={url} target="_blank" rel="noopener noreferrer" class="text-orange-yellow-crayola underline underline-offset-4 decoration-2">
   {linkText}
-  <ion-icon name="open-outline" aria-hidden="true" class="text-[14px]"></ion-icon>
 </a>
