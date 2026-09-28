@@ -1,6 +1,6 @@
 ---
 slug: country-flags-by-containers-in-tableau
-title: Country flags using Tableau containers
+title: Country Flags Using Tableau Containers
 category: tableau
 pubDate: 2026-09-26
 excerpt: What if a Tableau container could be more than a way to organize a dashboard?
@@ -46,7 +46,7 @@ By the end, we'll put it all together to build the <Highlight>flag of Finland</H
 Before we build let's discuss:
 </Paragraph>
 
-<H1>What are containers?</H1>
+<H1>What are Containers?</H1>
 
 <Paragraph>
 A Tableau dashboard is essentially a space where different <Highlight>objects</Highlight> live together. Containers help us control <Highlight>how those objects are arranged within that space</Highlight>. 
@@ -67,7 +67,7 @@ In Tableau, we mainly work with two types of containers:
 <H2>Horizontal Container</H2>
 
 <Paragraph>
-A horizontal container in Tableau allows us to align dashboard objects like charts, filters, text and even more containers <Highlight>side by side in a single row.</Highlight>
+A horizontal container in Tableau allows us to align dashboard objects like charts, filters, text and even more containers <Highlight>side by side in a single row</Highlight>.
 </Paragraph>
 
 <Figure src={HorizontalContainer} caption='A horizontal container with three nested horizontal containers, illustrating the left-to-right layout direction.'/>
@@ -75,7 +75,7 @@ A horizontal container in Tableau allows us to align dashboard objects like char
 <H2>Vertical Container</H2>
 
 <Paragraph>
-A vertical container in Tableau stacks dashboard elements like worksheets, filters, or text boxes on <Highlight>top of one another in a single column.</Highlight> 
+A vertical container in Tableau stacks dashboard objects like worksheets, filters, or text boxes on <Highlight>top of one another in a single column</Highlight>.
 </Paragraph>
 
 <Figure src={VerticalContainer} caption='A vertical container with three nested vertical containers, illustrating the top-to-bottom layout direction.'/>
@@ -116,15 +116,11 @@ So far, we've been working with one container at a time. But what if we need <Hi
 </Paragraph>
 
 <Paragraph>
-That's where <Highlight>nested containers come in.</Highlight> 
+That's where <Highlight>nested containers</Highlight> come in. We can place one container inside another, giving us more control over how our layout is arranged.
 </Paragraph>
 
 <Paragraph>
-We can place one container inside another, giving us more control over how our layout is arranged.
-</Paragraph>
-
-<Paragraph>
-<Highlight>Think of it as a container inside a container.</Highlight>
+Think of it as a container inside a container.
 </Paragraph>
 
 <H1>And Now, Let's Put It All Together</H1>
@@ -158,7 +154,7 @@ The <Highlight>height</Highlight> is divided into three sections with a ratio of
 <Figure src={FinnishFlagDimensions} caption='The Finnish flag with its official proportions and dimensions (18:11)'/>
 
 <Paragraph>
-To maintain the <Highlight>18:11</Highlight> aspect ratio and to make calculations of the strips easier, we can use a width of <Highlight>900</Highlight> and a height of <Highlight>550</Highlight>.
+To maintain the <Highlight>18:11</Highlight> aspect ratio and to make calculations of the strips easier, we'll use a width of <Highlight>900</Highlight> and a height of <Highlight>550</Highlight> pixels.
 </Paragraph>
 
 <H2>01 — Start With the Foundation</H2>
@@ -180,7 +176,7 @@ It gives us the basic left-to-right structure we need for the Finnish flag.
 <H2>02 — Divide the Flag Into Three </H2>
 
 <Paragraph>
-Inside our main horizontal container, we add three pieces
+Inside our main horizontal container, we add three pieces.
 </Paragraph>
 
 <Paragraph>
@@ -200,7 +196,7 @@ Now let's work on the left side of the flag.
 </Paragraph>
 
 <Paragraph>
-We start with a first <Highlight>vertical container</Highlight> and nest three more vertical containers inside it
+We start with a first <Highlight>vertical container</Highlight> and nest three more vertical containers inside it.
 </Paragraph>
 
 <Paragraph>
@@ -236,17 +232,13 @@ Now both sides have their own three-part structure, leaving the middle blue cont
 </Paragraph>
 
 <Paragraph>
-Our main horizontal container is now doing exactly what we designed it to do
+Our main horizontal container is now doing exactly what we designed it to do.
 </Paragraph>
 
 <Figure src={ForthStep} caption='A right vertical container divided into three sections white, blue, and white to form the right side of the Finnish flag'/>
 
 <Paragraph>
 The nested containers control the details inside the left and right sections, while the middle container creates the blue horizontal strip. 
-</Paragraph>
-
-<Paragraph>
-And just like that, our simple container hierarchy starts looking like a flag.
 </Paragraph>
 
 <H2>06 — The Final Result</H2>
@@ -274,7 +266,7 @@ By combining horizontal and vertical layouts, nesting, distribution, and a littl
 </Paragraph>
 
 <Paragraph>
-Here’s a collection of the country flags we built in Tableau — using containers.
+Here’s a collection of the country flags I built in Tableau using containers.
 </Paragraph>
 
 <Figure src={Flags} caption='A collection of flags recreated in Tableau using nested containers and precise layout proportions'/>
