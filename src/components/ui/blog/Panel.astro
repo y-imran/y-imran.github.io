@@ -1,0 +1,55 @@
+---
+export enum PanelType {
+  Info = 'info',
+  Warning = 'warning',
+  Success = 'success',
+  Error = 'error',
+}
+
+interface Props {
+  type?: PanelType;
+}
+
+const { type = PanelType.Info } = Astro.props;
+
+const config = {
+  [PanelType.Info]: {
+    icon: 'information-circle',
+    accent: 'hsl(192, 85%, 57%)',
+    bg: 'hsla(192, 85%, 47%, 0.08)',
+  },
+  [PanelType.Warning]: {
+    icon: 'warning',
+    accent: 'hsl(45, 96%, 60%)',
+    bg: 'hsla(45, 96%, 55%, 0.08)',
+  },
+  [PanelType.Success]: {
+    icon: 'checkmark-circle',
+    accent: 'hsl(142, 71%, 55%)',
+    bg: 'hsla(142, 71%, 50%, 0.08)',
+  },
+  [PanelType.Error]: {
+    icon: 'close-circle',
+    accent: 'hsl(0, 84%, 60%)',
+    bg: 'hsla(0, 84%, 55%, 0.08)',
+  },
+} as const;
+
+const { icon, accent, bg } = config[type];
+---
+
+<div
+  class="panel flex items-center gap-3 rounded-[12px] border px-4 py-4 my-[20px]"
+  style={`background:${bg}; border-color:${accent};`}
+>
+  <ion-icon
+    name={icon}
+    aria-hidden="true"
+    class="shrink-0 text-[24px]"
+    style={`color:${accent};`}
+  ></ion-icon>
+
+  <div class="flex-1 min-w-0 text-light-gray text-sm md:text-base font-light leading-[1.6]">
+    <slot />
+  </div>
+</div>

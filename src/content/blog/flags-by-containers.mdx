@@ -17,6 +17,7 @@ import H2 from '@src/components/ui/blog/H2.astro';
 import NumberList from '@src/components/ui/blog/NumberList.astro';
 import BulletList from '@src/components/ui/blog/BulletList.astro';
 import Link from '@src/components/ui/blog/Link.astro';
+import Panel from '@src/components/ui/blog/Panel.astro';
 
 {/* Images imports */}
 import ObjectPanel from "../../assets/blog/flags-by-container/1-object-panel.png"
@@ -156,10 +157,9 @@ The <Highlight>width</Highlight> is divided into three sections with a ratio of 
 To maintain the <Highlight>18:11</Highlight> aspect ratio and to make calculations of the strips easier, we'll use a width of <Highlight>900</Highlight> and a height of <Highlight>550</Highlight> pixels.
 </Paragraph>
 
-{/*Make the following para in panel*/}
-<Paragraph>
+<Panel type='info'>
 Throughout the construction process, we will keep <Highlight>Distribute Contents Evenly</Highlight> disabled for all containers.
-</Paragraph>
+</Panel>
 
 <H2>Colours Hex Codes</H2>
 
