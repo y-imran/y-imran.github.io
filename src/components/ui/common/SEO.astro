@@ -21,8 +21,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
 const imageURL = new URL(image, canonicalURL);
 const siteURL = Astro.site?.toString() ?? canonicalURL.origin;
 
-const xUrl = profile.socials.find((s) => s.name === 'X')?.url;
-const xHandle = xUrl ? `@${xUrl.replace(/\/+$/, '').split('/').pop()}` : undefined;
+const xHandle = '@_yimran';
 
 const personSchema = {
   '@context': 'https://schema.org',
