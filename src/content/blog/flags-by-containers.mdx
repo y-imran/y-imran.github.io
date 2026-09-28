@@ -13,16 +13,264 @@ import Figure from '@components/ui/blog/Figure.astro'
 import Highlight from '@src/components/ui/blog/Highlight.astro';
 import H1 from '@src/components/ui/blog/H1.astro';
 import H2 from '@src/components/ui/blog/H2.astro';
-import abc from "../../assets/blog/flags-by-container/thumbnail.png"
+import ObjectPanel from "../../assets/blog/flags-by-container/1-object-panel.png"
+import HorizontalContainer from "../../assets/blog/flags-by-container/2-horizontal-container.png"
+import VerticalContainer from "../../assets/blog/flags-by-container/3-vertical-container.png"
+import DistributeEvenly from "../../assets/blog/flags-by-container/4-distribute-contents-evenly-checked.png"
+import DistributeUnevenly from "../../assets/blog/flags-by-container/5-distribute-contents-evenly-unchecked.png"
+import FinnishFlagDimensions from "../../assets/blog/flags-by-container/6-finnish-flag-dimensions.png"
+import FirstStep from "../../assets/blog/flags-by-container/7-first-step.png"
+import SecondStep from "../../assets/blog/flags-by-container/8-second-step.png"
+import ThirdStep from "../../assets/blog/flags-by-container/9-third-step.png"
+import ForthStep from "../../assets/blog/flags-by-container/10-forth-step.png"
+import Flags from "../../assets/blog/flags-by-container/11-flags-collection.png"
 
 <Paragraph>
-Let's see how far we can go with something we use in almost every dashboard: <Highlight>containers</Highlight>. 
+Let's see how far we can go with something we use in almost every dashboard: <Highlight>containers</Highlight>.
 </Paragraph>
 
-<H1>This is H1 heading</H1>
 <Paragraph>
-In this blog post, we'll break down how <b>horizontal and vertical containers distribute space in Tableau</b>, how they can be nested, and how this simple idea can be used creatively. 
+In this blog post, we'll break down <Highlight>how horizontal and vertical containers distribute space in Tableau</Highlight>, how they can be nested, and how this simple idea can be used creatively.
 </Paragraph>
-<H2>This is H2 heading</H2>
 
-<Figure src={abc} caption="This is the image of the thumbnail that we have used to check Figure component" />
+<Paragraph>
+By the end, we'll put it all together to build the <Highlight>flag of Finland</Highlight>, and once you understand the technique, you can use the same approach to recreate almost any flag made up of rectangular blocks.
+</Paragraph>
+
+<Paragraph>
+Before we build let's discuss:
+</Paragraph>
+
+<H1>What are containers?</H1>
+
+<Paragraph>
+A Tableau dashboard is essentially a space where different <Highlight>objects</Highlight> live together. Containers help us control <Highlight>how those objects are arranged within that space</Highlight>. 
+</Paragraph>
+
+<Paragraph>
+In Tableau, we mainly work with two types of containers:
+1. Horizontal Container
+2. Vertical Container
+</Paragraph>
+
+
+<Figure src={ObjectPanel} caption='Horizontal and Vertical containers in Tableau’s dashboard object pane'/>
+
+<H2>Horizontal Container</H2>
+
+<Paragraph>
+A horizontal container in Tableau allows us to align dashboard objects like charts, filters, text and even more containers <Highlight>side by side in a single row.</Highlight>
+</Paragraph>
+
+<Figure src={HorizontalContainer} caption='A horizontal container with three nested horizontal containers, illustrating the left-to-right layout direction.'/>
+
+<H2>Vertical Container</H2>
+
+<Paragraph>
+A vertical container in Tableau stacks dashboard elements like worksheets, filters, or text boxes on <Highlight>top of one another in a single column.</Highlight> 
+</Paragraph>
+
+<Figure src={VerticalContainer} caption='A vertical container with three nested vertical containers, illustrating the top-to-bottom layout direction.'/>
+
+<H1>Equal Space or Your Own Rules?</H1>
+
+<Paragraph>
+Not every layout needs to share space equally.
+</Paragraph>
+
+<Paragraph>
+Sometimes we want Tableau to keep things <Highlight>even</Highlight>, and sometimes, we need to decide exactly how much space each object gets.
+</Paragraph>
+
+<H2>Let Tableau Share the Space</H2>
+
+<Paragraph>
+When <Highlight>Distribute Contents Evenly</Highlight> is enabled, the objects inside the container share the available space equally.
+</Paragraph>
+
+<Figure src={DistributeEvenly} caption='A vertical container evenly distributing space using Distribute Contents Evenly.'/>
+<H2>Or... Let's Break the Balance</H2>
+
+<Paragraph>
+Turn it off, and we can take control of the proportions ourselves.
+</Paragraph>
+
+<Figure src={DistributeUnevenly} caption='A vertical container with unevenly distributed contents, allowing manual control over the space between each section.'/>
+
+<Paragraph>
+Now we can adjust the <Highlight>width</Highlight> if it is a horizontal container or <Highlight>height</Highlight> if it is a vertical container of each object to create the layout we want. 
+</Paragraph>
+
+<H1>When One Container Isn't Enough</H1>
+
+<Paragraph>
+So far, we've been working with one container at a time. 
+</Paragraph>
+
+<Paragraph>
+But what if we need <Highlight>different layouts within a single layout?</Highlight> 
+</Paragraph>
+
+<Paragraph>
+That's where <Highlight>nested containers come in.</Highlight> 
+</Paragraph>
+
+<Paragraph>
+We can place one container inside another, giving us more control over how our layout is arranged.
+</Paragraph>
+
+<Paragraph>
+<Highlight>Think of it as a container inside a container.</Highlight>
+</Paragraph>
+
+<H1>And Now, Let's Put It All Together</H1>
+
+<Paragraph>
+We’ve looked at horizontal and vertical containers, distribution, and nesting. 
+</Paragraph>
+
+<Paragraph>
+By combining these simple ideas, we can create something surprisingly creative, flags from around the world, built entirely with Tableau containers.
+</Paragraph>
+
+<H1>Let's Build One - Finland Flag</H1>
+
+<Paragraph>
+We've talked about what containers can do. Now we'll put everything together to build the <Highlight>flag of Finland</Highlight>.
+</Paragraph>
+
+<H2>Dimension of the Flag:</H2>
+
+<Paragraph>
+The <Highlight>Finnish flag</Highlight> has an overall width-to-height ratio of <Highlight>18:11</Highlight>.
+</Paragraph>
+
+<Paragraph>
+The <Highlight>width</Highlight> is divided into three sections with a ratio of <Highlight>5:3:10</Highlight>
+
+The <Highlight>height</Highlight> is divided into three sections with a ratio of <Highlight>4:3:4</Highlight>
+</Paragraph>
+
+<Figure src={FinnishFlagDimensions} caption='The Finnish flag with its official proportions and dimensions (18:11)'/>
+
+<Paragraph>
+To maintain the <Highlight>18:11</Highlight> aspect ratio and to make calculations of the strips easier, we can use a width of <Highlight>900</Highlight> and a height of <Highlight>550</Highlight>.
+</Paragraph>
+
+<H2>01 — Start With the Foundation</H2>
+
+<Paragraph>
+First, we add a horizontal container as our main container.
+</Paragraph>
+
+<Paragraph>
+Think of it as the frame that will hold everything together.
+</Paragraph>
+
+<Paragraph>
+It gives us the basic left-to-right structure we need for the Finnish flag.
+</Paragraph>
+
+<Figure src={FirstStep} caption='A 900 × 550 px empty horizontal container serving as the main base for the Finnish flag'/>
+
+<H2>02 — Divide the Flag Into Three </H2>
+
+<Paragraph>
+Inside our main horizontal container, we add three pieces
+</Paragraph>
+
+<Paragraph>
+The two <Highlight>vertical containers</Highlight> will handle the left and right strips, while the <Highlight>horizontal container</Highlight> in the middle creates the blue strip running across the flag. 
+</Paragraph>
+
+<Figure src={SecondStep} caption='The main horizontal container divided into three sections to build the blue and white strips of Finnish flag'/>
+
+<Paragraph>
+Now we have the basic skeleton of our cross.
+</Paragraph>
+
+<H2>03 — Build the Left Section</H2>
+
+<Paragraph>
+Now let's work on the left side of the flag.
+</Paragraph>
+
+<Paragraph>
+We start with a first <Highlight>vertical container</Highlight> and nest three more vertical containers inside it
+</Paragraph>
+
+<Paragraph>
+Each container represents one section of the Finnish flag: 
+</Paragraph>
+
+<Paragraph>
+<Highlight>Top:</Highlight> White
+
+<Highlight>Middle:</Highlight> Blue
+
+<Highlight>Bottom:</Highlight> White
+</Paragraph>
+
+<Figure src={ThirdStep} caption='A left vertical container divided into three sections white, blue, and white to form the left side of the Finnish flag'/>
+
+<Paragraph>
+By stacking these three containers vertically, we create the left side of the flag and establish the proportions we need for the cross. 
+</Paragraph>
+
+<H2>04 — Mirror the Structure</H2>
+
+<Paragraph>
+Now we repeat the same idea on the right.
+</Paragraph>
+
+<Paragraph>
+In second <Highlight>vertical container</Highlight>, we’ll nest three vertical containers inside it
+</Paragraph>
+
+<Paragraph>
+Now both sides have their own three-part structure, leaving the middle blue container to complete the cross.
+</Paragraph>
+
+<Paragraph>
+Our main horizontal container is now doing exactly what we designed it to do
+</Paragraph>
+
+<Figure src={ForthStep} caption='A right vertical container divided into three sections white, blue, and white to form the right side of the Finnish flag'/>
+
+<Paragraph>
+The nested containers control the details inside the left and right sections, while the middle container creates the blue horizontal strip. 
+</Paragraph>
+
+<Paragraph>
+And just like that, our simple container hierarchy starts looking like a flag.
+</Paragraph>
+
+<H2>06 — The Final Result</H2>
+
+<Paragraph>
+What started as a few empty containers has turned into the <Highlight>flag of Finland</Highlight>. 
+</Paragraph>
+
+<Paragraph>
+No image.
+
+No custom shapes.
+
+Just <Highlight>containers, nesting, proportions, and a little creativity</Highlight>. 
+</Paragraph>
+
+<H1>The Final Collection</H1>
+
+<Paragraph>
+We started with something as simple as a container.
+</Paragraph>
+
+<Paragraph>
+By combining horizontal and vertical layouts, nesting, distribution, and a little control over proportions, we can turn those simple building blocks into something much more creative.
+</Paragraph>
+
+<Paragraph>
+Here’s a collection of the country flags we built in Tableau — using containers.
+</Paragraph>
+
+<Figure src={Flags} caption='A collection of flags recreated in Tableau using nested containers and precise layout proportions'/>
