@@ -62,7 +62,7 @@
 
   @media (min-width: 1024px) {
     .wheel-canvas {
-      width: min(52vw, 620px, 56vh);
+      width: min(52vw, 620px, 54vh);
     }
   }
 </style>
@@ -86,6 +86,7 @@
 
 <script>
   import * as d3 from 'd3';
+  import type { BaseType, Transition } from 'd3';
   import { flavorWheel } from '@data/flavor-wheel';
   import type { FlavorNode } from '@data/flavor-wheel';
 
@@ -245,7 +246,7 @@
       const t = g.transition().duration(dur).ease(ease);
 
       path
-        .transition(t as unknown as d3.Transition<SVGPathElement, RNode, null, unknown>)
+        .transition(t as unknown as Transition<BaseType, any, any, any>)
         .delay(delayFn)
         .tween('data', (d) => {
           const i = d3.interpolate(d.current, d.target!);
@@ -270,10 +271,10 @@
             labelVisible(d, d.target!)
           );
         })
-        .transition(t as unknown as d3.Transition<SVGTextElement, RNode, null, unknown>)
+        .transition(t as unknown as Transition<BaseType, any, any, any>)
         .delay(delayFn)
         .attrTween('transform', (d) => () => labelTransform(d.current))
-        .attrTween('fill-opacity', (d) => () => +labelVisible(d, d.current));
+        .attrTween('fill-opacity', (d) => () => String(+labelVisible(d, d.current)));
     }
 
     function zoomTo(p: RNode) {
@@ -296,7 +297,7 @@
 
     path.on('click', (_event, d) => zoomTo(d));
     center.on('click', (event) =>
-      zoomTo((event.target as SVGCircleElement).__data__ as RNode),
+      zoomTo(d3.select(event.currentTarget as SVGCircleElement).datum() as RNode),
     );
 
     path.on('pointerenter', (_event, d) => {
