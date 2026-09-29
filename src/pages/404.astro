@@ -1,4 +1,6 @@
 ---
+import { Font } from 'astro:assets';
+import FlavorWheel from '@components/ui/FlavorWheel.astro';
 ---
 
 <!DOCTYPE html>
@@ -10,9 +12,123 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="robots" content="noindex" />
     <title>Page not found - Yusra Imran</title>
+    <Font cssVariable="--font-poppins" preload />
   </head>
-  <body style="margin: 0; background: hsl(0, 0%, 7%); font-family: sans-serif; color: hsl(0, 0%, 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 16px;">
-    <h1 style="margin: 0; font-size: 24px; color: hsl(0, 0%, 100%); font-weight: 400;">Page Not Found</h1>
-    <a href="/" style="color: hsl(192, 85%, 47%); text-decoration: none;">Home</a>
+  <body>
+    <main class="not-found">
+      <div class="four-o-four">
+        <p class="four" aria-hidden="true">4</p>
+        <FlavorWheel />
+        <p class="four" aria-hidden="true">4</p>
+      </div>
+      <p class="sr-only">404</p>
+      <h1 class="title">page not found</h1>
+      <p class="subtitle">
+        Lost your way? Let the wheel find your perfect coffee flavor.
+      </p>
+      <a class="home" href="/">← back to home</a>
+    </main>
+
+    <footer class="credit">flavor wheel adapted from the <a href="https://sca.coffee/sca-news/how-to-use-the-flavor-wheel-in-eight-steps-ab2hy" rel="noopener noreferrer" target="_blank">SCA × World Coffee Research Coffee Taster's Flavor Wheel</a> (© SCA &amp; WCR, CC BY-NC-ND 4.0)</footer>
   </body>
 </html>
+
+<style>
+  body {
+    box-sizing: border-box;
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: hsl(0, 0%, 7%);
+    overflow-x: clip;
+    color: hsl(0, 0%, 100%);
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: 1.25rem 1rem;
+  }
+
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .four-o-four {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .four {
+    margin: 0;
+    font-size: clamp(5rem, 20vw, 10rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: hsl(0, 0%, 100%);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .title {
+    margin: 0.5rem 0 0;
+    font-size: 1.35rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    margin: 0.35rem 0 0.9rem;
+    font-weight: 300;
+    color: hsl(0, 0%, 70%);
+    text-wrap: balance;
+  }
+
+  .home {
+    color: hsl(192, 85%, 47%);
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+
+  .home:hover {
+    text-decoration: underline;
+  }
+
+  .credit {
+    font-size: 0.7rem;
+    font-weight: 300;
+    color: hsl(0, 0%, 45%);
+    text-align: center;
+  }
+
+  .credit a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 1024px) {
+    .four-o-four {
+      flex-direction: row;
+      gap: clamp(1rem, 3.5vw, 3rem);
+    }
+
+    .four {
+      font-size: clamp(7rem, 15vw, 12rem);
+    }
+  }
+</style>
