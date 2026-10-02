@@ -20,6 +20,7 @@ import turkiyeFlag from '@assets/portfolio/turkiye_flag.png';
 import waffleChart from '@assets/portfolio/waffle_chart.png';
 import yearlyEvents from '@assets/portfolio/yearly_events.png';
 import bloomYear from '@assets/portfolio/bloom_year.png';
+import globalPopulation from '@assets/portfolio/global_population.png'
 
 export interface TableauVisualization {
   id: string;
@@ -31,6 +32,13 @@ export interface TableauVisualization {
 }
 
 export const tableauVisualizations: TableauVisualization[] = [
+  {
+    id: 'global-population-analytics',
+    publishedDate: '2026-10-01',
+    title: "Global Population Analytics",
+    tableauUrl: 'https://public.tableau.com/app/profile/yusra.imran/viz/GlobalPopulationAnalytics/Dashboard1',
+    thumbnail: globalPopulation
+  },
   {
     id: 'bloom-through-the-seasons',
     publishedDate: '2026-09-24',
