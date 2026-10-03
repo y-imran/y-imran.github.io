@@ -1,0 +1,41 @@
+---
+import { Font } from 'astro:assets';
+import SEO from '@components/ui/common/SEO.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+}
+
+const { title, description, image, type = 'website', publishedTime } = Astro.props;
+---
+
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#181819" />
+<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<title>{title}</title>
+<SEO
+  title={title}
+  description={description}
+  image={image}
+  type={type}
+  publishedTime={publishedTime}
+/>
+
+<!-- Poppins font (optimized by Astro) -->
+<Font cssVariable="--font-poppins" preload />
+
+<!-- Ionicons -->
+<script
+  type="module"
+  src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script
+  nomodule
+  src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>

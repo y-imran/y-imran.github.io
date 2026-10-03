@@ -1,0 +1,38 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  meta?: string;
+  backHref?: string;
+}
+
+const { title, subtitle, meta, backHref = '/dashboard/' } = Astro.props;
+---
+
+<header
+  class="sticky top-0 z-10 flex items-center gap-2 px-4 py-3 border-b border-jet bg-[hsla(240,2%,12%,0.85)] backdrop-blur-[10px] md:gap-5 md:px-6"
+>
+  <a
+    href={backHref}
+    aria-label="Back to dashboards"
+    class="w-5 h-5 md:w-10 md:h-10 flex-shrink-0 flex items-center justify-center text-light-gray transition-colors duration-[250ms] hover:text-orange-yellow-crayola"
+  >
+    <ion-icon name="chevron-back-outline" class="text-[16px] md:text-[20px]"></ion-icon>
+  </a>
+
+  <span class="self-stretch w-px flex-shrink-0 bg-jet" aria-hidden="true"></span>
+
+  <div class="min-w-0">
+    <h1 class="text-white-2 text-[length:var(--fs-2)] font-bold leading-tight line-clamp-2">
+      {title}
+    </h1>
+    {subtitle && (
+      <p class="text-light-gray-70 text-[length:var(--fs-6)] font-light leading-snug truncate">
+        {subtitle}
+      </p>
+    )}
+    {meta && (
+      <p class="text-light-gray-70 text-[length:var(--fs-7)] font-light leading-snug">{meta}</p>
+    )}
+  </div>
+</header>
