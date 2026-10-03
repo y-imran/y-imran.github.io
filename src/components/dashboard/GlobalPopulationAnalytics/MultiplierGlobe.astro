@@ -25,6 +25,7 @@ const CLASS_LABELS = [
   data-thresholds={JSON.stringify(THRESHOLDS)}
   data-colors={JSON.stringify(CLASS_COLORS)}
 >
+  <div class="globe-skeleton" aria-hidden="true"></div>
   <div class="globe-tooltip" data-globe-tooltip hidden></div>
   <div
     class="globe-legend absolute bottom-4 left-4 flex flex-col gap-1 text-[length:var(--fs-8)] text-light-gray-70 pointer-events-none"
@@ -78,6 +79,58 @@ const CLASS_LABELS = [
   @media (min-width: 768px) {
     .globe-legend {
       bottom: calc((100% - var(--globe-diameter, 100%)) / 2);
+    }
+  }
+
+  .globe {
+    container-type: size;
+  }
+
+  .globe-skeleton {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+
+  .globe-skeleton::before {
+    content: '';
+    width: min(70%, 40vh);
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    background: var(--color-eerie-black-1);
+    box-shadow: inset 0 0 0 1px var(--color-jet);
+    animation: globe-skeleton-pulse 1.6s ease-in-out infinite;
+  }
+
+  @supports (width: 1cqw) {
+    .globe-skeleton::before {
+      width: min(74cqw, 74cqh);
+    }
+  }
+
+  .globe[data-ready] .globe-skeleton {
+    display: none;
+  }
+
+  .globe:not([data-ready]) .globe-legend {
+    visibility: hidden;
+  }
+
+  @keyframes globe-skeleton-pulse {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .globe-skeleton::before {
+      animation: none;
     }
   }
 </style>
@@ -625,5 +678,7 @@ const CLASS_LABELS = [
       };
       animate();
     }
+
+    container.dataset.ready = 'true';
   }
 </script>

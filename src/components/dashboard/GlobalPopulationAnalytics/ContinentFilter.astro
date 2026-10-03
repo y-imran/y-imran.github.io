@@ -43,6 +43,7 @@ const REGION_CARDS = [
               <circle cx="3" cy="3" r="1.8" />
             </pattern>
           </defs>
+          <rect class="region-skeleton" x="0" y="0" width="224" height="128" rx="14" />
           <path data-region-path={region.id} fill={`url(#region-dots-${region.id})`} />
         </svg>
       </button>
@@ -63,6 +64,29 @@ const REGION_CARDS = [
   }
   [data-continent-filter] [data-active='true'] .region-map path {
     stroke: #ffffff;
+  }
+
+  [data-continent-filter] .region-skeleton {
+    fill: var(--color-onyx);
+    animation: region-skeleton-pulse 1.4s ease-in-out infinite;
+  }
+  [data-continent-filter][data-ready] .region-skeleton {
+    display: none;
+  }
+  @keyframes region-skeleton-pulse {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-continent-filter] .region-skeleton {
+      animation: none;
+      opacity: 0.6;
+    }
   }
 </style>
 
@@ -134,6 +158,8 @@ const REGION_CARDS = [
       const d = project({ type: 'FeatureCollection', features: regionFeatures(region) } as never);
       if (d) path.setAttribute('d', d);
     }
+
+    container.dataset.ready = 'true';
 
     container.addEventListener('click', (event) => {
       const chip = (event.target as HTMLElement).closest<HTMLElement>('[data-region]');
