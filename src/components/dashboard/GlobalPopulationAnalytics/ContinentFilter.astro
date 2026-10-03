@@ -1,6 +1,5 @@
 ---
 const REGION_CARDS = [
-  { id: 'global', label: 'Global' },
   { id: 'africa', label: 'Africa' },
   { id: 'asia', label: 'Asia' },
   { id: 'europe', label: 'Europe' },
@@ -17,12 +16,12 @@ const REGION_CARDS = [
   data-continent-filter
 >
   {
-    REGION_CARDS.map((region, i) => (
+    REGION_CARDS.map((region) => (
       <button
         type="button"
         data-region={region.id}
-        aria-pressed={i === 0 ? 'true' : 'false'}
-        data-active={i === 0 ? 'true' : 'false'}
+        aria-pressed="false"
+        data-active="false"
         class="group flex min-w-[124px] flex-1 cursor-pointer flex-col items-center gap-1.5 rounded-lg border border-jet bg-eerie-black-1 px-2.5 pb-2.5 pt-2 transition-colors duration-[250ms] hover:border-white-2/25 group-data-[active=true]:border-white-2/50 group-data-[active=true]:bg-onyx"
       >
         <span class="whitespace-nowrap text-[length:var(--fs-6)] font-semibold tracking-wide text-light-gray-70 transition-colors duration-[250ms] group-data-[active=true]:text-white-2">
@@ -115,15 +114,13 @@ const REGION_CARDS = [
     ).features.filter((f) => String(f.id) !== '010');
 
     const regionFeatures = (region: string): Feature[] =>
-      region === 'global'
-        ? allFeatures
-        : allFeatures.filter((f) => {
-            const alpha3 = whereNumeric(String(f.id ?? '').padStart(3, '0'))?.alpha3;
-            return !!alpha3 && (REGIONS[region]?.includes(alpha3) ?? false);
-          });
+      allFeatures.filter((f) => {
+        const alpha3 = whereNumeric(String(f.id ?? '').padStart(3, '0'))?.alpha3;
+        return !!alpha3 && (REGIONS[region]?.includes(alpha3) ?? false);
+      });
 
     const makeProjection = (region: string) => {
-      const map = REGION_MAPS[region] ?? REGION_MAPS.global;
+      const map = REGION_MAPS[region];
       const factory = () =>
         (map.mercator ? geoMercator() : geoEquirectangular()).rotate([-map.center, 0]);
       const [[minLon, minLat], [maxLon, maxLat]] = map.viewport;
@@ -153,7 +150,8 @@ const REGION_CARDS = [
     };
 
     for (const path of container.querySelectorAll<SVGPathElement>('[data-region-path]')) {
-      const region = path.dataset.regionPath ?? 'global';
+      const region = path.dataset.regionPath;
+      if (!region) continue;
       const project = geoPath(makeProjection(region));
       const d = project({ type: 'FeatureCollection', features: regionFeatures(region) } as never);
       if (d) path.setAttribute('d', d);

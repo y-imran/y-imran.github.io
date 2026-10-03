@@ -24,7 +24,6 @@ export type RegionMapConfig = {
   mercator?: boolean;
 };
 export const REGION_MAPS: Record<string, RegionMapConfig> = {
-  global: { center: 0, viewport: [[-180, -90], [180, 90]] },
   africa: { center: 16, viewport: [[-20, -36], [52, 38]] },
   asia: { center: 87, viewport: [[26, -11], [148, 56]] },
   europe: { center: 75, viewport: [[-30, 33], [180, 83]], mercator: true },

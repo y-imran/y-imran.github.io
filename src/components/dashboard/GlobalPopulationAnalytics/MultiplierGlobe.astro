@@ -4,6 +4,9 @@ interface Props {
     'Country Name'?: string;
     Multiplied?: number | null;
     'Peak Year'?: number | string | null;
+    'Peak Population'?: string | number | null;
+    'Population 1960'?: string | number | null;
+    'Population 2025'?: string | number | null;
   }>;
 }
 
@@ -68,7 +71,13 @@ const CLASS_LABELS = [
     display: none;
   }
 
-  .globe :global(.globe-tooltip-peak) {
+  .globe :global(.globe-tooltip-title) {
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .globe :global(.globe-tooltip-peak),
+  .globe :global(.globe-tooltip-pop) {
     display: block;
     margin-top: 2px;
     font-size: 11px;
@@ -149,7 +158,14 @@ const CLASS_LABELS = [
     properties?: { name?: string };
     geometry: { type: string; coordinates: unknown };
   };
-  type PopEntry = { 'Country Name'?: string; Multiplied?: number | null; 'Peak Year'?: number | string | null };
+  type PopEntry = {
+    'Country Name'?: string;
+    Multiplied?: number | null;
+    'Peak Year'?: number | string | null;
+    'Peak Population'?: string | number | null;
+    'Population 1960'?: string | number | null;
+    'Population 2025'?: string | number | null;
+  };
 
   const container = document.querySelector<HTMLElement>('[data-globe]');
 
@@ -400,6 +416,9 @@ const CLASS_LABELS = [
         name: entry['Country Name'] ?? alpha3,
         multiplied: entry.Multiplied,
         peakYear: entry['Peak Year'],
+        peakPopulation: entry['Peak Population'],
+        population1960: entry['Population 1960'],
+        population2025: entry['Population 2025'],
       };
     };
 
@@ -411,6 +430,13 @@ const CLASS_LABELS = [
 
     const hideTooltip = () => {
       if (tooltip) tooltip.hidden = true;
+    };
+
+    const tooltipLine = (tip: HTMLElement, className: string, text: string): void => {
+      const line = document.createElement('span');
+      line.className = className;
+      line.textContent = text;
+      tip.appendChild(line);
     };
 
     const updateHover = () => {
@@ -447,18 +473,15 @@ const CLASS_LABELS = [
       if (!entry) return hideTooltip();
 
       tooltip.hidden = false;
-      const formatted =
-        entry.multiplied < 1 ? entry.multiplied.toFixed(2) : Math.round(entry.multiplied);
+      const formatted = entry.multiplied.toFixed(2);
       const title = document.createElement('span');
       title.className = 'globe-tooltip-title';
       title.textContent = `${entry.name} · ${formatted}×`;
       tooltip.replaceChildren(title);
-      if (entry.peakYear != null) {
-        const peak = document.createElement('span');
-        peak.className = 'globe-tooltip-peak';
-        peak.textContent = `Peak year ${entry.peakYear}`;
-        tooltip.appendChild(peak);
-      }
+      if (entry.population1960 != null) tooltipLine(tooltip, 'globe-tooltip-pop', `Year 1960 · ${entry.population1960}`);
+      if (entry.population2025 != null) tooltipLine(tooltip, 'globe-tooltip-pop', `Year 2025 · ${entry.population2025}`);
+      if (entry.peakPopulation != null && entry.peakYear != null)
+        tooltipLine(tooltip, 'globe-tooltip-peak', `Peak population ${entry.peakPopulation} in ${entry.peakYear}`);
       tooltip.style.left = `${event.clientX - rect.left}px`;
       tooltip.style.top = `${event.clientY - rect.top}px`;
     };
@@ -585,7 +608,7 @@ const CLASS_LABELS = [
 
     // Continent filter chips: highlight the region silhouette (outer boundary
     // only — arcs with exactly one side inside the region) and rotate it into
-    // view; the spin stays stopped until Global is picked.
+    // view; the spin stays stopped until the pointer leaves the globe.
     const regionOutline = (region: string): void => {
       const codes = REGIONS[region];
       if (!codes) return;
@@ -616,12 +639,8 @@ const CLASS_LABELS = [
     };
 
     window.addEventListener('globe:filter', (event) => {
-      const region = (event as CustomEvent<{ region?: string }>).detail?.region ?? 'global';
-      if (region === 'global' || !REGIONS[region]) {
-        clearHighlight();
-        if (!hovering && !reduceMotion) controls.autoRotate = true;
-        return;
-      }
+      const region = (event as CustomEvent<{ region?: string }>).detail?.region;
+      if (!region || !REGIONS[region]) return;
       regionOutline(region);
     });
 

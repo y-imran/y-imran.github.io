@@ -44,7 +44,7 @@ const max = entries.length ? Math.max(...entries.map((e) => e.multiplied)) : 1;
               />
             </span>
             <span class="w-12 shrink-0 text-right text-[length:var(--fs-6)] tabular-nums text-white-2">
-              {entry.multiplied < 1 ? entry.multiplied.toFixed(2) : Math.round(entry.multiplied)}
+              {entry.multiplied.toFixed(2)}
             </span>
           </button>
         </li>
