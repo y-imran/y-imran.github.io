@@ -74,6 +74,12 @@ const CLASS_LABELS = [
     font-weight: 400;
     color: hsla(0, 0%, 84%, 0.7);
   }
+
+  @media (min-width: 768px) {
+    .globe-legend {
+      bottom: calc((100% - var(--globe-diameter, 100%)) / 2);
+    }
+  }
 </style>
 
 <script>
@@ -83,6 +89,7 @@ const CLASS_LABELS = [
   import { geoContains, geoBounds, geoCentroid, geoEquirectangular, geoPath } from 'd3-geo';
   import { whereNumeric } from 'iso-3166-1';
   import world from 'world-atlas/countries-110m.json';
+  import { REGIONS } from './regions';
 
   type Feature = {
     id?: string | number;
@@ -108,6 +115,9 @@ const CLASS_LABELS = [
     const featureObjects = (
       world as never as { objects: { countries: { geometries: { id?: string | number }[] } } }
     ).objects.countries.geometries.filter((g) => String(g.id) !== '010');
+    const countriesCollection = (
+      world as never as { objects: { countries: never } }
+    ).objects.countries;
     const bounds = features.map((f) => geoBounds(f as never));
 
     const RADIUS = 1;
@@ -430,14 +440,16 @@ const CLASS_LABELS = [
     const easeInOut = (t: number): number =>
       t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 
-    const focusOn = (lon: number, lat: number): void => {
+    const focusOn = (lon: number, lat: number, resume = true): void => {
       controls.autoRotate = false;
       window.clearTimeout(resumeTimer);
-      resumeTimer = window.setTimeout(() => {
-        if (hovering) return;
-        controls.autoRotate = !reduceMotion;
-        if (controls.autoRotate) clearHighlight();
-      }, RESUME_DELAY);
+      if (resume) {
+        resumeTimer = window.setTimeout(() => {
+          if (hovering) return;
+          controls.autoRotate = !reduceMotion;
+          if (controls.autoRotate) clearHighlight();
+        }, RESUME_DELAY);
+      }
 
       const dist = camera.position.length();
       const from = camera.position.clone().normalize();
@@ -493,26 +505,72 @@ const CLASS_LABELS = [
       }
     };
 
-    const setHighlight = (index: number): void => {
-      if (highlightIndex === index) return;
-      highlightIndex = index;
-      outlineFadingOut = false;
-      outlineStart = performance.now();
-
-      const outlineLines = mesh(world as never, featureObjects[index] as never) as unknown as {
-        coordinates: number[][][];
-      };
+    const highlightOutline = (lines: number[][][]): void => {
       const segments: number[] = [];
-      for (const line of outlineLines.coordinates) projectLine(line, segments);
+      for (const line of lines) projectLine(line, segments);
       outline.geometry.dispose();
       outline.geometry = new THREE.BufferGeometry();
       outline.geometry.setAttribute('position', new THREE.Float32BufferAttribute(segments, 3));
       outline.visible = true;
+      outlineFadingOut = false;
+      outlineStart = performance.now();
+    };
+
+    const setHighlight = (index: number): void => {
+      if (highlightIndex === index) return;
+      highlightIndex = index;
+      highlightOutline(
+        (mesh(world as never, featureObjects[index] as never) as unknown as {
+          coordinates: number[][][];
+        }).coordinates,
+      );
       if (reduceMotion) {
         outlineMaterial.opacity = OUTLINE_STATIC_OPACITY;
         renderer.render(scene, camera);
       }
     };
+
+    // Continent filter chips: highlight the region silhouette (outer boundary
+    // only — arcs with exactly one side inside the region) and rotate it into
+    // view; the spin stays stopped until Global is picked.
+    const regionOutline = (region: string): void => {
+      const codes = REGIONS[region];
+      if (!codes) return;
+      const regions = new Set(codes);
+      const inRegion = (g: { id?: string | number } | null | undefined): boolean => {
+        if (!g) return false;
+        const alpha3 = whereNumeric(String(g.id ?? '').padStart(3, '0'))?.alpha3;
+        return !!alpha3 && regions.has(alpha3);
+      };
+      const outlineLines = mesh(
+        world as never,
+        countriesCollection as never,
+        // Coastal arcs pass (g, g) — same geometry as both filter args — so those
+        // keep only when the country is in the region; shared interior arcs are
+        // kept on an XOR basis: exactly one side inside the region (the continent
+        // silhouette), excluded when both/neither sides are members.
+        (a: { id?: string | number }, b: { id?: string | number }) =>
+          a === b ? inRegion(a) : inRegion(a) !== inRegion(b),
+      ) as unknown as { coordinates: number[][][] };
+      highlightIndex = null;
+      highlightOutline(outlineLines.coordinates);
+      const [lon, lat] = geoCentroid(outlineLines as never) as [number, number];
+      focusOn(lon, lat, false);
+      if (reduceMotion) {
+        outlineMaterial.opacity = OUTLINE_STATIC_OPACITY;
+        renderer.render(scene, camera);
+      }
+    };
+
+    window.addEventListener('globe:filter', (event) => {
+      const region = (event as CustomEvent<{ region?: string }>).detail?.region ?? 'global';
+      if (region === 'global' || !REGIONS[region]) {
+        clearHighlight();
+        if (!hovering && !reduceMotion) controls.autoRotate = true;
+        return;
+      }
+      regionOutline(region);
+    });
 
     const resize = () => {
       const w = container.clientWidth;

@@ -1,0 +1,151 @@
+---
+const REGION_CARDS = [
+  { id: 'global', label: 'Global' },
+  { id: 'africa', label: 'Africa' },
+  { id: 'asia', label: 'Asia' },
+  { id: 'europe', label: 'Europe' },
+  { id: 'north-america', label: 'North America' },
+  { id: 'south-america', label: 'South America' },
+  { id: 'oceania', label: 'Oceania' },
+];
+---
+
+<div
+  class="flex items-stretch gap-2 overflow-x-auto px-4 py-2 md:px-6"
+  role="group"
+  aria-label="Region filter"
+  data-continent-filter
+>
+  {
+    REGION_CARDS.map((region, i) => (
+      <button
+        type="button"
+        data-region={region.id}
+        aria-pressed={i === 0 ? 'true' : 'false'}
+        data-active={i === 0 ? 'true' : 'false'}
+        class="group flex min-w-[124px] flex-1 cursor-pointer flex-col items-center gap-1.5 rounded-lg border border-jet bg-eerie-black-1 px-2.5 pb-2.5 pt-2 transition-colors duration-[250ms] hover:border-white-2/25 group-data-[active=true]:border-white-2/50 group-data-[active=true]:bg-onyx"
+      >
+        <span class="whitespace-nowrap text-[length:var(--fs-6)] font-semibold tracking-wide text-light-gray-70 transition-colors duration-[250ms] group-data-[active=true]:text-white-2">
+          {region.label}
+        </span>
+        <svg
+          viewBox="0 0 224 128"
+          class="region-map h-14 w-full opacity-80 transition-opacity duration-[250ms] group-data-[active=true]:opacity-100"
+          aria-hidden="true"
+        >
+          <defs>
+            <pattern
+              id={`region-dots-${region.id}`}
+              width="6"
+              height="6"
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="3" cy="3" r="1.8" />
+            </pattern>
+          </defs>
+          <path data-region-path={region.id} fill={`url(#region-dots-${region.id})`} />
+        </svg>
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  [data-continent-filter] .region-map circle {
+    fill: #e7e7e3;
+  }
+  [data-continent-filter] [data-active='true'] .region-map circle {
+    fill: #ffffff;
+  }
+  [data-continent-filter] .region-map path {
+    stroke: #e7e7e3;
+    stroke-width: 0.5;
+  }
+  [data-continent-filter] [data-active='true'] .region-map path {
+    stroke: #ffffff;
+  }
+</style>
+
+<script>
+  import { feature } from 'topojson-client';
+  import { geoEquirectangular, geoMercator, geoPath } from 'd3-geo';
+  import { whereNumeric } from 'iso-3166-1';
+  import world from 'world-atlas/countries-110m.json';
+  import { REGION_MAPS, REGIONS } from './regions';
+
+  type Feature = { id?: string | number; properties?: { name?: string }; geometry: unknown };
+
+  const container = document.querySelector<HTMLElement>('[data-continent-filter]');
+
+  if (container && !container.dataset.mounted) {
+    container.dataset.mounted = 'true';
+
+    const W = 224;
+    const H = 128;
+    const PAD = 8;
+
+    const allFeatures = (
+      feature(world as never, (world as never as { objects: { countries: never } }).objects.countries) as unknown as {
+        features: Feature[];
+      }
+    ).features.filter((f) => String(f.id) !== '010');
+
+    const regionFeatures = (region: string): Feature[] =>
+      region === 'global'
+        ? allFeatures
+        : allFeatures.filter((f) => {
+            const alpha3 = whereNumeric(String(f.id ?? '').padStart(3, '0'))?.alpha3;
+            return !!alpha3 && (REGIONS[region]?.includes(alpha3) ?? false);
+          });
+
+    const makeProjection = (region: string) => {
+      const map = REGION_MAPS[region] ?? REGION_MAPS.global;
+      const factory = () =>
+        (map.mercator ? geoMercator() : geoEquirectangular()).rotate([-map.center, 0]);
+      const [[minLon, minLat], [maxLon, maxLat]] = map.viewport;
+      const raw = factory().scale(1).translate([0, 0]);
+      const corners = (
+        [
+          [minLon, minLat],
+          [maxLon, minLat],
+          [maxLon, maxLat],
+          [minLon, maxLat],
+        ] as [number, number][]
+      ).map((p) => raw(p) as [number, number]);
+      const xs = corners.map((c) => c[0]);
+      const ys = corners.map((c) => c[1]);
+      const dx = Math.max(...xs) - Math.min(...xs);
+      const dy = Math.max(...ys) - Math.min(...ys);
+      const scale = Math.min((W - 2 * PAD) / dx, (H - 2 * PAD) / dy);
+      const tx = PAD + (W - 2 * PAD - dx * scale) / 2 - Math.min(...xs) * scale;
+      const ty = PAD + (H - 2 * PAD - dy * scale) / 2 - Math.min(...ys) * scale;
+      return factory()
+        .scale(scale)
+        .translate([tx, ty])
+        .clipExtent([
+          [0, 0],
+          [W, H],
+        ]);
+    };
+
+    for (const path of container.querySelectorAll<SVGPathElement>('[data-region-path]')) {
+      const region = path.dataset.regionPath ?? 'global';
+      const project = geoPath(makeProjection(region));
+      const d = project({ type: 'FeatureCollection', features: regionFeatures(region) } as never);
+      if (d) path.setAttribute('d', d);
+    }
+
+    container.addEventListener('click', (event) => {
+      const chip = (event.target as HTMLElement).closest<HTMLElement>('[data-region]');
+      if (!chip) return;
+      container.querySelectorAll<HTMLElement>('[data-region]').forEach((el) => {
+        const active = el === chip;
+        el.dataset.active = active ? 'true' : 'false';
+        el.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      window.dispatchEvent(
+        new CustomEvent('globe:filter', { detail: { region: chip.dataset.region } }),
+      );
+    });
+  }
+</script>

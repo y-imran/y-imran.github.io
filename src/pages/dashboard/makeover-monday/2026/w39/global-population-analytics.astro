@@ -2,6 +2,7 @@
 import DashboardLayout from '@src/layouts/DashboardLayout.astro';
 import MultiplierGlobe from '@components/dashboard/GlobalPopulationAnalytics/MultiplierGlobe.astro';
 import MultiplierTable from '@components/dashboard/GlobalPopulationAnalytics/MultiplierTable.astro';
+import ContinentFilter from '@components/dashboard/GlobalPopulationAnalytics/ContinentFilter.astro';
 
 const POPULATION_URL =
   'https://raw.githubusercontent.com/y-imran/Dashboarding/refs/heads/main/makeover-monday/2026/W39/api/population-growth.json';
@@ -48,11 +49,15 @@ const entries = Object.entries(population)
         after peaking in 1988.
       </p>
       <p>
-        Click a row to bring that country front and center on the globe, or hover the globe for
-        exact multiples and the year each population peaked.
+        Click a row to bring that country front and center on the globe, click a continent below to
+        highlight it, or hover the globe for exact multiples and the year each population peaked.
       </p>
       </div>
     </div>
+  </section>
+
+  <section class="mt-6 lg:mx-auto lg:w-[80%] lg:max-w-[1180px]">
+    <ContinentFilter />
   </section>
 
   <main class="flex-1 flex flex-col lg:flex-row lg:w-[60%] lg:mx-auto lg:min-h-0">
