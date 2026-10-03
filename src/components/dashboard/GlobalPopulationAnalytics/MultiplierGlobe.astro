@@ -1,0 +1,571 @@
+---
+interface Props {
+  population: Record<string, {
+    'Country Name'?: string;
+    Multiplied?: number | null;
+    'Peak Year'?: number | string | null;
+  }>;
+}
+
+const { population } = Astro.props;
+const populationJson = JSON.stringify(population).replace(/</g, '\\u003c');
+
+const THRESHOLDS = [1, 1.5, 3, 5, 10];
+const CLASS_COLORS = ['#b3b3b3', '#3b82f6', '#22d3ee', '#4ade80', '#facc15', '#f97316'];
+const CLASS_LABELS = [
+  `< ${THRESHOLDS[0]}×`,
+  ...THRESHOLDS.slice(1).map((t, i) => `${THRESHOLDS[i]}–${t}×`),
+  `> ${THRESHOLDS[THRESHOLDS.length - 1]}×`,
+];
+---
+
+<div
+  class="globe relative w-full h-full"
+  data-globe
+  data-thresholds={JSON.stringify(THRESHOLDS)}
+  data-colors={JSON.stringify(CLASS_COLORS)}
+>
+  <div class="globe-tooltip" data-globe-tooltip hidden></div>
+  <div
+    class="globe-legend absolute bottom-4 left-4 flex flex-col gap-1 text-[length:var(--fs-8)] text-light-gray-70 pointer-events-none"
+  >
+    {
+      CLASS_COLORS.map((color, i) => (
+        <div class="flex items-center gap-2">
+          <span class="h-2.5 w-4 rounded-sm" style={`background:${color}`} />
+          <span class="tabular-nums">{CLASS_LABELS[i]}</span>
+        </div>
+      ))
+    }
+  </div>
+</div>
+<script type="application/json" id="globe-population" set:html={populationJson}></script>
+
+<style>
+  .globe :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .globe :global(.globe-tooltip) {
+    position: absolute;
+    transform: translate(-50%, calc(-100% - 12px));
+    padding: 4px 9px;
+    border-radius: 8px;
+    background: hsla(240, 2%, 10%, 0.92);
+    border: 1px solid var(--color-jet);
+    color: var(--color-white-2);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .globe :global(.globe-tooltip[hidden]) {
+    display: none;
+  }
+
+  .globe :global(.globe-tooltip-peak) {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    font-weight: 400;
+    color: hsla(0, 0%, 84%, 0.7);
+  }
+</style>
+
+<script>
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { feature, mesh } from 'topojson-client';
+  import { geoContains, geoBounds, geoCentroid, geoEquirectangular, geoPath } from 'd3-geo';
+  import { whereNumeric } from 'iso-3166-1';
+  import world from 'world-atlas/countries-110m.json';
+
+  type Feature = {
+    id?: string | number;
+    properties?: { name?: string };
+    geometry: { type: string; coordinates: unknown };
+  };
+  type PopEntry = { 'Country Name'?: string; Multiplied?: number | null; 'Peak Year'?: number | string | null };
+
+  const container = document.querySelector<HTMLElement>('[data-globe]');
+
+  if (container && !container.dataset.mounted) {
+    container.dataset.mounted = 'true';
+
+    const dataEl = document.getElementById('globe-population');
+    const population: Record<string, PopEntry> = dataEl?.textContent
+      ? JSON.parse(dataEl.textContent)
+      : {};
+
+    const geo = feature(world as never, (world as never as { objects: { countries: never } }).objects.countries) as unknown as {
+      features: Feature[];
+    };
+    const features = geo.features.filter((f) => String(f.id) !== '010');
+    const featureObjects = (
+      world as never as { objects: { countries: { geometries: { id?: string | number }[] } } }
+    ).objects.countries.geometries.filter((g) => String(g.id) !== '010');
+    const bounds = features.map((f) => geoBounds(f as never));
+
+    const RADIUS = 1;
+    // Portion of the panel's smaller dimension that the visible dot-globe spans
+    // (2R over the fitted viewport height: fit = 1.25, buffer = 1.08).
+    const DIAMETER_FRACTION = 1 / (1.25 * 1.08);
+    const spherePos = (lon: number, lat: number): THREE.Vector3 => {
+      const phi = ((90 - lat) * Math.PI) / 180;
+      const theta = ((lon + 180) * Math.PI) / 180;
+      return new THREE.Vector3(
+        -Math.sin(phi) * Math.cos(theta),
+        Math.cos(phi),
+        Math.sin(phi) * Math.sin(theta),
+      );
+    };
+
+    // Rasterize land to an offscreen canvas and sample it into globe points.
+    const W = 2048;
+    const H = 1024;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const indexCanvas = document.createElement('canvas');
+    indexCanvas.width = W;
+    indexCanvas.height = H;
+    const indexCtx = indexCanvas.getContext('2d');
+    const positions: number[] = [];
+    const colors: number[] = [];
+
+    const multiplierFor = (f: Feature): number | null => {
+      const alpha3 = whereNumeric(String(f.id ?? '').padStart(3, '0'))?.alpha3;
+      const value = alpha3 ? population[alpha3]?.Multiplied : null;
+      return typeof value === 'number' ? value : null;
+    };
+    const multipliers = features.map(multiplierFor);
+
+    // Country lookup indexes + spherical centroids (lon, lat) for camera focus.
+    const alpha3Index = new Map<string, number>();
+    const nameIndex = new Map<string, number>();
+    const centroids: [number, number][] = features.map((f, i) => {
+      const alpha3 = whereNumeric(String(f.id ?? '').padStart(3, '0'))?.alpha3;
+      if (alpha3 && !alpha3Index.has(alpha3)) alpha3Index.set(alpha3, i);
+      const name = String(f.properties?.name ?? '').toLowerCase();
+      if (name && !nameIndex.has(name)) nameIndex.set(name, i);
+      return geoCentroid(f as never) as [number, number];
+    });
+    const thresholds: number[] = JSON.parse(container.dataset.thresholds || '[]');
+    const classColors = (JSON.parse(container.dataset.colors || '[]') as string[]).map(
+      (c) => new THREE.Color(c),
+    );
+    const noDataColor = new THREE.Color('#243b53');
+    const multiplierColor = (value: number | null): THREE.Color => {
+      if (value === null) return noDataColor;
+      let bin = 0;
+      while (bin < thresholds.length && value >= thresholds[bin]) bin++;
+      return classColors[bin] ?? noDataColor;
+    };
+    const featureColors = multipliers.map(multiplierColor);
+
+    if (ctx && indexCtx) {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, W, H);
+      indexCtx.fillStyle = '#000';
+      indexCtx.fillRect(0, 0, W, H);
+      const projection = geoEquirectangular()
+        .scale(W / (2 * Math.PI))
+        .translate([W / 2, H / 2]);
+      const path = geoPath(projection, ctx);
+      const indexPath = geoPath(projection, indexCtx);
+
+      features.forEach((f, i) => {
+        const id = i + 1;
+        ctx.beginPath();
+        path(f as never);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+
+        indexCtx.beginPath();
+        indexPath(f as never);
+        indexCtx.fillStyle = `rgb(${id & 255},${(id >> 8) & 255},0)`;
+        indexCtx.fill();
+      });
+
+      const pixels = ctx.getImageData(0, 0, W, H).data;
+      const indexPixels = indexCtx.getImageData(0, 0, W, H).data;
+      const stride = 3;
+      for (let py = 0; py < H; py += stride) {
+        for (let px = 0; px < W; px += stride) {
+          const offset = (py * W + px) * 4;
+          if (pixels[offset] > 128) {
+            const id = indexPixels[offset] | (indexPixels[offset + 1] << 8);
+            const color = featureColors[id - 1] ?? noDataColor;
+            const lon = ((px - W / 2) * 360) / W;
+            const lat = ((H / 2 - py) * 360) / W;
+            const v = spherePos(lon, lat).multiplyScalar(RADIUS);
+            positions.push(v.x, v.y, v.z);
+            colors.push(color.r, color.g, color.b);
+          }
+        }
+      }
+    }
+
+    const scene = new THREE.Scene();
+    scene.add(new THREE.Mesh(
+      new THREE.SphereGeometry(RADIUS * 0.995, 64, 48),
+      new THREE.MeshBasicMaterial({ color: 0x06111f }),
+    ));
+    scene.add(new THREE.Mesh(
+      new THREE.SphereGeometry(RADIUS * 1.06, 64, 48),
+      new THREE.MeshBasicMaterial({
+        color: 0x1d5c8a,
+        transparent: true,
+        opacity: 0.12,
+        side: THREE.BackSide,
+      }),
+    ));
+
+    const dotCanvas = document.createElement('canvas');
+    dotCanvas.width = dotCanvas.height = 64;
+    const dotCtx = dotCanvas.getContext('2d');
+    if (dotCtx) {
+      const grad = dotCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grad.addColorStop(0, 'rgba(255,255,255,1)');
+      grad.addColorStop(0.55, 'rgba(255,255,255,0.7)');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      dotCtx.fillStyle = grad;
+      dotCtx.fillRect(0, 0, 64, 64);
+    }
+    const dotTexture = new THREE.CanvasTexture(dotCanvas);
+    const pointsGeometry = new THREE.BufferGeometry();
+    pointsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    pointsGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    scene.add(new THREE.Points(
+      pointsGeometry,
+      new THREE.PointsMaterial({
+        size: 0.0135,
+        map: dotTexture,
+        vertexColors: true,
+        transparent: true,
+        depthWrite: false,
+      }),
+    ));
+
+    const borders = mesh(
+      world as never,
+      (world as never as { objects: { countries: never } }).objects.countries,
+      (a: { id?: string | number }, b: { id?: string | number }) =>
+        a !== b && String(a.id) !== '010' && String(b.id) !== '010',
+    ) as unknown as { coordinates: number[][][] };
+
+    const borderRadius = RADIUS * 1.002;
+    const projectLine = (line: number[][], out: number[]): void => {
+      let prev: THREE.Vector3 | null = null;
+      let prevLon: number | null = null;
+      for (const [rawLon, lat] of line) {
+        let lon = rawLon;
+        if (prevLon !== null) {
+          while (lon - prevLon > 180) lon -= 360;
+          while (lon - prevLon < -180) lon += 360;
+        }
+        prevLon = lon;
+        const point = spherePos(lon, lat).multiplyScalar(borderRadius);
+        if (prev) {
+          const steps = Math.max(1, Math.ceil(prev.distanceTo(point) / 0.02));
+          let from = prev;
+          for (let s = 1; s <= steps; s++) {
+            const to = prev
+              .clone()
+              .lerp(point, s / steps)
+              .normalize()
+              .multiplyScalar(borderRadius);
+            out.push(from.x, from.y, from.z, to.x, to.y, to.z);
+            from = to;
+          }
+        }
+        prev = point;
+      }
+    };
+
+    const borderSegments: number[] = [];
+    for (const line of borders.coordinates) projectLine(line, borderSegments);
+    const borderGeometry = new THREE.BufferGeometry();
+    borderGeometry.setAttribute('position', new THREE.Float32BufferAttribute(borderSegments, 3));
+    scene.add(new THREE.LineSegments(
+      borderGeometry,
+      new THREE.LineBasicMaterial({ color: 0x8fd8ff, transparent: true, opacity: 0.28 }),
+    ));
+
+    // Focused-country outline: rebuilt on each focus, animated from the render loop.
+    const outlineMaterial = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+    const outline = new THREE.LineSegments(new THREE.BufferGeometry(), outlineMaterial);
+    outline.visible = false;
+    scene.add(outline);
+
+    const baseSphere = scene.children[0] as THREE.Mesh;
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.copy(spherePos(45, 0));
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enableZoom = false;
+    controls.enablePan = false;
+    controls.autoRotate = !reduceMotion;
+    controls.autoRotateSpeed = 0.8;
+
+    const tooltip = container.querySelector<HTMLElement>('[data-globe-tooltip]');
+
+    const entryAt = (f: Feature) => {
+      const alpha3 = whereNumeric(String(f.id ?? '').padStart(3, '0'))?.alpha3;
+      const entry = alpha3 ? population[alpha3] : undefined;
+      if (!entry || typeof entry.Multiplied !== 'number') return null;
+      return {
+        name: entry['Country Name'] ?? alpha3,
+        multiplied: entry.Multiplied,
+        peakYear: entry['Peak Year'],
+      };
+    };
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let hovering = false;
+    let pendingEvent: PointerEvent | null = null;
+    let frame = 0;
+
+    const hideTooltip = () => {
+      if (tooltip) tooltip.hidden = true;
+    };
+
+    const updateHover = () => {
+      frame = 0;
+      const event = pendingEvent;
+      pendingEvent = null;
+      if (!event || !hovering || !tooltip) return;
+
+      const rect = container.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObject(baseSphere, false)[0];
+      if (!hit) return hideTooltip();
+
+      const n = hit.point.clone().normalize();
+      const lat = 90 - (Math.acos(Math.min(1, Math.max(-1, n.y))) * 180) / Math.PI;
+      let lon = (Math.atan2(n.z, -n.x) * 180) / Math.PI - 180;
+      lon = ((((lon + 180) % 360) + 360) % 360) - 180;
+
+      const index = features.findIndex((f, i) => {
+        const b = bounds[i];
+        if (lat < b[0][1] || lat > b[1][1]) return false;
+        // Bounds wrapping the antimeridian (e.g. Russia, Fiji) have lonMin > lonMax.
+        const lonMin = b[0][0];
+        const lonMax = b[1][0];
+        const inLon =
+          lonMin <= lonMax ? lon >= lonMin && lon <= lonMax : lon >= lonMin || lon <= lonMax;
+        if (!inLon) return false;
+        return geoContains(f as never, [lon, lat]);
+      });
+
+      const entry = index >= 0 ? entryAt(features[index]) : null;
+      if (!entry) return hideTooltip();
+
+      tooltip.hidden = false;
+      const formatted =
+        entry.multiplied < 1 ? entry.multiplied.toFixed(2) : Math.round(entry.multiplied);
+      const title = document.createElement('span');
+      title.className = 'globe-tooltip-title';
+      title.textContent = `${entry.name} · ${formatted}×`;
+      tooltip.replaceChildren(title);
+      if (entry.peakYear != null) {
+        const peak = document.createElement('span');
+        peak.className = 'globe-tooltip-peak';
+        peak.textContent = `Peak year ${entry.peakYear}`;
+        tooltip.appendChild(peak);
+      }
+      tooltip.style.left = `${event.clientX - rect.left}px`;
+      tooltip.style.top = `${event.clientY - rect.top}px`;
+    };
+
+    container.addEventListener('pointerenter', () => {
+      hovering = true;
+      window.clearTimeout(resumeTimer);
+      controls.autoRotate = false;
+    });
+    container.addEventListener('pointerleave', () => {
+      hovering = false;
+      controls.autoRotate = !reduceMotion;
+      if (controls.autoRotate) clearHighlight();
+      hideTooltip();
+    });
+    container.addEventListener('pointermove', (event) => {
+      pendingEvent = event;
+      if (!frame) frame = requestAnimationFrame(updateHover);
+    });
+
+    // Focus: rotate the camera along great circles to bring a country front.
+    const FOCUS_DURATION = 900;
+    const RESUME_DELAY = 6000;
+    let resumeTimer: number | undefined;
+    let focusAnim: {
+      from: THREE.Vector3;
+      axis: THREE.Vector3;
+      angle: number;
+      dist: number;
+      start: number;
+    } | null = null;
+    const easeInOut = (t: number): number =>
+      t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    const focusOn = (lon: number, lat: number): void => {
+      controls.autoRotate = false;
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        if (hovering) return;
+        controls.autoRotate = !reduceMotion;
+        if (controls.autoRotate) clearHighlight();
+      }, RESUME_DELAY);
+
+      const dist = camera.position.length();
+      const from = camera.position.clone().normalize();
+      const to = spherePos(lon, lat).normalize();
+      const angle = Math.acos(THREE.MathUtils.clamp(from.dot(to), -1, 1));
+      if (angle < 1e-4 || reduceMotion) {
+        camera.position.copy(to.multiplyScalar(dist));
+        focusAnim = null;
+        if (reduceMotion) renderer.render(scene, camera);
+        return;
+      }
+      let axis = new THREE.Vector3().crossVectors(from, to);
+      if (axis.lengthSq() < 1e-9) {
+        axis =
+          Math.abs(from.y) < 0.99
+            ? new THREE.Vector3().crossVectors(from, new THREE.Vector3(0, 1, 0))
+            : new THREE.Vector3(1, 0, 0);
+        axis.normalize();
+      } else {
+        axis.normalize();
+      }
+      focusAnim = { from, axis, angle, dist, start: performance.now() };
+    };
+
+    window.addEventListener('globe:focus', (event) => {
+      const { code, name } = (event as CustomEvent<{ code?: string; name?: string }>).detail ?? {};
+      const index = code
+        ? alpha3Index.get(code)
+        : name
+          ? nameIndex.get(name.toLowerCase())
+          : undefined;
+      if (index === undefined) return;
+      const [lon, lat] = centroids[index];
+      focusOn(lon, lat);
+      setHighlight(index);
+    });
+
+    // Highlight the focused country with a pulsing white outline.
+    const OUTLINE_FADE_DURATION = 300;
+    const OUTLINE_STATIC_OPACITY = 0.85;
+    let highlightIndex: number | null = null;
+    let outlineStart = 0;
+    let outlineFadingOut = false;
+
+    const clearHighlight = (): void => {
+      highlightIndex = null;
+      if (reduceMotion) {
+        outline.visible = false;
+        outlineMaterial.opacity = 0;
+        renderer.render(scene, camera);
+      } else {
+        outlineFadingOut = true;
+      }
+    };
+
+    const setHighlight = (index: number): void => {
+      if (highlightIndex === index) return;
+      highlightIndex = index;
+      outlineFadingOut = false;
+      outlineStart = performance.now();
+
+      const outlineLines = mesh(world as never, featureObjects[index] as never) as unknown as {
+        coordinates: number[][][];
+      };
+      const segments: number[] = [];
+      for (const line of outlineLines.coordinates) projectLine(line, segments);
+      outline.geometry.dispose();
+      outline.geometry = new THREE.BufferGeometry();
+      outline.geometry.setAttribute('position', new THREE.Float32BufferAttribute(segments, 3));
+      outline.visible = true;
+      if (reduceMotion) {
+        outlineMaterial.opacity = OUTLINE_STATIC_OPACITY;
+        renderer.render(scene, camera);
+      }
+    };
+
+    const resize = () => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      // Expose the visible dot-globe diameter so sibling components (table) can size to it.
+      const diameter = Math.min(w, h) * DIAMETER_FRACTION;
+      document.documentElement.style.setProperty('--globe-diameter', `${Math.round(diameter)}px`);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      const halfFov = (camera.fov * Math.PI) / 360;
+      const distV = 1.25 / Math.tan(halfFov);
+      const distH = distV / camera.aspect;
+      camera.position.setLength(Math.max(distV, distH) * 1.08);
+    };
+
+    new ResizeObserver(resize).observe(container);
+    resize();
+
+    if (reduceMotion) {
+      renderer.render(scene, camera);
+      controls.addEventListener('change', () => renderer.render(scene, camera));
+    } else {
+      const animate = () => {
+        requestAnimationFrame(animate);
+        controls.update();
+        if (focusAnim) {
+          const t = Math.min((performance.now() - focusAnim.start) / FOCUS_DURATION, 1);
+          const q = new THREE.Quaternion().setFromAxisAngle(
+            focusAnim.axis,
+            focusAnim.angle * easeInOut(t),
+          );
+          camera.position.copy(focusAnim.from).applyQuaternion(q).multiplyScalar(focusAnim.dist);
+          if (t >= 1) focusAnim = null;
+        }
+        if (outline.visible) {
+          if (outlineFadingOut) {
+            outlineMaterial.opacity = Math.max(0, outlineMaterial.opacity - 0.07);
+            if (outlineMaterial.opacity === 0) {
+              outline.visible = false;
+              outlineFadingOut = false;
+            }
+          } else {
+            const elapsed = performance.now() - outlineStart;
+            const k = Math.min(elapsed / OUTLINE_FADE_DURATION, 1);
+            const pulse = 0.62 + 0.26 * Math.sin(elapsed * 0.004);
+            outlineMaterial.opacity = k * pulse;
+          }
+        }
+        renderer.render(scene, camera);
+      };
+      animate();
+    }
+  }
+</script>

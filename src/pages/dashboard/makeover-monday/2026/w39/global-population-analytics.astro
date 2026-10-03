@@ -1,5 +1,28 @@
 ---
 import DashboardLayout from '@src/layouts/DashboardLayout.astro';
+import MultiplierGlobe from '@components/dashboard/GlobalPopulationAnalytics/MultiplierGlobe.astro';
+import MultiplierTable from '@components/dashboard/GlobalPopulationAnalytics/MultiplierTable.astro';
+
+const POPULATION_URL =
+  'https://raw.githubusercontent.com/y-imran/Dashboarding/refs/heads/main/makeover-monday/2026/W39/api/population-growth.json';
+
+let population: Record<string, { 'Country Name'?: string; Multiplied?: number | null }> = {};
+
+try {
+  const res = await fetch(POPULATION_URL);
+  if (res.ok) {
+    population = await res.json();
+  } else {
+    console.warn(`Population data request failed: ${res.status}`);
+  }
+} catch (error) {
+  console.warn('Failed to load population data', error);
+}
+
+const entries = Object.entries(population)
+  .filter(([, v]) => typeof v.Multiplied === 'number' && v['Country Name'])
+  .map(([code, v]) => ({ code, name: v['Country Name'] as string, multiplied: v.Multiplied as number }))
+  .sort((a, b) => b.multiplied - a.multiplied);
 ---
 
 <DashboardLayout
@@ -9,4 +32,35 @@ import DashboardLayout from '@src/layouts/DashboardLayout.astro';
   subtitle="Makeover Monday"
   meta="2026 • W39"
 >
+  <section class="px-4 py-3 md:px-6">
+    <div class="lg:mx-auto lg:max-w-2xl">
+      <h2 class="text-lg font-semibold text-white-2 lg:text-xl">
+        How many times over has each country's population grown since 1960?
+      </h2>
+      <div
+        class="mt-1.5 space-y-1 text-[length:var(--fs-6)] font-light leading-relaxed text-light-gray-70"
+      >
+      <p>
+        The <strong class="font-semibold text-white-2">UAE</strong> has grown the most,
+        up <strong class="font-semibold text-white-2">87×</strong> in 65 years,
+        while <strong class="font-semibold text-white-2">Bulgaria</strong> has gone the other way,
+        down to <strong class="font-semibold text-white-2">0.82×</strong> of its 1960 count
+        after peaking in 1988.
+      </p>
+      <p>
+        Click a row to bring that country front and center on the globe, or hover the globe for
+        exact multiples and the year each population peaked.
+      </p>
+      </div>
+    </div>
+  </section>
+
+  <main class="flex-1 flex flex-col lg:flex-row lg:w-[60%] lg:mx-auto lg:min-h-0">
+    <section class="h-[42vh] shrink-0 lg:h-full lg:w-[55%]">
+      <MultiplierGlobe population={population} />
+    </section>
+    <section class="flex-1 flex flex-col justify-center lg:min-h-0">
+      <MultiplierTable entries={entries} />
+    </section>
+  </main>
 </DashboardLayout>
