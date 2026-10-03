@@ -2,6 +2,7 @@
 import '@src/styles/main.css';
 import Head from '@components/ui/common/Head.astro';
 import Topbar from '@components/ui/dashboard/Topbar.astro';
+import Footer from '@components/ui/dashboard/Footer.astro';
 
 interface Props {
   title?: string;
@@ -9,6 +10,7 @@ interface Props {
   heading?: string;
   subtitle?: string;
   meta?: string;
+  footerDescription?: string;
 }
 
 const {
@@ -17,6 +19,7 @@ const {
   heading = 'Dashboard',
   subtitle,
   meta,
+  footerDescription,
 } = Astro.props;
 ---
 
@@ -25,9 +28,11 @@ const {
   <head>
     <Head title={title} description={description} />
   </head>
-  <body class="h-dvh flex flex-col bg-smoky-black text-light-gray">
+  <body class="min-h-dvh flex flex-col bg-smoky-black text-light-gray">
     <Topbar title={heading} subtitle={subtitle} meta={meta} />
 
     <slot />
+
+    <Footer description={footerDescription} />
   </body>
 </html>

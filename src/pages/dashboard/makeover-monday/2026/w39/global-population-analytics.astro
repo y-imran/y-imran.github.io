@@ -32,6 +32,7 @@ const entries = Object.entries(population)
   heading="Global Population Analytics"
   subtitle="Makeover Monday"
   meta="2026 • W39"
+  footerDescription="Built with three.js for the globe, D3 geo projections, TopoJSON, world-atlas and iso-3166-1."
 >
   <section class="px-4 py-3 md:px-6">
     <div class="lg:mx-auto lg:max-w-2xl">
@@ -60,11 +61,11 @@ const entries = Object.entries(population)
     <ContinentFilter />
   </section>
 
-  <main class="flex-1 flex flex-col lg:flex-row lg:w-[60%] lg:mx-auto lg:min-h-0">
-    <section class="h-[42vh] shrink-0 lg:h-full lg:w-[55%]">
+  <main class="flex-1 flex flex-col lg:flex-row lg:w-[60%] lg:mx-auto">
+    <section class="h-[42vh] shrink-0 lg:h-[58vh] lg:min-h-[380px] lg:w-[55%]">
       <MultiplierGlobe population={population} />
     </section>
-    <section class="flex-1 flex flex-col justify-center lg:min-h-0">
+    <section class="flex-1 flex flex-col justify-center">
       <MultiplierTable entries={entries} />
     </section>
   </main>

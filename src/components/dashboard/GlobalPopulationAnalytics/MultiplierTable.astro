@@ -13,7 +13,7 @@ const { entries } = Astro.props;
 const max = entries.length ? Math.max(...entries.map((e) => e.multiplied)) : 1;
 ---
 
-<div class="flex h-full max-h-[var(--globe-diameter,100%)] flex-col" data-multiplier-table>
+<div class="flex h-full max-h-[calc(var(--globe-diameter,50%)*2)] flex-col lg:max-h-[var(--globe-diameter,100%)]" data-multiplier-table>
   <div
     class="flex flex-none items-center gap-4 border-b border-jet bg-smoky-black px-4 py-2 md:px-6"
   >
@@ -22,7 +22,7 @@ const max = entries.length ? Math.max(...entries.map((e) => e.multiplied)) : 1;
     </span>
     <span class="flex-1 text-[length:var(--fs-7)] font-medium text-light-gray-70">Multiplier</span>
   </div>
-  <div class="min-h-0 flex-1 overflow-y-auto">
+  <div class="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
     <ul class="px-4 pb-3 pt-2 md:px-6">
     {
       entries.map((entry) => (
