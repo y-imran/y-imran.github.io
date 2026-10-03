@@ -1,8 +1,3 @@
-// Continent regions as alpha-3 codes, covering the world-atlas 110m features.
-// ATF (Fr. S. Antarctic Lands) and the code-devoid Kosovo / Somaliland /
-// N. Cyprus fall outside every region; Antarctica (010) is excluded globally.
-// Conventions follow the UN geoscheme: Russia → Europe, Turkey → Asia,
-// Greenland → North America, Indonesia → Asia, Falklands → South America.
 export const REGIONS: Record<string, string[]> = {
   africa:
     'TZA ESH COD SOM KEN SDN TCD ZAF LSO ZWE BWA NAM SEN MLI MRT BEN NER NGA CMR TGO GHA CIV GIN GNB LBR SLE BFA CAF COG GAB GNQ ZMB MWI MOZ SWZ AGO BDI MDG GMB TUN DZA EGY LBY ETH DJI UGA RWA ERI SSD MAR'.split(
@@ -23,10 +18,6 @@ export const REGIONS: Record<string, string[]> = {
     'CAN USA GRL MEX PAN CRI NIC HND SLV GTM BLZ PRI JAM CUB DOM HTI BHS TTO'.split(' '),
 };
 
-// Flat map windows for the filter-card minimaps: the projection is fitted to
-// this rectangle and everything outside is clipped. Lons may exceed ±180
-// (spherical coords are fine; the seam stays away from the region's mass).
-// Europe uses Mercator so the far north keeps the flag-art proportions.
 export type RegionMapConfig = {
   center: number;
   viewport: number[][];
