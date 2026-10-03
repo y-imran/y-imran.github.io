@@ -4,6 +4,7 @@ const navItems = [
   { label: 'Resume', href: '/resume/', icon: '/icons/resume.svg' },
   { label: 'Portfolio', href: '/portfolio/', icon: '/icons/portfolio.svg' },
   { label: 'Blog', href: '/blog/', icon: '/icons/blog.svg' },
+  { label: 'Dashboard', href: '/dashboard/', icon: '/icons/dashboard.svg', rotate: true },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -15,21 +16,27 @@ function isActive(href: string) {
 ---
 
 <nav
-  class="navbar fixed bottom-4 left-1/2 right-auto w-max max-w-[calc(100vw-32px)] bg-[hsla(240,1%,17%,0.75)] backdrop-blur-[10px] border border-jet rounded-[32px] shadow-[var(--shadow-2)] z-[5]
+  class="navbar fixed bottom-4 left-1/2 right-auto w-[calc(100vw-32px)] bg-[hsla(240,1%,17%,0.75)] backdrop-blur-[10px] border border-jet rounded-[32px] shadow-[var(--shadow-2)] z-[5]
          md:rounded-[36px]
          xl:absolute xl:bottom-auto xl:top-0 xl:left-auto xl:right-0 xl:w-max xl:max-w-none xl:rounded-tl-none xl:rounded-tr-[20px] xl:rounded-br-none xl:rounded-bl-[20px] xl:px-[20px] xl:shadow-none"
 >
   <ul
-    class="navbar-list flex flex-wrap justify-center items-center gap-[10px] px-2 md:gap-[14px] xl:gap-[30px] xl:px-[20px]"
+    class="navbar-list flex flex-wrap justify-between items-center gap-[4px] px-3 md:gap-[14px] md:px-4 xl:justify-center xl:gap-[30px] xl:px-[20px]"
   >
     {navItems.map((item) => (
       <li class="navbar-item">
         <a
           href={item.href}
-          class={`navbar-link text-light-gray text-[length:var(--fs-8)] py-5 px-[7px] flex flex-col items-center gap-1 transition-colors duration-[250ms] ease hover:text-light-gray-70 focus:text-light-gray-70 lg:text-[15px] xl:flex-row xl:gap-0${isActive(item.href) ? ' active' : ''}`}
+          class:list={[
+            'navbar-link text-light-gray text-[length:var(--fs-8)] py-5 px-[7px] flex flex-col items-center gap-1 transition-colors duration-[250ms] ease hover:text-light-gray-70 focus:text-light-gray-70 lg:text-[15px] xl:flex-row xl:gap-0',
+            isActive(item.href) && 'active',
+          ]}
         >
           <span
-            class="navbar-icon w-5 h-5 flex-shrink-0 bg-current [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:center] xl:hidden"
+            class:list={[
+              'navbar-icon w-5 h-5 flex-shrink-0 bg-current [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:center] xl:hidden',
+              item.rotate && 'rotate-180',
+            ]}
             style={`mask-image: url('${item.icon}'); -webkit-mask-image: url('${item.icon}');`}
           ></span>
           <span class="navbar-text">{item.label}</span>
@@ -53,7 +60,7 @@ function isActive(href: string) {
   @media (max-width: 1023px) {
     .navbar-link {
       padding-block: 6px;
-      padding-inline: 12px;
+      padding-inline: 7px;
     }
 
     .navbar {
@@ -64,6 +71,22 @@ function isActive(href: string) {
 
     .navbar.navbar-hidden {
       transform: translateX(-50%) translateY(calc(100% + 30px));
+    }
+  }
+
+  @media (max-width: 360px) {
+    .navbar {
+      width: calc(100vw - 16px);
+    }
+
+    .navbar-list {
+      gap: 2px;
+      padding-inline: 6px;
+    }
+
+    .navbar-link {
+      padding-inline: 4px;
+      font-size: 10px;
     }
   }
 </style>

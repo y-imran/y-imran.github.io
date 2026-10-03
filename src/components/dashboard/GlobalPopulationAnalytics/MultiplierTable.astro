@@ -1,0 +1,67 @@
+---
+interface Entry {
+  code: string;
+  name: string;
+  multiplied: number;
+}
+
+interface Props {
+  entries: Entry[];
+}
+
+const { entries } = Astro.props;
+const max = entries.length ? Math.max(...entries.map((e) => e.multiplied)) : 1;
+---
+
+<div class="flex h-full max-h-[calc(var(--globe-diameter,50%)*2)] flex-col lg:max-h-[var(--globe-diameter,100%)]" data-multiplier-table>
+  <div
+    class="flex flex-none items-center gap-4 border-b border-jet bg-smoky-black px-4 py-2 md:px-6"
+  >
+    <span class="w-[44%] shrink-0 text-[length:var(--fs-7)] font-medium text-light-gray-70">
+      Country
+    </span>
+    <span class="flex-1 text-[length:var(--fs-7)] font-medium text-light-gray-70">Multiplier</span>
+  </div>
+  <div class="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
+    <ul class="px-4 pb-3 pt-2 md:px-6">
+    {
+      entries.map((entry) => (
+        <li>
+          <button
+            type="button"
+            data-code={entry.code}
+            data-name={entry.name}
+            title="View on globe"
+            class="flex w-full cursor-pointer items-center gap-4 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-white-1/5 focus-visible:bg-white-1/10"
+          >
+            <span class="w-[44%] shrink-0 truncate text-[length:var(--fs-6)] text-light-gray">
+              {entry.name}
+            </span>
+            <span class="h-[6px] flex-1 overflow-hidden rounded-full bg-jet">
+              <span
+                class={`block h-full rounded-full ${entry.multiplied < 1 ? 'bg-light-gray' : 'bg-orange-yellow-crayola'}`}
+                style={`width:${Math.max((entry.multiplied / max) * 100, 1)}%`}
+              />
+            </span>
+            <span class="w-12 shrink-0 text-right text-[length:var(--fs-6)] tabular-nums text-white-2">
+              {entry.multiplied.toFixed(2)}
+            </span>
+          </button>
+        </li>
+      ))
+    }
+    </ul>
+  </div>
+</div>
+
+<script>
+  document.querySelector('[data-multiplier-table]')?.addEventListener('click', (event) => {
+    const row = (event.target as HTMLElement).closest<HTMLElement>('[data-code]');
+    if (!row) return;
+    window.dispatchEvent(
+      new CustomEvent('globe:focus', {
+        detail: { code: row.dataset.code, name: row.dataset.name },
+      }),
+    );
+  });
+</script>
