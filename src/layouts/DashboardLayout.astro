@@ -1,0 +1,38 @@
+---
+import '@src/styles/main.css';
+import Head from '@components/ui/common/Head.astro';
+import Topbar from '@components/ui/dashboard/Topbar.astro';
+import Footer from '@components/ui/dashboard/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  heading?: string;
+  subtitle?: string;
+  meta?: string;
+  footerDescription?: string;
+}
+
+const {
+  title = 'Dashboard - Yusra Imran',
+  description = 'Interactive dashboard by Yusra Imran built from public datasets using D3.js and three.js.',
+  heading = 'Dashboard',
+  subtitle,
+  meta,
+  footerDescription,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <Head title={title} description={description} />
+  </head>
+  <body class="min-h-dvh flex flex-col bg-smoky-black text-light-gray">
+    <Topbar title={heading} subtitle={subtitle} meta={meta} />
+
+    <slot />
+
+    <Footer description={footerDescription} />
+  </body>
+</html>

@@ -1,0 +1,22 @@
+---
+interface Props {
+  description?: string;
+}
+
+const { description } = Astro.props;
+---
+
+<footer class="mt-8 flex-none border-t border-jet px-4 py-3 md:px-6">
+  <div class="flex flex-col items-center gap-1.5 text-center">
+    {
+      description && (
+        <p class="text-[length:var(--fs-7)] font-light leading-relaxed text-light-gray-70 lg:max-w-2xl">
+          {description}
+        </p>
+      )
+    }
+    <a href="/" class="text-[length:var(--fs-7)] font-medium text-orange-yellow-crayola">
+      Home
+    </a>
+  </div>
+</footer>

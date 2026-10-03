@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Agents skills
 .agents/
+
+# Temporary files
+.tmp/

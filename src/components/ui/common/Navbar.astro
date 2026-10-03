@@ -27,10 +27,16 @@ function isActive(href: string) {
       <li class="navbar-item">
         <a
           href={item.href}
-          class={`navbar-link text-light-gray text-[length:var(--fs-8)] py-5 px-[7px] flex flex-col items-center gap-1 transition-colors duration-[250ms] ease hover:text-light-gray-70 focus:text-light-gray-70 lg:text-[15px] xl:flex-row xl:gap-0${isActive(item.href) ? ' active' : ''}`}
+          class:list={[
+            'navbar-link text-light-gray text-[length:var(--fs-8)] py-5 px-[7px] flex flex-col items-center gap-1 transition-colors duration-[250ms] ease hover:text-light-gray-70 focus:text-light-gray-70 lg:text-[15px] xl:flex-row xl:gap-0',
+            isActive(item.href) && 'active',
+          ]}
         >
           <span
-            class={`navbar-icon w-5 h-5 flex-shrink-0 bg-current [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:center] xl:hidden${item.rotate ? ' rotate-180' : ''}`}
+            class:list={[
+              'navbar-icon w-5 h-5 flex-shrink-0 bg-current [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:center] xl:hidden',
+              item.rotate && 'rotate-180',
+            ]}
             style={`mask-image: url('${item.icon}'); -webkit-mask-image: url('${item.icon}');`}
           ></span>
           <span class="navbar-text">{item.label}</span>
