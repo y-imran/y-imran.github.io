@@ -1,0 +1,245 @@
+---
+import { codeToHtml, type ShikiTransformer } from 'shiki';
+
+interface Props {
+  code?: string;
+  lang?: string;
+  filename?: string;
+  caption?: string;
+  theme?: string;
+  showLineNumbers?: boolean;
+  highlight?: number[] | string;
+  wrap?: boolean;
+  output?: string;
+}
+
+const {
+  code,
+  lang,
+  filename,
+  caption,
+  theme = 'github-dark-default',
+  showLineNumbers = false,
+  highlight,
+  wrap = false,
+  output,
+} = Astro.props;
+
+function parseHighlight(input?: number[] | string): number[] {
+  if (!input) return [];
+  if (Array.isArray(input)) return input;
+
+  const lines = new Set<number>();
+  for (const part of input.split(',')) {
+    const value = part.trim();
+    const range = value.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (range) {
+      const [, start, end] = range;
+      for (let i = Number(start); i <= Number(end); i++) lines.add(i);
+    } else if (/^\d+$/.test(value)) {
+      lines.add(Number(value));
+    }
+  }
+  return [...lines];
+}
+
+const highlighted = new Set(parseHighlight(highlight));
+
+function decodeEntities(input: string): string {
+  return input
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+
+async function resolveSource(): Promise<{ source: string; language: string }> {
+  if (typeof code === 'string' && code.length > 0) {
+    return { source: code, language: lang ?? 'python' };
+  }
+
+  if (Astro.slots.has('default')) {
+    const slotHtml = await Astro.slots.render('default');
+    const codeMatch = slotHtml.match(/<code[^>]*>([\s\S]*?)<\/code>/);
+
+    if (codeMatch) {
+      const languageMatch = slotHtml.match(/data-language="([^"]+)"/);
+      return {
+        source: decodeEntities(codeMatch[1].replace(/<[^>]*>/g, '')),
+        language: lang ?? languageMatch?.[1] ?? 'python',
+      };
+    }
+  }
+
+  throw new Error(
+    'CodeSnippet: provide code through the `code` prop or as a fenced code block between the component tags.'
+  );
+}
+
+const { source, language } = await resolveSource();
+
+const transformers: ShikiTransformer[] = [];
+if (highlighted.size) {
+  transformers.push({
+    name: 'line-highlight',
+    line(node, line) {
+      if (highlighted.has(line)) this.addClassToHast(node, 'highlighted');
+    },
+  });
+}
+
+const html = await codeToHtml(source.replace(/\n$/, ''), {
+  lang: language,
+  theme,
+  transformers,
+});
+
+const classes = [
+  'code-snippet',
+  showLineNumbers && 'with-line-numbers',
+  wrap && 'wrap',
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<figure class={`my-5 ${classes}`}>
+  <div class="code-block rounded-[10px] overflow-hidden border border-jet bg-eerie-black-1">
+    <div class="code-header flex items-center justify-between gap-3 px-4 py-2 border-b border-jet">
+      <span class="code-filename flex items-center gap-2 min-w-0 text-light-gray-70 font-mono text-xs">
+        {filename && (
+          <>
+            <ion-icon name="document-text-outline" aria-hidden="true" class="shrink-0 text-[14px]"></ion-icon>
+            <span class="truncate">{filename}</span>
+          </>
+        )}
+      </span>
+
+      <button
+        type="button"
+        class="code-copy shrink-0 flex items-center gap-1 text-light-gray-70 hover:text-orange-yellow-crayola transition-colors text-xs"
+        data-code-copy
+        aria-label="Copy code"
+      >
+        <ion-icon name="copy-outline" aria-hidden="true" class="text-[15px]"></ion-icon>
+        <span class="code-copy-label">Copy</span>
+      </button>
+    </div>
+
+    <div class="code-body text-sm" set:html={html} />
+
+    {output && <pre class="code-output"><code>{output}</code></pre>}
+  </div>
+
+  {caption && (
+    <figcaption class="text-light-gray-70 text-xs md:text-sm font-[var(--fw-300)] text-center font-sans italic mt-3">
+      {caption}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .code-block :global(pre.shiki) {
+    margin: 0;
+    padding: 16px;
+    background-color: transparent !important;
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    line-height: 1.6;
+  }
+
+  .code-block :global(code) {
+    font-family: inherit;
+  }
+
+  .code-block :global(code span) {
+    display: inline;
+  }
+
+  .code-block:not(.wrap) :global(pre.shiki) {
+    white-space: pre;
+  }
+  .code-snippet.wrap .code-block :global(pre.shiki) {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .code-snippet.with-line-numbers .code-block :global(code) {
+    counter-reset: line;
+  }
+  .code-snippet.with-line-numbers .code-block :global(.line) {
+    counter-increment: line;
+  }
+  .code-snippet.with-line-numbers .code-block :global(.line)::before {
+    content: counter(line);
+    display: inline-block;
+    width: 2ch;
+    margin-right: 1.25rem;
+    text-align: right;
+    color: var(--color-light-gray-70);
+    opacity: 0.5;
+    user-select: none;
+  }
+
+  .code-block :global(.line.highlighted) {
+    display: inline-block;
+    width: 100%;
+    background: hsla(192, 85%, 47%, 0.12);
+    box-shadow: inset 3px 0 0 var(--color-orange-yellow-crayola);
+  }
+
+  .code-output {
+    margin: 0;
+    padding: 16px;
+    border-top: 1px dashed var(--color-jet);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--color-onyx);
+    color: var(--color-light-gray);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  .code-output code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+  }
+</style>
+
+<script>
+  function setupCopyButtons() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-code-copy]');
+    buttons.forEach((button) => {
+      if (button.dataset.bound === 'true') return;
+      button.dataset.bound = 'true';
+
+      button.addEventListener('click', async () => {
+        const block = button.closest('.code-block');
+        const code = block?.querySelector('code');
+        if (!code) return;
+
+        const label = button.querySelector('.code-copy-label');
+        const icon = button.querySelector('ion-icon');
+
+        try {
+          await navigator.clipboard.writeText(code.innerText);
+          if (label) label.textContent = 'Copied!';
+          icon?.setAttribute('name', 'checkmark-outline');
+        } catch {
+          if (label) label.textContent = 'Failed';
+        }
+
+        window.setTimeout(() => {
+          if (label) label.textContent = 'Copy';
+          icon?.setAttribute('name', 'copy-outline');
+        }, 1500);
+      });
+    });
+  }
+
+  setupCopyButtons();
+  document.addEventListener('astro:page-load', setupCopyButtons);
+</script>
