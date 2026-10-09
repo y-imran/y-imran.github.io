@@ -20,7 +20,8 @@ import turkiyeFlag from '@assets/portfolio/turkiye_flag.png';
 import waffleChart from '@assets/portfolio/waffle_chart.png';
 import yearlyEvents from '@assets/portfolio/yearly_events.png';
 import bloomYear from '@assets/portfolio/bloom_year.png';
-import globalPopulation from '@assets/portfolio/global_population.png'
+import globalPopulation from '@assets/portfolio/global_population.png';
+import moreCowbell from '@assets/portfolio/more_cowbell.png'
 
 export interface TableauVisualization {
   id: string;
@@ -32,6 +33,13 @@ export interface TableauVisualization {
 }
 
 export const tableauVisualizations: TableauVisualization[] = [
+  {
+    id: 'more-cowbell',
+    publishedDate: '2026-10-09',
+    title: "One Klank at a Time",
+    tableauUrl: 'https://public.tableau.com/app/profile/yusra.imran/viz/OneKlankataTime/Dashboard1#1',
+    thumbnail: moreCowbell
+  },
   {
     id: 'global-population-analytics',
     publishedDate: '2026-10-01',
