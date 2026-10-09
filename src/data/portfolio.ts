@@ -8,6 +8,7 @@ import containersFlags from '@assets/portfolio/containers_flags.png'
 import launchExplorer from '@assets/portfolio/launch_explorer.png'
 import parkinsonsDisease from '@assets/portfolio/parkinsons_disease.png'
 import bloomYear from '@assets/portfolio/bloom_year.png';
+import moreCowbell from '@assets/portfolio/more_cowbell.png'
 
 export enum PortfolioCategory {
   TABLEAU = 'Tableau',
@@ -39,6 +40,12 @@ const portfolios: Portfolio[] = [
     title: "Makeover Monday W37 2026: World's deadlist animals",
     category: PortfolioCategory.TABLEAU,
     url: 'https://public.tableau.com/app/profile/yusra.imran/viz/TheWorldsDeadliestAnimals/Dashboard'
+  },
+  {
+    image: moreCowbell,
+    title: "Makeover Monday W40 2026: One klank at a time",
+    category: PortfolioCategory.TABLEAU,
+    url: 'https://public.tableau.com/app/profile/yusra.imran/viz/OneKlankataTime/Dashboard1#1'
   },
   {
     image: sydneyForest,
