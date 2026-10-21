@@ -1,13 +1,72 @@
 ---
+import Link from './Link.astro';
+
+type Token =
+  | { type: 'text'; value: string }
+  | { type: 'bold'; value: string }
+  | { type: 'link'; value: string; url: string };
+
 interface Props {
-  items: string[];
+  items?: string[];
+}
+
+// Splits an item string into text / **bold** / [linkText](url) tokens.
+// Keep in sync with NumberList.astro (same logic).
+function tokenize(item: string): Token[] {
+  const tokens: Token[] = [];
+  const re = /\*\*(.+?)\*\*|\[(.+?)\]\((.+?)\)/g;
+  let last = 0;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(item)) !== null) {
+    if (match.index > last) {
+      tokens.push({ type: 'text', value: item.slice(last, match.index) });
+    }
+    if (match[1] !== undefined) {
+      tokens.push({ type: 'bold', value: match[1] });
+    } else if (match[2] !== undefined && match[3] !== undefined) {
+      tokens.push({
+        type: 'link',
+        value: match[2],
+        // tolerate surrounding quotes: [text]('url') → url
+        url: match[3].replace(/^['"]|['"]$/g, ''),
+      });
+    }
+    last = re.lastIndex;
+  }
+  if (last < item.length) {
+    tokens.push({ type: 'text', value: item.slice(last) });
+  }
+  return tokens;
 }
 
 const { items } = Astro.props;
 ---
 
 <ul class="text-light-gray text-base md:text-xl font-light leading-[1.6] mb-[15px] list-disc list-inside pl-3 md:pl-6">
-  {items.map((item) => (
-    <li class="list-disc list-inside">{item}</li>
-  ))}
+  {items ? (
+    items.map((item) => (
+      <li class="list-disc list-inside">
+      {tokenize(item).map((token) =>
+        token.type === 'bold' ? (
+          <strong class="font-semibold">{token.value}</strong>
+        ) : token.type === 'link' ? (
+          <Link url={token.url} linkText={token.value} />
+        ) : (
+          token.value
+        )
+      )}
+      </li>
+    ))
+  ) : (
+    // children mode: direct <li> elements from MDX, e.g. for images in items
+    <slot />
+  )}
 </ul>
+
+<style>
+  /* Markers for <li> children rendered from MDX (they don't get the utility classes) */
+  ul > :global(li) {
+    list-style-type: disc;
+    list-style-position: inside;
+  }
+</style>
