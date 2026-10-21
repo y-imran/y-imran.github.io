@@ -21,13 +21,12 @@ import Link from '@src/components/ui/blog/Link.astro';
 import Panel from '@src/components/ui/blog/Panel.astro';
 
 {/* Images imports */}
-import RyanBook from "../../assets/blog/tableau-certifications/1-ryan-sleeper-book.png"
+import Voucher from "../../assets/blog/tableau-certifications/voucher.png"
 
-<H1>How I prepared, paid, and passed, and how you can do it too</H1>
+<H1>How I Prepared, Paid From Pakistan, and Passed, and How You Can Do It Too</H1>
 
-<Paragraph>Are you staring at the Tableau certification page wondering where to even begin? Not sure which exam to pick, how to pay from Karachi, Pakistan, or what actually happens inside a test center? I was exactly where you are a few months ago. Googling late at night, reading half-true forum posts, and trying to figure out if this was even worth it</Paragraph>
+<Paragraph>Are you staring at the Tableau certification page wondering where to even begin? Not sure which exam to pick, how to pay from Pakistan, or what actually happens inside a test center? I was exactly where you are a few months ago.</Paragraph>
 
-<Paragraph>I passed both exams and wanted to share my experience. If you're planning to take the Tableau Certifications, this guide will walk you through the process, from preparation to receiving your certificates.</Paragraph>
 
 <H2>First, Which Tableau Certification Are You Taking?</H2>
 
@@ -40,73 +39,77 @@ import RyanBook from "../../assets/blog/tableau-certifications/1-ryan-sleeper-bo
 
 <Paragraph>Although both validate your Tableau skills, they differ in scope and difficulty.</Paragraph>
 
-<H3>Salesforce Certified Tableau Desktop Foundations</H3>
-<Paragraph>It is the foundational one. It's built for people with basic Tableau Desktop skills and around three months of hands-on use. Think of it as proof that you understand how Tableau "thinks", connecting data, building common views, and knowing the difference between dimensions and measures.</Paragraph>
+<Panel type='info'>
+The quick way to decide: If you're just starting with Tableau, <Highlight>Desktop Foundations</Highlight> is a good place to begin. If you already have hands-on experience and want to demonstrate broader data analytics skills, the <Highlight>Data Analyst</Highlight> certification may be the better fit.
+</Panel>
 
-<H3>Salesforce Certified Tableau Data Analyst</H3>
-<Paragraph>It is the advanced one. It goes well beyond Desktop, testing Tableau Prep, Tableau Server and Tableau Cloud. It assumes you already have the foundational skills and does not re-test them.</Paragraph>
-
-<Paragraph>The quick way to decide: if you're new to Tableau, start with Desktop Foundations. If you've been using Tableau for a while and want the credential employers recognize most, go straight for Data Analyst.</Paragraph>
-
-<H2>What's Actually on the Exam?</H2>
 
 <Paragraph>Both exams are scenario-based, they reward understanding, not memorization.</Paragraph>
 
-<Paragraph>Desktop Foundations covers <Highlight>connecting and preparing data</Highlight>, <Highlight>building and analyzing views</Highlight>, <Highlight>sharing insights through dashboards</Highlight>, and <Highlight>core concepts</Highlight> like discrete versus continuous fields.</Paragraph>
-
-<Paragraph>The Data Analyst exam adds connect to data and data transformation in Tableau Prep, calculated and Level of Detail (LOD) expressions, table calculations, parameters, create content and publishing and managing content on Tableau Server or Cloud.</Paragraph>
-
-<Paragraph>The exact exam format, fees, passing scores, and validity periods change over time.</Paragraph>
-
-<Paragraph>
-Check the official pages: <Link url='https://trailheadacademy.salesforce.com/certificate/exam-tableau-desktop-found---Analytics-101' linkText='Tableau Desktop Foundation'/> and <Link url='https://trailheadacademy.salesforce.com/certificate/exam-tableau-data-analyst---Analytics-DA-201' linkText='Tableau Data Analyst'/>
-</Paragraph>
+<Paragraph>The exact exam format, fees, passing scores, and validity periods change over time. Check the official pages: <Link url='https://trailheadacademy.salesforce.com/certificate/exam-tableau-desktop-found---Analytics-101' linkText='Tableau Desktop Foundation'/> and <Link url='https://trailheadacademy.salesforce.com/certificate/exam-tableau-data-analyst---Analytics-DA-201' linkText='Tableau Data Analyst'/>.</Paragraph>
 
 <H2>The Resources That Actually Helped Me</H2>
+
 <Paragraph>I didn't use a single expensive bootcamp. Here's what earned its place on my desk.</Paragraph>
 
 <Paragraph><Highlight>For Tableau Desktop Foundations Certification</Highlight> I used the following resources:</Paragraph>
 
-<H3>Practical Tableau by Ryan Sleeper</H3>
+<BulletList items={[
+    "**Practical Tableau by Ryan Sleeper**: Helped me strengthen my understanding of tableau fundamentals, visualizations, calculations, filters, and dashboard design [View on Amazon](https://www.amazon.com/Practical-Tableau-Tutorials-Strategies-Master-ebook/dp/B07BX5HH4Z?ref_=ast_author_mpb)"
+]}/>
 
-<Paragraph>One of the resources I found particularly valuable. It helped me strengthen my understanding of visualisation techniques, calculations, filters, dashboards, and different ways of approaching a problem in Tableau. </Paragraph>
+<BulletList items={[
+    "**Udemy Courses**: Helped me revise key concepts through structured lessons and practice tests. The courses that helped me for exam preparation are:"
+]}/>
 
-<Figure src={RyanBook}/>
-
-<H3>Udemy Courses</H3>
-
-<Paragraph>I also completed two Udemy courses, both of which included practice tests to help me prepare for the exam.</Paragraph>
-<Paragraph>This helped me revisit topics in a structured way and identify concepts that needed more attention.</Paragraph>
-<Paragraph>My recommendation is to avoid taking practice tests only to memorize answers. When you get a question wrong, revisit the underlying concept in Tableau and understand why the correct option works.</Paragraph>
-
-<H3>Read Tableau Documentations</H3>
-
-<Paragraph>The <Link url= "https://help.tableau.com/current/pro/desktop/en-us/default.htm" linkText='Official Tableau Documentation'/> was another important resource. It is useful when you need a clear explanation of a feature or want to verify how a particular function works.</Paragraph>
-<Paragraph>Tableau provided comprehensive explanations, precise, and extremely helpful.</Paragraph>
+<NumberList items={[
+    "[Tableau Desktop Foundations Exam Practice Tests 2026](https://www.udemy.com/course/tableaudesktop/?src=sac&kw=tableau+desktop+Foundation&couponCode=MT261019G1)",
+    "[Tableau Desktop Specialist + Data Analyst Certification](https://www.udemy.com/course/tableau-desktop-specialist-data-analyst-certification/?src=sac&kw=Tableau+Desktop&couponCode=MT261019G1)"
+]
+}
+/>
 
 <Paragraph>For <Highlight>Tableau Data Analyst</Highlight>, I used the following resources:</Paragraph>
 
-<Paragraph>I leaned more heavily on practice. I used Udemy courses with practice tests, Skillcertpro practice tests, and different AI agents to generate fresh practice papers that I then solved by hand. The documentation stayed open, and so did Tableau itself.</Paragraph>
+<BulletList items={[
+    "**Udemy Courses**: Following are the courses I completed for this exam preparation:"
+]}/>
+
+<NumberList items={[
+    "[Tableau Desktop Specialist + Data Analyst Certification](https://www.udemy.com/course/tableau-desktop-specialist-data-analyst-certification/?src=sac&kw=Tableau+Desktop&couponCode=MT261019G1)",
+    "[Tableau Data Analyst Certification 2026 - Practice Exams](https://www.udemy.com/course/tableau-certified-data-analyst-practice-exams-2024/?src=sac&kw=Tableau+Data+Analyst&couponCode=MT261019G1)"
+]
+}
+/>
+
+<BulletList items={[
+    "**Skillcertpro Practice Tests**: These practice tests helped me assess my preparation, become familiar with exam-style questions, and identify areas that needed more attention"
+]}/>
+
+<Paragraph>The <Link url= "https://help.tableau.com/current/pro/desktop/en-us/default.htm" linkText="Official Tableau Documentation"/> was another important resource. It is useful when you need a clear explanation of a feature or want to verify how a particular function works.</Paragraph>
 
 <Paragraph>Two things made a bigger difference than any course:</Paragraph>
 
 <NumberList items={[
-    "Hands-on practice in Tableau Desktop almost every day. Watching a tutorial is not the same as dragging fields onto shelves until the logic clicks.",
-    "The free trials of Tableau Prep and Tableau Cloud. The Data Analyst exam expects familiarity with these tools, and the Tableau free trial gave me just enough real exposure. There's also a free Tableau Desktop edition if you don't have a license"
+    "**Hands-on practice in Tableau Desktop almost every day**. Watching a tutorial is not the same as dragging fields onto shelves until the logic clicks",
+    "**The free trials of Tableau Prep and Tableau Cloud**. The Data Analyst exam expects familiarity with these tools, and the Tableau free trial gave me just enough real exposure. There's also a free Tableau Desktop edition if you don't have a license"
 ]}/>
 
-<H2>Registering from Pakistan</H2>
+<H2>Registeration from Pakistan</H2>
 
 <Paragraph>This part worries most people, so here are the exact steps I followed after my direct card payment kept failing.</Paragraph>
 
-<Paragraph><Highlight>Start your registration</Highlight>. Log in, pick your certification, and begin the registration process.</Paragraph>
-<Paragraph><Highlight>Attempt the normal payment first</Highlight>. but if the card or gateway fails (as it did for me), don't keep retrying. Switch to the voucher route instead.</Paragraph>
-<Paragraph><Highlight>Buy an exam voucher</Highlight>. from the <Link url="https://salesforcestore.pearsonvue.com/" linkText="Pearson VUE"/> store. </Paragraph>
-<Paragraph><Highlight>Wait for the voucher email.</Highlight>.  Within 24 hours I received an email containing my voucher number. Save that number somewhere safe.</Paragraph>
-<Paragraph><Highlight>Return to the registration flow</Highlight>. and choose the voucher option at checkout.</Paragraph>
-<Paragraph><Highlight>Enter your voucher number</Highlight>.  in the voucher/promo field and apply it.</Paragraph>
-<Paragraph><Highlight>Choose your exam date, time, and test center</Highlight>. (or the online-proctored option).</Paragraph>
-<Paragraph><Highlight>Confirm and submit</Highlight>. You'll receive a confirmation email with your appointment details.</Paragraph>
+
+<NumberList>
+  <li>Start your registration. Log in, pick your certification, and begin the registration process</li>
+  <li>Attempt the normal payment first. but if the card or gateway fails (as it did for me), don't keep retrying. Switch to the voucher route instead</li>
+  <li>Buy an exam voucher from <Link url="https://salesforcestore.pearsonvue.com/" linkText="Pearson VUE"/> store</li>
+  <li>Wait for the voucher email. Within 24 hours I received an email containing my voucher number.<Figure src={Voucher} caption="Voucher email from Pearson VUE" /></li>
+  <li>Return to the registration flow. and choose the voucher option at checkout</li>
+  <li>Enter your voucher number in the <Highlight>Voucher/Promo Code</Highlight> field and click Apply. Once the voucher is applied successfully, the total amount should change to <Highlight>$0</Highlight></li>
+  <li>Choose your exam date, time, and test center. (or the online-proctored option)</li>
+  <li>Confirm and submit. You'll receive a confirmation email with your appointment details</li>
+</NumberList>
 
 <Paragraph>That single workaround removed all the friction. If you hit the same card or gateway issue from Pakistan, buying the voucher first is a simple fix.</Paragraph>
 
@@ -123,5 +126,5 @@ Check the official pages: <Link url='https://trailheadacademy.salesforce.com/cer
 <Paragraph>I want to be clear that this was my timeline, not a guarantee. Official guidance says to allow up to 24 hours for results and dashboard updates, so plan for that and don't panic if your badge takes a little time to show up.</Paragraph>
 
 <H1>Final Thoughts</H1>
-<Paragraph>If you're planning to take a Tableau certification from Pakistan, know that the hardest part isn't the exam — it's staying consistent while juggling work, study, and the usual payment hurdles. Pick the right credential, study straight from the official objectives, live inside Tableau, and treat practice tests as diagnostic tools rather than scores to brag about.</Paragraph>
+<Paragraph>If you're planning to take a Tableau certification from Pakistan, know that the hardest part isn't the exam, it's staying consistent while juggling work, study, and the usual payment hurdles. Pick the right credential, study straight from the official objectives, live inside Tableau, and treat practice tests as diagnostic tools rather than scores to brag about.</Paragraph>
 <Paragraph>If I could do it from a test center in Karachi, so can you. Good luck and start today.</Paragraph>
