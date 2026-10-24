@@ -18,7 +18,7 @@ const urls = import.meta.glob('../assets/blog/tableau-certifications/**/*.pdf', 
 
 const SPECIAL_NAMES: Record<string, string> = {
   'lod-decoder-card': 'LOD Decoder Card',
-  'skillcertpro-cheat-sheet': 'SkillCertPro Cheat Sheet',
+  'skill-cert-pro-guide': 'Skill Cert Pro Guide',
 };
 
 const titleCase = (slug: string) =>
