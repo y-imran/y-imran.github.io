@@ -1,0 +1,12 @@
+{
+  "Paragraph": {
+    "scope": "mdx",
+    "prefix": "para",
+    "body": "<Paragraph>$0</Paragraph>"
+  },
+  "Highlight": {
+    "scope": "mdx",
+    "prefix": "high",
+    "body": "<Highlight>$0</Highlight>"
+  }
+}
