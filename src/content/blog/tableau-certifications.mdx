@@ -18,6 +18,8 @@ import NumberList from '@src/components/ui/blog/NumberList.astro';
 import BulletList from '@src/components/ui/blog/BulletList.astro';
 import Link from '@src/components/ui/blog/Link.astro';
 import Panel from '@src/components/ui/blog/Panel.astro';
+import DownloadGrid from '@components/ui/blog/DownloadGrid.astro';
+import { tableauPapers, tableauAnswers, tableauHelpers } from '@data/tableau-certification-pdfs.ts';
 
 {/* Images imports */}
 import Voucher from "../../assets/blog/tableau-certifications/voucher.png"
@@ -141,3 +143,9 @@ The AI-generated practice papers, along with their answer keys, are available fo
 <Paragraph>I noticed that some questions in the actual exam followed similar patterns to those I had encountered in Udemy courses, Skillcertpro practice tests, and AI-generated practice papers.</Paragraph>
 
 <Paragraph>The actual exam questions were fully aligned with the official exam guide.</Paragraph>
+
+<Paragraph>Download the complete set of AI-generated practice papers, their answer keys, and the helper resources I used:</Paragraph>
+
+<DownloadGrid heading="Practice papers" items={tableauPapers} />
+<DownloadGrid heading="Answer keys" items={tableauAnswers} />
+<DownloadGrid heading="Cheat sheets" items={tableauHelpers} />
