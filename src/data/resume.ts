@@ -10,7 +10,7 @@ export interface Timeline {
   achievements: TimelineItem[];
 }
 
-const timeline: Timeline = {
+const resume: Timeline = {
   projects  : [
     {
       title: 'UFO Sightings',
@@ -30,6 +30,11 @@ const timeline: Timeline = {
       title: 'Salesforce Certified Tableau Desktop Foundations',
       subTitle: 'Tableau Desktop Specialist',
       description: "The certificate validates the foundational skills and a core understanding of Tableau Desktop. It verifies a hands-on ability to connect to data sources, import datasets, perform data preparation, build interactive charts, and write calculations."
+    },
+    {
+      title: 'Salesforce Certified Tableau Data Analyst',
+      subTitle: 'Data Analyst',
+      description: "The certificate validates core Tableau knowledge and hands-on development skills across Tableau Desktop, Tableau Prep, and Tableau Server. It verifies the ability to connect to and transform data, analyze it with calculations and interactivity, and build, publish, and maintain dashboards."
     },
     {
       title: 'From Self-Taught to Viz of the Day: The Journey',
@@ -53,4 +58,4 @@ const timeline: Timeline = {
   ],
 };
 
-export default timeline;
+export default resume;
