@@ -8,6 +8,7 @@ type Token =
 
 interface Props {
   items?: string[];
+  indent?: number;
 }
 
 // Splits an item string into text / **bold** / [linkText](url) tokens.
@@ -39,10 +40,13 @@ function tokenize(item: string): Token[] {
   return tokens;
 }
 
-const { items } = Astro.props;
+const { items, indent } = Astro.props;
 ---
 
-<ol class="text-light-gray text-base md:text-xl font-light leading-[1.6] mb-[15px] list-decimal list-inside pl-3 md:pl-6">
+<ol
+  class="text-light-gray text-base md:text-xl font-light leading-[1.6] mb-[15px] list-decimal list-inside pl-3 md:pl-6"
+  style={indent ? `margin-left: ${indent}rem` : undefined}
+>
   {items ? (
     items.map((item) => (
       <li class="list-decimal list-inside">
