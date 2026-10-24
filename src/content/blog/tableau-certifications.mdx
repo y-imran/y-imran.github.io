@@ -19,7 +19,22 @@ import BulletList from '@src/components/ui/blog/BulletList.astro';
 import Link from '@src/components/ui/blog/Link.astro';
 import Panel from '@src/components/ui/blog/Panel.astro';
 import DownloadGrid from '@components/ui/blog/DownloadGrid.astro';
-import { tableauPapers, tableauAnswers, tableauHelpers } from '@data/tableau-certification-pdfs.ts';
+import { pdfDownloads } from '@src/utils/pdf-download.ts';
+
+export const pdfs = pdfDownloads(
+  import.meta.glob('/src/assets/blog/tableau-certifications/**/*.pdf', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+  {
+    root: '/src/assets/blog/tableau-certifications',
+    names: {
+      'lod-decoder-card': 'LOD Decoder Card',
+      'skill-cert-pro-guide': 'Skill Cert Pro Guide',
+    },
+  },
+);
 
 {/* Images imports */}
 import Voucher from "../../assets/blog/tableau-certifications/voucher.png"
@@ -146,6 +161,6 @@ The AI-generated practice papers, along with their answer keys, are available fo
 
 <Paragraph>Download the complete set of AI-generated practice papers, their answer keys, and the helper resources I used:</Paragraph>
 
-<DownloadGrid heading="Practice papers" items={tableauPapers} />
-<DownloadGrid heading="Answer keys" items={tableauAnswers} />
-<DownloadGrid heading="Cheat sheets" items={tableauHelpers} />
+<DownloadGrid heading="Practice papers" items={pdfs.filter((pdf) => pdf.folder === 'paper')} />
+<DownloadGrid heading="Answer keys" items={pdfs.filter((pdf) => pdf.folder === 'answer-key')} />
+<DownloadGrid heading="Cheat sheets" items={pdfs.filter((pdf) => pdf.folder === 'helper')} />
