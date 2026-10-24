@@ -69,4 +69,9 @@ const { items } = Astro.props;
     list-style-type: decimal;
     list-style-position: inside;
   }
+
+  /* Small vertical gap between numbered items (items-mode and children-mode) */
+  ol > :global(li + li) {
+    margin-top: 8px;
+  }
 </style>
