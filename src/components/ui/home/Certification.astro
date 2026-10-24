@@ -42,8 +42,8 @@ const { certifications } = Astro.props;
 
   .cert-list {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     margin-top: 24px;
     list-style: none;
     padding: 0;
@@ -51,7 +51,7 @@ const { certifications } = Astro.props;
 
   @media (min-width: 580px) {
     .cert-list {
-      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
     }
   }
 
@@ -65,7 +65,7 @@ const { certifications } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 16px;
+    padding: 12px;
     border-radius: 14px;
     background: var(--color-eerie-black-1);
     border: 1px solid var(--color-jet);
@@ -88,12 +88,6 @@ const { certifications } = Astro.props;
     overflow: hidden;
     background: var(--color-onyx);
     border: 1px solid var(--color-jet);
-  }
-
-  @media (max-width: 579px) {
-    .cert-card-thumb {
-      padding: 16px;
-    }
   }
 
   .cert-card-img {
@@ -122,5 +116,16 @@ const { certifications } = Astro.props;
     font-size: var(--fs-6);
     font-weight: var(--fw-500);
     line-height: 1.4;
+  }
+
+  @media (max-width: 579px) {
+    .cert-card {
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .cert-card-title {
+      font-size: var(--fs-8);
+    }
   }
 </style>

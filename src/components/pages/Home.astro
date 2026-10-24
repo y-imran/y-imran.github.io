@@ -1,5 +1,4 @@
 ---
-import about from '@data/about.ts';
 import certifications from '@data/certification.ts';
 import tableauVisualizations from '@data/tableau-visualizations.ts';
 import Certification from '@components/ui/home/Certification.astro';
@@ -14,7 +13,11 @@ import TableauVisualizationTimeline from '@components/ui/tableau/TableauVisualiz
   </header>
 
   <section class="about-text text-light-gray text-[length:var(--fs-6)] font-light leading-[1.6] md:mb-[40px]">
-    {about.paragraphs.map((paragraph) => <p class="mb-[15px]">{paragraph}</p>)}
+    <p class="mb-[15px]">I started with microscopes, but somewhere along the way, I found my way to data.</p>
+    <p class="mb-[15px]">
+      With a background in Medical Laboratory Technology and a passion for Data Analytics, I
+      enjoy looking beyond the numbers to find patterns, stories, and insights that matter.
+    </p>
   </section>
 
   <LatestBlogPost />
