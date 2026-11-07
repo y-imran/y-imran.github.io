@@ -1,0 +1,42 @@
+---
+
+interface Props {
+  headers?: string[];
+  rows?: string[][];
+}
+
+const { headers = [], rows = [] } = Astro.props;
+---
+
+<div class="w-full overflow-x-auto my-[20px]">
+  <table
+    class="w-full border-collapse text-light-gray text-base md:text-lg font-light leading-[1.6] rounded-[12px] overflow-hidden border border-jet"
+  >
+    {headers.length > 0 && (
+      <thead>
+        <tr class="bg-eerie-black-1">
+          {headers.map((header) => (
+            <th
+              class="text-left font-semibold text-vegas-gold px-4 py-3 border-b border-jet whitespace-nowrap"
+            >
+              {header}
+            </th>
+          ))}
+        </tr>
+      </thead>
+    )}
+    <tbody>
+      {rows.map((row, rowIndex) => (
+        <tr class={rowIndex % 2 === 1 ? 'bg-eerie-black-1/50' : undefined}>
+          {row.map((cell, cellIndex) => (
+            <td
+              class={`px-4 py-3 align-top border-b border-jet ${cellIndex === 0 ? 'text-white-2 font-normal whitespace-nowrap' : ''}`}
+            >
+              {cell}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
