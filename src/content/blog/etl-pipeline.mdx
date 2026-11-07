@@ -1,0 +1,130 @@
+---
+slug: building-etl-pipeline-using-python
+title: Building an ETL Pipeline Using Python
+category: python
+pubDate: 2026-11-07
+excerpt: How does raw data become analysis-ready? Let's build a simple ETL pipeline using Python and find out!
+readTimeMins: 10
+banner: "../../assets/blog/etl-pipeline/thumbnail.png"
+---
+
+{/* Components imports */}
+import Paragraph from '@components/ui/blog/Paragraph.astro';
+import Figure from '@components/ui/blog/Figure.astro'
+import Highlight from '@src/components/ui/blog/Highlight.astro';
+import H1 from '@src/components/ui/blog/H1.astro';
+import H2 from '@src/components/ui/blog/H2.astro';
+import NumberList from '@src/components/ui/blog/NumberList.astro';
+import BulletList from '@src/components/ui/blog/BulletList.astro';
+import Link from '@src/components/ui/blog/Link.astro';
+import Panel from '@src/components/ui/blog/Panel.astro';
+import Table from '@src/components/ui/blog/Table.astro';
+import CodeSnippet from '@src/components/ui/blog/CodeSnippet.astro';
+
+<H1>Moving Data from CSV Files to a Cloud MySQL Database</H1>
+
+<Paragraph>I've spent quite some time working with datasets, cleaning data, writing SQL queries, and building visualizations. But the more I worked with data, the more curious I became about the part that happens before the analysis:</Paragraph>
+
+<Highlight>Where does all this data come from, and how does it actually get into a database?</Highlight>
+
+<Paragraph>That sparked my interest in learning the core concepts of Data Engineering. As I began exploring them, one topic kept coming up: <Highlight>ETL</Highlight>.</Paragraph>
+
+<Paragraph>I started with a simple hands-on project: building a basic ETL pipeline using Python, Pandas, CSV files, and a cloud-hosted MySQL database.</Paragraph>
+
+<Paragraph>Let's walk through what I built.</Paragraph>
+
+<H1>First, What Exactly Is ETL?</H1>
+
+<Paragraph>ETL stands for:</Paragraph>
+
+<BulletList items={[
+    "**Extract**: Get the data out of its source. That source could be a CSV file, an API, a database, or a spreadsheet.",
+    "**Transform**: Clean, validate, and reshape the data so it's ready to use.",
+    "**Load**: Store the prepared data in a destination, usually a database or data warehouse"
+]}/>
+
+<Paragraph>It's a three-step process for moving data from a source to a destination.</Paragraph>
+
+<H1>The Project: A Small E-Commerce Dataset</H1>
+
+<Paragraph>For this project, I used a simple e-commerce dataset made of four CSV files and Aiven MySQL as my destination database.</Paragraph>
+
+<Table
+  headers={['File', 'What it contains']}
+  rows={[
+    ['customers.csv', 'Customer IDs, names, emails, cities'],
+    ['products.csv', 'Product IDs, names, categories, prices'],
+    ['orders.csv', 'Orders with dates, statuses, and timestamps'],
+    ['order_items.csv', 'Which products were in which order, and how many'],
+  ]}
+/>
+
+
+<Paragraph>Nothing fancy, just enough to show how tables relate to each other. Customers place orders, orders contain order items, and order items reference products.</Paragraph>
+
+<H2>Step 1: Extract - Getting the Data</H2>
+
+<Paragraph>The Extract stage was the easiest to understand. All I needed was to read four CSV files into pandas DataFrames.</Paragraph>
+
+<Paragraph>I used a small dictionary to map each dataset name to its file, then looped through it:</Paragraph>
+
+<CodeSnippet
+  filename="etl.py"
+  lang="python"
+  code={`import pandas as pd
+from pathlib import Path
+
+RAW_DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "raw"
+def extract_data():
+    datasets = {
+        "customers": "customers.csv",
+        "products": "products.csv",
+        "orders": "orders.csv",
+        "order_items": "order_items.csv"
+    }
+
+    raw_data = {}
+
+    for name, filename in datasets.items():
+        file_path = RAW_DATA_PATH / filename
+        raw_data[name] = pd.read_csv(file_path)
+        print(f"Extracted {name}: {len(raw_data[name])} records")
+
+    return raw_data`}
+/>
+
+<NumberList items={[
+    "**Using pathlib instead of hard-coded paths**. The pipeline works no matter which folder I run it from.",
+    "**Printing record counts**. If a file is empty or missing rows, I see it immediately instead of discovering it later in the database",
+]}/>
+
+<Paragraph>At this stage, the goal is simply to retrieve the data. We haven't started cleaning or preparing it yet.</Paragraph>
+
+<H2>Step 2: Transform - Preparing the Data</H2>
+
+<Paragraph>This is where most of the real work happens. Real-world datasets aren't always ready to use.</Paragraph>
+<Paragraph>They can contain missing values, inconsistent formats, duplicate records, or incorrect data types.</Paragraph>
+<Paragraph>This is where the transformation stage comes in.</Paragraph>
+<Paragraph>Using Pandas, we can perform operations such as:</Paragraph>
+
+<BulletList items={[
+    "Handling missing values.",
+    "Removing duplicate records.",
+    "Converting columns into appropriate data types",
+    "Standardizing text values.",
+    "Preparing records for database insertion."
+]}/>
+
+<Paragraph>Because my raw data has these kinds of small issues, I added validation rules so the pipeline fails loudly rather than loading bad data. For example:</Paragraph>
+
+<CodeSnippet
+  filename="etl.py"
+  lang="python"
+  code={`customers["customer_name"] = customers["customer_name"].str.strip()
+customers["city"] = customers["city"].str.strip()
+customers["email_missing"] = customers["email"].isna()
+
+if customers["customer_id"].duplicated().any():
+    raise ValueError("Duplicate customer IDs found")`
+}
+/>
