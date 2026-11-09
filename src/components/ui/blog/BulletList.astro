@@ -44,12 +44,12 @@ const { items, indent } = Astro.props;
 ---
 
 <ul
-  class="text-light-gray text-base md:text-xl font-light leading-[1.6] mb-[15px] list-disc list-inside pl-3 md:pl-6"
+  class="text-light-gray text-base md:text-xl font-light leading-[1.6] mb-[15px] list-disc list-outside pl-5 md:pl-6"
   style={indent ? `margin-left: ${indent}rem` : undefined}
 >
   {items ? (
     items.map((item) => (
-      <li class="list-disc list-inside">
+      <li>
       {tokenize(item).map((token) =>
         token.type === 'bold' ? (
           <strong class="font-semibold">{token.value}</strong>
@@ -71,6 +71,6 @@ const { items, indent } = Astro.props;
   /* Markers for <li> children rendered from MDX (they don't get the utility classes) */
   ul > :global(li) {
     list-style-type: disc;
-    list-style-position: inside;
+    list-style-position: outside;
   }
 </style>

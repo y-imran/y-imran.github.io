@@ -37,9 +37,13 @@ function isProblemCell(headers: string[], col: number, value: string): boolean {
 }
 
 function afterChanged(row: string[], col: number): boolean {
-  const before = beforeRows.find((candidate) => candidate[0] === row[0]);
-  return before ? before[col] !== row[col] : false;
+  return beforeRows
+    .filter((candidate) => candidate[0] === row[0])
+    .some((candidate) => candidate[col] !== row[col]);
 }
+
+const isBlank = (value: string) => value.trim() === '';
+const displayValue = (value: string) => (isBlank(value) ? "''" : value);
 
 const warn = 'text-[hsl(45,96%,64%)]';
 ---
@@ -67,10 +71,7 @@ const warn = 'text-[hsl(45,96%,64%)]';
           >
             {row.map((cell, col) => (
               <span class={`truncate ${isProblemCell(headers, col, cell) ? warn : 'text-light-gray'}`}>
-                {cell}
-                {col === 0 && isDuplicate(row) && (
-                  <span class={`ml-1 text-[9px] ${warn}`}>×2</span>
-                )}
+                {displayValue(cell)}
               </span>
             ))}
           </div>
@@ -87,14 +88,13 @@ const warn = 'text-[hsl(45,96%,64%)]';
           >
             <div class="flex items-center justify-between gap-2">
               <span class="text-xs text-light-gray">{row[0]} · {row[1]}</span>
-              {isDuplicate(row) && <span class={`text-[10px] ${warn}`}>×2</span>}
             </div>
             <div class="flex items-center justify-between gap-2 mt-0.5 text-[11px]">
               <span class={isProblemCell(headers, 2, row[2] ?? '') ? warn : 'text-light-gray-70'}>
                 {row[2]}
               </span>
               <span class={isProblemCell(headers, 3, row[3] ?? '') ? warn : 'text-light-gray-70'}>
-                {row[3]}
+                {displayValue(row[3] ?? '')}
               </span>
             </div>
           </div>
@@ -162,10 +162,10 @@ const warn = 'text-[hsl(45,96%,64%)]';
               <span class="text-xs text-light-gray">{row[0]} · {row[1]}</span>
             </div>
             <div class="flex items-center justify-between gap-2 mt-0.5 text-[11px]">
-              <span class={afterChanged(row, 2) ? 'text-vegas-gold' : 'text-light-gray-70'}>
+              <span class={afterChanged(row, 2) ? '-mx-1 rounded-[3px] bg-vegas-gold/10 px-1 text-vegas-gold' : 'text-light-gray-70'}>
                 {row[2]}
               </span>
-              <span class={afterChanged(row, 3) ? 'text-vegas-gold' : 'text-light-gray-70'}>
+              <span class={afterChanged(row, 3) ? '-mx-1 rounded-[3px] bg-vegas-gold/10 px-1 text-vegas-gold' : 'text-light-gray-70'}>
                 {row[3]}
               </span>
             </div>
