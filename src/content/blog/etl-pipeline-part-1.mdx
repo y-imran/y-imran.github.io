@@ -22,30 +22,39 @@ import Panel from '@src/components/ui/blog/Panel.astro';
 import Table from '@src/components/ui/blog/Table.astro';
 
 {/* Blog Components imports */}
-import PipelineDiagram from '@src/components/blog/EtlPipeline/PipelineDiagram.astro';
-import ExtractDiagram from '@src/components/blog/EtlPipeline/ExtractDiagram.astro';
-import TransformDiagram from '@src/components/blog/EtlPipeline/TransformDiagram.astro';
-import LoadDiagram from '@src/components/blog/EtlPipeline/LoadDiagram.astro';
-import LoadApproachesDiagram from '@src/components/blog/EtlPipeline/LoadApproachesDiagram.astro';
-import EtlVsEltDiagram from '@src/components/blog/EtlPipeline/EtlVsEltDiagram.astro';
+import PipelineDiagram from '@src/components/blog/EtlPipeline/Part01/PipelineDiagram.astro';
+import ExtractDiagram from '@src/components/blog/EtlPipeline/Part01/ExtractDiagram.astro';
+import TransformDiagram from '@src/components/blog/EtlPipeline/Part01/TransformDiagram.astro';
+import LoadDiagram from '@src/components/blog/EtlPipeline/Part01/LoadDiagram.astro';
+import LoadApproachesDiagram from '@src/components/blog/EtlPipeline/Part01/LoadApproachesDiagram.astro';
+import EtlVsEltDiagram from '@src/components/blog/EtlPipeline/Part01/EtlVsEltDiagram.astro';
 
 {/* Image import */}
 import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark.png';
 
 
-<Paragraph>I've spent quite some time working with datasets, cleaning data, writing SQL queries, and building visualizations. But the more I worked with data, the more curious I became about the part that happens before the analysis:</Paragraph>
+<Paragraph>I've spent quite some time working with datasets, cleaning data, writing SQL queries, and building visualizations. But the more I worked with data, the more curious I became about the part that happens before the analysis.</Paragraph>
 
 <Paragraph><Highlight>How do we collect data from different sources, prepare it, and make it available for analysis?</Highlight></Paragraph>
 
 <Paragraph>That sparked my interest in learning the core concepts of Data Engineering. As I began exploring them, one topic kept coming up: <Highlight>ETL</Highlight>.</Paragraph>
 
-<Paragraph>This is Part 1 of a three part series. In this part, I'll explain ETL and break down its three stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>. In Part 2, we'll build a simple ETL pipeline using Python and a local MySQL setup. Finally, in Part 3, we'll explore the tools and technologies commonly used in industry to build and manage ETL pipelines.</Paragraph>
+<Paragraph>This is <Highlight>Part 1</Highlight> of a three-part series:</Paragraph>
+
+<BulletList items={[
+    "**Part 1**: Understand what ETL is and explore its three stages: Extract, Transform, and Load",
+    "**Part 2**: Build a simple ETL pipeline using Python and a local MySQL setup",
+    "**Part 3**: Explore the tools and technologies commonly used in the industry to build and manage ETL pipelines"
+]}
+/>
 
 <H1>First, What Exactly is ETL?</H1>
 
 <Paragraph>Think of a restaurant: ingredients arrive each morning from the farm, butcher, and market, but they can’t be served as-is. You gather them, wash, cut, and cook them, then plate and serve.</Paragraph>
 
-<Paragraph>That is exactly what ETL does with data. ETL stands for:</Paragraph>
+<Paragraph>That is exactly what ETL does with data.</Paragraph>
+
+<Paragraph>ETL stands for:</Paragraph>
 
 <BulletList items={[
     "**Extract**: Collect the raw data from where it lives",
@@ -55,7 +64,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
 
 <Figure src={EtlPipeline}/>
 
-<Paragraph>In the figure, ingredients arrive from different places, get washed and cooked in the kitchen, and leave as a finished meal. Swap ingredients for data, the kitchen for the pipeline, and the meal for your database, that is ETL.</Paragraph>
+<Paragraph>In the figure, ingredients arrive from different places, get washed and cooked in the kitchen, and leave as a finished meal. Swap ingredients for data, the kitchen for the pipeline, and the meal for your database; that’s ETL in a nutshell.</Paragraph>
 
 <H1>Few Term You will Keep Hearing</H1>
 
@@ -63,7 +72,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
 
 <BulletList items={[
     "**Data** – Any piece of information: a customer's name, an order amount, a click on a website",
-    "**Database** – A database is an organized digital collection of information stored on a computer so it can be quickly found, changed, and updated",
+    "**Database** – A database is an organized digital collection of information stored on a computer system so it can be quickly found, changed, and updated",
     "**Data warehouse** – A data warehouse is a centralized system designed specifically to store large amounts of data from different sources for reporting, business intelligence, and analysis",
     "**Source** – Wherever the data comes from: a database, a spreadsheet, a website, an app",
     "**Destination** (target) – Wherever the data ends up, usually a data warehouse",
@@ -77,14 +86,18 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
 <PipelineDiagram
   sources={['CSV files', 'Databases', 'APIs', 'Apps', 'Spreadsheets']}
   stages={['Extract', 'Transform', 'Load']}
-  destinations={['Data warehouse', 'Database', 'Analytics tool']}
+  destinations={[
+    { icon: 'layers-outline', title: 'Data warehouse', detail: 'Snowflake, BigQuery, Redshift' },
+    { icon: 'server-outline', title: 'Database', detail: 'MySQL, PostgreSQL' },
+    { icon: 'bar-chart-outline', title: 'Analytics tool', detail: 'Tableau, Power BI' },
+  ]}
   sourceLabel="Sources"
   pipelineLabel="The pipeline"
   destinationLabel="Destination"
   sourceNote="where data originates"
   pipelineNote="where data is cleaned & prepared"
   destinationNote="Where data is stored & used"
-  caption="The ETL pipeline at a glance: Raw material on the left. Finished product on the right. The pipeline in the middle"
+  caption="The ETL pipeline at a glance: From raw data to an analysis-ready result, through three essential stages."
 />
 <H1>Why do we even need ETL?</H1>
 
@@ -153,7 +166,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
 
 <Paragraph>For example, if a table contains 10,000 orders, a full extraction retrieves all 10,000 records.</Paragraph>
 
-<Paragraph>This approach is simple and can be useful for smaller datasets</Paragraph>
+<Paragraph>This approach is simple and can be useful for smaller datasets.</Paragraph>
 
 <H3>Incremental Extraction</H3>
 
@@ -165,9 +178,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
 
 <H2>Stage 2: Transform - Making the Data Useful</H2>
 
-<Paragraph>Now that we've collected the data, is it ready for analysis?</Paragraph>
-
-<Paragraph>Not always.</Paragraph>
+<Paragraph>Now that we've collected the data, is it ready for analysis? Not always.</Paragraph>
 
 <Paragraph>Data coming from different systems may have different formats, missing values, duplicate records, inconsistent naming conventions, or incorrect data types.</Paragraph>
 
@@ -178,7 +189,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
   rows={[
     ['501', 'Ali', 'karachi', 'ali@gmail.com'],
     ['502', 'Sara', 'Lahore', 'NULL'],
-    ['502', 'Sara', 'Lahore', 'NULL'],
+    ['502', 'Sara', 'Lahore', ''],
     ['503', 'Ahmed', 'KARACHI', 'ahmed@gmail.com'],
   ]}
 />
@@ -186,9 +197,9 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
 <Paragraph>There are a few things we might want to address:</Paragraph>
 
 <BulletList items={[
-    "Customer 502 appears twice.",
-    "Some city names use lowercase while others use uppercase.",
-    "One customer has a missing email address."
+    "Customer with id 502 appears twice",
+    "Some city names use lowercase while others use uppercase",
+    "One customer record has a missing email address represented in two ways: NULL and an empty string (' ')"
 ]}/>
 
 <Paragraph>These inconsistencies can affect reporting and analysis.</Paragraph>
@@ -201,7 +212,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
     "**Removing Duplicate Records** - Duplicate records can lead to incorrect counts and totals",
     "**Standardizing Values** - Make formats match. One system writes dates as 07-11-2026, another as Nov 7, 2026. We pick one style for all",
     "**Converting Data Types** - Sometimes dates and numbers are stored as text. We can convert them into appropriate data types before performing calculations or storing them",
-    "**Combining Data (joining)** - Merge data from different sources. For example, join an order list with a customer list so each order shows the customer's name",
+    "**Combining Data** (joining) - Merge data from different sources. For example, join an order list with a customer list so each order shows the customer's name",
     "**Calculating** - Create new useful values, like total price = quantity × price",
     "**Filtering** - Keep only the data we need and drop the rest"
 ]}
@@ -212,7 +223,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
   beforeRows={[
     ['501', 'Ali', 'karachi', 'ali@gmail.com'],
     ['502', 'Sara', 'Lahore', 'NULL'],
-    ['502', 'Sara', 'Lahore', 'NULL'],
+    ['502', 'Sara', 'Lahore', ''],
     ['503', 'Ahmed', 'KARACHI', 'ahmed@gmail.com'],
   ]}
   afterRows={[
@@ -223,7 +234,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
   steps={[
     { title: 'Remove duplicates', detail: 'Customer 502 appears twice, so keep one copy.' },
     { title: 'Standardize values', detail: 'karachi and KARACHI both become Karachi.' },
-    { title: 'Handle missing values', detail: 'The empty email is kept as NULL.' },
+    { title: 'Handle missing values', detail: 'The two missing forms (NULL and empty) both become NULL.' },
   ]}
   caption="Transform is the middle of the journey: the raw copy from Extract goes in, and clean, consistent data comes out. Nothing new is added — the same records are just fixed."
 />
@@ -345,13 +356,13 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark
 
 <H1>ETL vs. ELT: What's the Difference?</H1>
 
-<Paragraph>While learning about ETL, you'll also come across another term: ELT (Extract, Load, Transform).</Paragraph>
+<Paragraph>While learning about ETL, you'll also come across another term: <Highlight>ELT</Highlight> (Extract, Load, Transform).</Paragraph>
 
 <Paragraph>Both approaches involve collecting data, preparing it, and making it available for analysis. The main difference is when and where the transformation happens.</Paragraph>
 
 <BulletList items={[
-    "In ETL, data is transformed before it reaches the destination",
-    "In ELT, data is first extracted and loaded into the destination. Transformation happens afterward, usually within the destination system."
+    "In **ETL**, data is transformed before it reaches the destination",
+    "In **ELT**, data is first extracted and loaded into the destination. Transformation happens afterward, usually within the destination system"
 ]}
 />
 

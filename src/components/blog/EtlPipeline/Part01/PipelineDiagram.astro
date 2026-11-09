@@ -1,0 +1,133 @@
+---
+interface Destination {
+  icon?: string;
+  title: string;
+  detail?: string;
+}
+
+interface Props {
+  sources: string[];
+  stages: string[];
+  destinations: (string | Destination)[];
+  sourceLabel?: string;
+  pipelineLabel?: string;
+  destinationLabel?: string;
+  sourceNote?: string;
+  pipelineNote?: string;
+  destinationNote?: string;
+  caption?: string;
+}
+
+const {
+  sources,
+  stages,
+  destinations,
+  sourceLabel = 'Sources',
+  pipelineLabel = 'The pipeline',
+  destinationLabel = 'Destination',
+  sourceNote,
+  pipelineNote,
+  destinationNote,
+  caption,
+} = Astro.props;
+
+const destinationItems = destinations.map((destination) =>
+  typeof destination === 'string' ? { title: destination } : destination
+);
+---
+
+<figure class="my-5">
+  <div class="w-full rounded-[10px] border border-jet bg-eerie-black-1 p-4 md:p-6">
+    <div class="flex flex-col xl:flex-row xl:items-stretch gap-3 xl:gap-2">
+
+      {/* Sources */}
+      <div class="flex-1 min-w-0 flex flex-col">
+        <p class="text-center text-[11px] uppercase tracking-[0.18em] text-light-gray-70">
+          {sourceLabel}
+        </p>
+        {sourceNote && (
+          <p class="mt-0.5 mb-2 text-center text-[11px] italic text-light-gray-70">{sourceNote}</p>
+        )}
+        <div class="flex-1 rounded-[8px] border border-jet bg-onyx px-3 py-2.5">
+          <ul class="text-light-gray text-sm md:text-base leading-[1.7]">
+            {sources.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      {/* Arrow: down on small screens, right on larger ones */}
+      <div class="flex shrink-0 items-center justify-center text-orange-yellow-crayola xl:px-1">
+        <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[22px] xl:hidden"></ion-icon>
+        <ion-icon name="arrow-forward-outline" aria-hidden="true" class="text-[22px] hidden xl:block"></ion-icon>
+      </div>
+
+      {/* Pipeline stages */}
+      <div class="flex-1 min-w-0 flex flex-col">
+        <p class="text-center text-[11px] uppercase tracking-[0.18em] text-light-gray-70">
+          {pipelineLabel}
+        </p>
+        {pipelineNote && (
+          <p class="mt-0.5 mb-2 text-center text-[11px] italic text-light-gray-70">{pipelineNote}</p>
+        )}
+        <div class="flex-1 rounded-[8px] border border-jet bg-onyx p-3">
+          {stages.map((stage, index) => (
+            <Fragment>
+              <div class="rounded-[6px] border border-vegas-gold/40 bg-vegas-gold/10 px-3 py-2 text-center text-xs md:text-sm uppercase tracking-[0.12em] font-medium text-vegas-gold">
+                {stage}
+              </div>
+              {index < stages.length - 1 && (
+                <div class="flex justify-center py-1 text-light-gray-70">
+                  <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[14px]"></ion-icon>
+                </div>
+              )}
+            </Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* Arrow: down on small screens, right on larger ones */}
+      <div class="flex shrink-0 items-center justify-center text-orange-yellow-crayola xl:px-1">
+        <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[22px] xl:hidden"></ion-icon>
+        <ion-icon name="arrow-forward-outline" aria-hidden="true" class="text-[22px] hidden xl:block"></ion-icon>
+      </div>
+
+      {/* Destinations */}
+      <div class="flex-1 min-w-0 flex flex-col">
+        <p class="text-center text-[11px] uppercase tracking-[0.18em] text-light-gray-70">
+          {destinationLabel}
+        </p>
+        {destinationNote && (
+          <p class="mt-0.5 mb-2 text-center text-[11px] italic text-light-gray-70">{destinationNote}</p>
+        )}
+        <div class="flex-1 rounded-[8px] border border-jet bg-onyx px-3 py-2.5">
+          <div class="space-y-2">
+            {destinationItems.map((destination) => (
+              <div class="flex items-start gap-2">
+                {destination.icon && (
+                  <ion-icon
+                    name={destination.icon}
+                    aria-hidden="true"
+                    class="shrink-0 mt-0.5 text-vegas-gold text-[14px]"
+                  ></ion-icon>
+                )}
+                <div class="min-w-0">
+                  <p class="text-light-gray text-sm md:text-base font-medium leading-[1.3]">{destination.title}</p>
+                  {destination.detail && (
+                    <p class="text-light-gray-70 text-xs md:text-sm leading-[1.4]">{destination.detail}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {caption && (
+    <figcaption class="text-light-gray-70 text-xs md:text-sm font-[var(--fw-300)] text-center font-sans italic mt-3">
+      {caption}
+    </figcaption>
+  )}
+</figure>
