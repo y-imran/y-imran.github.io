@@ -1,0 +1,83 @@
+---
+type Tone = 'kept' | 'added' | 'reloaded';
+
+interface Row {
+  id: string;
+  action: string;
+  tone: Tone;
+}
+
+interface Mode {
+  title: string;
+  icon: string;
+  subtitle: string;
+  rows: Row[];
+  note: string;
+}
+
+interface Props {
+  title?: string;
+  modes: Mode[];
+}
+
+const { title, modes } = Astro.props;
+
+const toneStyles: Record<Tone, { bar: string; chip: string }> = {
+  kept: {
+    bar: 'border-jet/60 bg-eerie-black-1 text-light-gray-70',
+    chip: 'border-jet bg-white/5 text-light-gray-70',
+  },
+  added: {
+    bar: 'border-vegas-gold/40 bg-vegas-gold/5 text-light-gray',
+    chip: 'border-vegas-gold/40 bg-vegas-gold/10 text-vegas-gold',
+  },
+  reloaded: {
+    bar: 'border-vegas-gold/40 bg-vegas-gold/5 text-light-gray',
+    chip: 'border-vegas-gold/40 bg-vegas-gold/10 text-vegas-gold',
+  },
+};
+---
+
+<figure class="my-5">
+  <div class="w-full rounded-[10px] border border-jet bg-eerie-black-1 p-4 md:p-6">
+
+    {title && (
+      <p class="text-center text-light-gray text-sm md:text-base font-medium leading-[1.4] mb-4">
+        {title}
+      </p>
+    )}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+      {modes.map((mode) => (
+        <div class="rounded-[8px] border border-jet bg-onyx p-3">
+          <div class="flex items-center gap-2 text-vegas-gold">
+            <ion-icon name={mode.icon} aria-hidden="true" class="text-[18px]"></ion-icon>
+            <span class="text-xs font-semibold uppercase tracking-[0.15em]">{mode.title}</span>
+          </div>
+
+          <p class="mt-1.5 text-light-gray-70 text-[11px] leading-[1.45]">{mode.subtitle}</p>
+
+          <div class="mt-3 space-y-1.5">
+            {mode.rows.map((row) => (
+              <div class={`flex items-center justify-between gap-2 rounded-[5px] border px-2 py-1.5 font-mono text-[10px] sm:text-[11px] ${toneStyles[row.tone].bar}`}>
+                <span class="flex min-w-0 items-center gap-1.5">
+                  {row.tone === 'added' && (
+                    <ion-icon name="arrow-down-outline" aria-hidden="true" class="shrink-0 text-vegas-gold text-[12px]"></ion-icon>
+                  )}
+                  <span class="min-w-0 break-words">{row.id}</span>
+                </span>
+                <span class={`shrink-0 rounded-full border px-1.5 py-0.5 text-[9px] uppercase tracking-[0.06em] ${toneStyles[row.tone].chip}`}>
+                  {row.action}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <p class="mt-3 text-[11px] leading-[1.45] text-light-gray-70">{mode.note}</p>
+        </div>
+      ))}
+
+    </div>
+  </div>
+</figure>
