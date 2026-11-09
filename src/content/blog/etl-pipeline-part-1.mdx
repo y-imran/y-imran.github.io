@@ -1,14 +1,14 @@
 ---
 slug: understanding-etl-data-pipeline-basics
-title: The Concepts Behind Extract, Transform, and Load (ETL)
+title: The Concepts Behind Extract, Transform, and Load (ETL) Pipeline
 category: python
-pubDate: 2026-11-07
+pubDate: 2026-11-09
 excerpt: How does raw data become ready for analysis? Let's explore the ETL pipeline and find out!
 readTimeMins: 10
 banner: "../../assets/blog/etl-pipeline/thumbnail.png"
 ---
 
-{/* Components imports */}
+{/* Common Components imports */}
 import Paragraph from '@components/ui/blog/Paragraph.astro';
 import Figure from '@components/ui/blog/Figure.astro'
 import Highlight from '@src/components/ui/blog/Highlight.astro';
@@ -20,25 +20,28 @@ import BulletList from '@src/components/ui/blog/BulletList.astro';
 import Link from '@src/components/ui/blog/Link.astro';
 import Panel from '@src/components/ui/blog/Panel.astro';
 import Table from '@src/components/ui/blog/Table.astro';
-import CodeSnippet from '@src/components/ui/blog/CodeSnippet.astro';
-import PipelineDiagram from '@src/components/ui/blog/PipelineDiagram.astro';
-import ExtractDiagram from '@src/components/ui/blog/ExtractDiagram.astro';
-import TransformDiagram from '@src/components/ui/blog/TransformDiagram.astro';
-import LoadDiagram from '@src/components/ui/blog/LoadDiagram.astro';
-import LoadApproachesDiagram from '@src/components/ui/blog/LoadApproachesDiagram.astro';
-import EtlVsEltDiagram from '@src/components/ui/blog/EtlVsEltDiagram.astro';
 
-import EtlPipeline from '../../assets/blog/etl-pipeline/01-etl-kitchen-analogy-dark.png';
+{/* Blog Components imports */}
+import PipelineDiagram from '@src/components/blog/EtlPipeline/PipelineDiagram.astro';
+import ExtractDiagram from '@src/components/blog/EtlPipeline/ExtractDiagram.astro';
+import TransformDiagram from '@src/components/blog/EtlPipeline/TransformDiagram.astro';
+import LoadDiagram from '@src/components/blog/EtlPipeline/LoadDiagram.astro';
+import LoadApproachesDiagram from '@src/components/blog/EtlPipeline/LoadApproachesDiagram.astro';
+import EtlVsEltDiagram from '@src/components/blog/EtlPipeline/EtlVsEltDiagram.astro';
+
+{/* Image import */}
+import EtlPipeline from '../../assets/blog/etl-pipeline/etl-kitchen-analogy-dark.png';
+
 
 <Paragraph>I've spent quite some time working with datasets, cleaning data, writing SQL queries, and building visualizations. But the more I worked with data, the more curious I became about the part that happens before the analysis:</Paragraph>
 
-<Highlight>How do we collect data from different sources, prepare it, and make it available for analysis?</Highlight>
+<Paragraph><Highlight>How do we collect data from different sources, prepare it, and make it available for analysis?</Highlight></Paragraph>
 
 <Paragraph>That sparked my interest in learning the core concepts of Data Engineering. As I began exploring them, one topic kept coming up: <Highlight>ETL</Highlight>.</Paragraph>
 
-<Paragraph>This is Part 1 of a two-part series. In this part, I'll explain what ETL is and break down each of its three stages: Extract, Transform, and Load. In Part 2, I will show you how I built a real ETL pipeline using Python.</Paragraph>
+<Paragraph>This is Part 1 of a three part series. In this part, I'll explain ETL and break down its three stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>. In Part 2, we'll build a simple ETL pipeline using Python and a local MySQL setup. Finally, in Part 3, we'll explore the tools and technologies commonly used in industry to build and manage ETL pipelines.</Paragraph>
 
-<H1>First, What Exactly Is ETL?</H1>
+<H1>First, What Exactly is ETL?</H1>
 
 <Paragraph>Think of a restaurant: ingredients arrive each morning from the farm, butcher, and market, but they can’t be served as-is. You gather them, wash, cut, and cook them, then plate and serve.</Paragraph>
 
@@ -46,25 +49,25 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/01-etl-kitchen-analogy-d
 
 <BulletList items={[
     "**Extract**: Collect the raw data from where it lives",
-    "**Transform**: Clean, organize, and prepare the extracted data.",
+    "**Transform**: Clean, organize, and prepare the extracted data",
     "**Load**: Store it in a final place where people can use it"
 ]}/>
 
-<Figure src={EtlPipeline} alt="Kitchen analogy for ETL: raw ingredients arrive from different places, get washed and cooked in a kitchen, and leave as a finished meal."/>
+<Figure src={EtlPipeline}/>
 
-<Paragraph>In the image, ingredients arrive from different places, get washed and cooked in the kitchen, and leave as a finished meal. Swap ingredients for data, the kitchen for the pipeline, and the meal for your database — that is ETL.</Paragraph>
+<Paragraph>In the figure, ingredients arrive from different places, get washed and cooked in the kitchen, and leave as a finished meal. Swap ingredients for data, the kitchen for the pipeline, and the meal for your database, that is ETL.</Paragraph>
 
-<H1>First, a few words you will keep hearing</H1>
+<H1>Few Term You will Keep Hearing</H1>
 
 <Paragraph>Before we go deeper, let's decode the common terms.</Paragraph>
 
 <BulletList items={[
     "**Data** – Any piece of information: a customer's name, an order amount, a click on a website",
     "**Database** – A database is an organized digital collection of information stored on a computer so it can be quickly found, changed, and updated",
-    "**Data warehouse** – A data warehouse is a centralized system designed specifically to store large amounts of data from different sources for reporting, business intelligence, and analysis.",
-    "**Source** – Wherever the data comes from: a database, a spreadsheet, a website, an app.",
-    "**Destination** (target) – Wherever the data ends up, usually a data warehouse.",
-    "**Pipeline** – A series of steps that data travels through automatically, like water through connected pipes. An ETL pipeline is simply the E, T and L steps linked together."
+    "**Data warehouse** – A data warehouse is a centralized system designed specifically to store large amounts of data from different sources for reporting, business intelligence, and analysis",
+    "**Source** – Wherever the data comes from: a database, a spreadsheet, a website, an app",
+    "**Destination** (target) – Wherever the data ends up, usually a data warehouse",
+    "**Pipeline** – A series of steps that data travels through automatically, like water through connected pipes. An ETL pipeline is simply the E, T and L steps linked together"
 ]}/>
 
 <H1>Before We Begin: The Shape of the Journey</H1>
@@ -78,9 +81,9 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/01-etl-kitchen-analogy-d
   sourceLabel="Sources"
   pipelineLabel="The pipeline"
   destinationLabel="Destination"
-  sourceNote="where it is"
-  pipelineNote="where it's fixed"
-  destinationNote="where it's used"
+  sourceNote="where data originates"
+  pipelineNote="where data is cleaned & prepared"
+  destinationNote="Where data is stored & used"
   caption="The ETL pipeline at a glance: Raw material on the left. Finished product on the right. The pipeline in the middle"
 />
 <H1>Why do we even need ETL?</H1>
@@ -104,7 +107,7 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/01-etl-kitchen-analogy-d
 
 <Paragraph>The purpose is simple: collect data from its original source and bring it into the pipeline.</Paragraph>
 
-<Highlight>Where does this data come from:</Highlight>
+<Paragraph><Highlight>Where does this data come from:</Highlight></Paragraph>
 
 <BulletList items={[
     "Databases (like a CRM system holding customer details)",
@@ -377,9 +380,9 @@ import EtlPipeline from '../../assets/blog/etl-pipeline/01-etl-kitchen-analogy-d
       nestedNote: 'happens inside the warehouse',
     },
   ]}
-  caption="ETL prepares the data before it is stored; ELT stores it first and prepares it inside the destination. The result is the same — only the order changes."
+  caption="ETL prepares the data before it is stored; ELT stores it first and prepares it inside the destination. The result is the sameonly the order changes."
 />
 
-<H1>What's next?</H1>
+<H1>What's Next?</H1>
 
-<Paragraph>Now that the ideas are clear, it's time to get our hands dirty. In Part 2, I will show how I built a working ETL pipeline using Python – step by step, with code you can follow along with.</Paragraph>
+<Paragraph>Now that the ideas are clear, it's time to get our hands dirty. In Part 2, I will show how I built a working ETL pipeline using Python, step by step with code you can follow along with.</Paragraph>

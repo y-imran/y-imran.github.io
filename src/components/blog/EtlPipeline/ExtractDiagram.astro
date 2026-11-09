@@ -1,0 +1,109 @@
+---
+interface Source {
+  icon: string;
+  title: string;
+  detail: string;
+  method: string;
+}
+
+interface Props {
+  sources: Source[];
+  rawLines?: string[];
+  caption?: string;
+}
+
+const { sources, rawLines = [], caption } = Astro.props;
+
+const rawText = rawLines.join('\n');
+---
+
+<figure class="my-5">
+  <div class="w-full rounded-[10px] border border-jet bg-eerie-black-1 p-4 md:p-6">
+    <div class="flex flex-col xl:flex-row xl:items-stretch gap-4 xl:gap-2">
+
+      {/* Sources */}
+      <div class="xl:flex-[3] min-w-0 flex flex-col">
+        <p class="text-left text-[11px] uppercase tracking-[0.14em] text-light-gray-70 mb-2">
+          Sources — where the data lives
+        </p>
+        <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {sources.map((source) => (
+            <div class="rounded-[8px] border border-jet bg-onyx p-2.5 flex items-start gap-2">
+              <ion-icon
+                name={source.icon}
+                aria-hidden="true"
+                class="shrink-0 text-vegas-gold text-[18px] mt-0.5"
+              ></ion-icon>
+              <div class="min-w-0">
+                <p class="text-light-gray text-sm font-medium leading-[1.3]">{source.title}</p>
+                <p class="text-light-gray-70 text-xs leading-[1.4] mt-0.5">{source.detail}</p>
+                <p class="text-vegas-gold/80 text-[10px] mt-1">{source.method}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Arrow */}
+      <div class="flex justify-center items-center text-orange-yellow-crayola xl:px-1 shrink-0">
+        <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[22px] xl:hidden"></ion-icon>
+        <ion-icon name="arrow-forward-outline" aria-hidden="true" class="text-[22px] hidden xl:block"></ion-icon>
+      </div>
+
+      {/* Extract */}
+      <div class="xl:flex-[2] min-w-0 flex flex-col">
+        <p class="text-left text-[11px] uppercase tracking-[0.14em] text-light-gray-70 mb-2">
+          Extract — copy it out
+        </p>
+        <div class="flex-1 rounded-[8px] border border-vegas-gold/40 bg-onyx p-3 flex flex-col">
+          <ol class="space-y-1.5 text-light-gray text-xs md:text-sm">
+            <li class="flex gap-2">
+              <span class="text-vegas-gold font-semibold">1</span>
+              <span>Connect to the source</span>
+            </li>
+            <li class="flex gap-2">
+              <span class="text-vegas-gold font-semibold">2</span>
+              <span>Take the data</span>
+            </li>
+            <li class="flex gap-2">
+              <span class="text-vegas-gold font-semibold">3</span>
+              <span>Copy it out, unchanged</span>
+            </li>
+          </ol>
+
+          <p class="mt-3 xl:mt-auto rounded-[6px] border border-jet bg-eerie-black-1 px-2.5 py-2 text-[11px] leading-[1.5] text-light-gray-70">
+            No cleaning or fixing yet.
+            <span class="text-light-gray">That happens in Transform.</span>
+          </p>
+        </div>
+      </div>
+
+      {/* Arrow */}
+      <div class="flex justify-center items-center text-orange-yellow-crayola xl:px-1 shrink-0">
+        <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[22px] xl:hidden"></ion-icon>
+        <ion-icon name="arrow-forward-outline" aria-hidden="true" class="text-[22px] hidden xl:block"></ion-icon>
+      </div>
+
+      {/* Raw copy */}
+      <div class="xl:flex-[2] min-w-0 flex flex-col">
+        <p class="text-left text-[11px] uppercase tracking-[0.14em] text-light-gray-70 mb-2">
+          Raw data — still same
+        </p>
+        <div class="flex-1 rounded-[8px] border border-jet bg-onyx p-3 flex flex-col">
+          <pre class="font-mono text-[10px] md:text-[11px] leading-[1.55] whitespace-pre-wrap text-light-gray-70 m-0">{rawText}</pre>
+
+          <p class="mt-2 xl:mt-auto text-[10px] italic text-light-gray-70">
+            Exactly the same as the source.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {caption && (
+    <figcaption class="text-light-gray-70 text-xs md:text-sm font-[var(--fw-300)] text-center font-sans italic mt-3">
+      {caption}
+    </figcaption>
+  )}
+</figure>
