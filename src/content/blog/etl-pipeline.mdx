@@ -1,9 +1,9 @@
 ---
-slug: building-etl-pipeline-using-python
-title: Building an ETL Pipeline Using Python
+slug: understanding-etl-data-pipeline-basics
+title: The Concepts Behind Extract, Transform, and Load (ETL)
 category: python
 pubDate: 2026-11-07
-excerpt: How does raw data become analysis-ready? Let's build a simple ETL pipeline using Python and find out!
+excerpt: How does raw data become ready for analysis? Let's explore the ETL pipeline and find out!
 readTimeMins: 10
 banner: "../../assets/blog/etl-pipeline/thumbnail.png"
 ---
@@ -14,117 +14,372 @@ import Figure from '@components/ui/blog/Figure.astro'
 import Highlight from '@src/components/ui/blog/Highlight.astro';
 import H1 from '@src/components/ui/blog/H1.astro';
 import H2 from '@src/components/ui/blog/H2.astro';
+import H3 from '@src/components/ui/blog/H3.astro';
 import NumberList from '@src/components/ui/blog/NumberList.astro';
 import BulletList from '@src/components/ui/blog/BulletList.astro';
 import Link from '@src/components/ui/blog/Link.astro';
 import Panel from '@src/components/ui/blog/Panel.astro';
 import Table from '@src/components/ui/blog/Table.astro';
 import CodeSnippet from '@src/components/ui/blog/CodeSnippet.astro';
+import PipelineDiagram from '@src/components/ui/blog/PipelineDiagram.astro';
+import ExtractDiagram from '@src/components/ui/blog/ExtractDiagram.astro';
+import TransformDiagram from '@src/components/ui/blog/TransformDiagram.astro';
+import LoadDiagram from '@src/components/ui/blog/LoadDiagram.astro';
+import LoadApproachesDiagram from '@src/components/ui/blog/LoadApproachesDiagram.astro';
+import EtlVsEltDiagram from '@src/components/ui/blog/EtlVsEltDiagram.astro';
 
-<H1>Moving Data from CSV Files to a Cloud MySQL Database</H1>
+import EtlPipeline from '../../assets/blog/etl-pipeline/01-etl-kitchen-analogy-dark.png';
 
 <Paragraph>I've spent quite some time working with datasets, cleaning data, writing SQL queries, and building visualizations. But the more I worked with data, the more curious I became about the part that happens before the analysis:</Paragraph>
 
-<Highlight>Where does all this data come from, and how does it actually get into a database?</Highlight>
+<Highlight>How do we collect data from different sources, prepare it, and make it available for analysis?</Highlight>
 
 <Paragraph>That sparked my interest in learning the core concepts of Data Engineering. As I began exploring them, one topic kept coming up: <Highlight>ETL</Highlight>.</Paragraph>
 
-<Paragraph>I started with a simple hands-on project: building a basic ETL pipeline using Python, Pandas, CSV files, and a cloud-hosted MySQL database.</Paragraph>
-
-<Paragraph>Let's walk through what I built.</Paragraph>
+<Paragraph>This is Part 1 of a two-part series. In this part, I'll explain what ETL is and break down each of its three stages: Extract, Transform, and Load. In Part 2, I will show you how I built a real ETL pipeline using Python.</Paragraph>
 
 <H1>First, What Exactly Is ETL?</H1>
 
-<Paragraph>ETL stands for:</Paragraph>
+<Paragraph>Think of a restaurant: ingredients arrive each morning from the farm, butcher, and market, but they can’t be served as-is. You gather them, wash, cut, and cook them, then plate and serve.</Paragraph>
+
+<Paragraph>That is exactly what ETL does with data. ETL stands for:</Paragraph>
 
 <BulletList items={[
-    "**Extract**: Get the data out of its source. That source could be a CSV file, an API, a database, or a spreadsheet.",
-    "**Transform**: Clean, validate, and reshape the data so it's ready to use.",
-    "**Load**: Store the prepared data in a destination, usually a database or data warehouse"
+    "**Extract**: Collect the raw data from where it lives",
+    "**Transform**: Clean, organize, and prepare the extracted data.",
+    "**Load**: Store it in a final place where people can use it"
 ]}/>
 
-<Paragraph>It's a three-step process for moving data from a source to a destination.</Paragraph>
+<Figure src={EtlPipeline} alt="Kitchen analogy for ETL: raw ingredients arrive from different places, get washed and cooked in a kitchen, and leave as a finished meal."/>
 
-<H1>The Project: A Small E-Commerce Dataset</H1>
+<Paragraph>In the image, ingredients arrive from different places, get washed and cooked in the kitchen, and leave as a finished meal. Swap ingredients for data, the kitchen for the pipeline, and the meal for your database — that is ETL.</Paragraph>
 
-<Paragraph>For this project, I used a simple e-commerce dataset made of four CSV files and Aiven MySQL as my destination database.</Paragraph>
+<H1>First, a few words you will keep hearing</H1>
+
+<Paragraph>Before we go deeper, let's decode the common terms.</Paragraph>
+
+<BulletList items={[
+    "**Data** – Any piece of information: a customer's name, an order amount, a click on a website",
+    "**Database** – A database is an organized digital collection of information stored on a computer so it can be quickly found, changed, and updated",
+    "**Data warehouse** – A data warehouse is a centralized system designed specifically to store large amounts of data from different sources for reporting, business intelligence, and analysis.",
+    "**Source** – Wherever the data comes from: a database, a spreadsheet, a website, an app.",
+    "**Destination** (target) – Wherever the data ends up, usually a data warehouse.",
+    "**Pipeline** – A series of steps that data travels through automatically, like water through connected pipes. An ETL pipeline is simply the E, T and L steps linked together."
+]}/>
+
+<H1>Before We Begin: The Shape of the Journey</H1>
+
+<Paragraph>Here's the map I want you to carry through the rest of this post:</Paragraph>
+
+<PipelineDiagram
+  sources={['CSV files', 'Databases', 'APIs', 'Apps', 'Spreadsheets']}
+  stages={['Extract', 'Transform', 'Load']}
+  destinations={['Data warehouse', 'Database', 'Analytics tool']}
+  sourceLabel="Sources"
+  pipelineLabel="The pipeline"
+  destinationLabel="Destination"
+  sourceNote="where it is"
+  pipelineNote="where it's fixed"
+  destinationNote="where it's used"
+  caption="The ETL pipeline at a glance: Raw material on the left. Finished product on the right. The pipeline in the middle"
+/>
+<H1>Why do we even need ETL?</H1>
+
+<Paragraph>In most companies, data is scattered everywhere. Sales sit in one system, customer details in another, website visits in a third. Each one uses different formats, different names for the same thing, and sometimes has mistakes.</Paragraph>
+
+<Paragraph>If you try to analyse this mess directly, you get wrong answers. ETL solves this by:</Paragraph>
+
+<BulletList items={[
+    "Bringing data from many places into one place",
+    "Cleaning mistakes and removing duplicates",
+    "Making everything follow one consistent format",
+    "Saving time by running automatically, instead of someone copying data by hand"
+]}/>
+
+<Paragraph>Now, let's understand what actually happens at each stage.</Paragraph>
+
+<H2>Stage 1: Extract - Collecting the Data</H2>
+
+<Paragraph>Extraction is the first step of an ETL process.</Paragraph>
+
+<Paragraph>The purpose is simple: collect data from its original source and bring it into the pipeline.</Paragraph>
+
+<Highlight>Where does this data come from:</Highlight>
+
+<BulletList items={[
+    "Databases (like a CRM system holding customer details)",
+    "Files (CSV, Excel, JSON)",
+    "APIs (a way for one app to politely ask another app for its data)",
+    "Websites and apps"
+]}/>
+
+<ExtractDiagram
+  sources={[
+    { icon: 'server-outline', title: 'Customer system (CRM)', detail: 'Names, emails, deals'},
+    { icon: 'cart-outline', title: 'Order database', detail: 'Orders and line items'},
+    { icon: 'document-text-outline', title: 'Spreadsheet', detail: 'campaigns.xlsx'},
+    { icon: 'pulse-outline', title: 'Payment app', detail: 'Payments and refunds'},
+  ]}
+  rawLines={[
+    'customers',
+    'id  | name | city',
+    '501 | Ali  | karachi',
+    '502 | Sara | Lahore',
+    '',
+    'orders',
+    'id   | customer_id | total',
+    '5001 | 501         | 42.00',
+  ]}
+  caption="Extract is just a copy step: it connects to each source, takes the data, and copies it out. The data stays raw until Transform cleans it."
+/>
+
+<Paragraph>In the above figure, each source is opened in its own way, but the result is always the same: a raw copy of the data. Nothing is cleaned or renamed yet.</Paragraph>
+
+<H2>Ways to Extract Data</H2>
+
+<Paragraph>There are 2 different ways to extract data.</Paragraph>
+
+<NumberList items={[
+    "Full Extraction",
+    "Incremental Extraction"
+]}/>
+
+<H3>Full Extraction</H3>
+
+<Paragraph>As the name suggests, full extraction retrieves the entire dataset from the source.</Paragraph>
+
+<Paragraph>For example, if a table contains 10,000 orders, a full extraction retrieves all 10,000 records.</Paragraph>
+
+<Paragraph>This approach is simple and can be useful for smaller datasets</Paragraph>
+
+<H3>Incremental Extraction</H3>
+
+<Paragraph>Instead of retrieving everything, incremental extraction retrieves only new or modified records since the previous extraction.</Paragraph>
+
+<Paragraph>For example, if we already extracted 10,000 orders and another 200 orders were added, we only need to retrieve those 200 new records.</Paragraph>
+
+<Paragraph>This can save time and resources when dealing with large and frequently updated datasets.</Paragraph>
+
+<H2>Stage 2: Transform - Making the Data Useful</H2>
+
+<Paragraph>Now that we've collected the data, is it ready for analysis?</Paragraph>
+
+<Paragraph>Not always.</Paragraph>
+
+<Paragraph>Data coming from different systems may have different formats, missing values, duplicate records, inconsistent naming conventions, or incorrect data types.</Paragraph>
+
+<Paragraph>For example, imagine an e-commerce company receives the following customer records:</Paragraph>
 
 <Table
-  headers={['File', 'What it contains']}
+  headers={['customer_id', 'customer_name', 'city', 'email']}
   rows={[
-    ['customers.csv', 'Customer IDs, names, emails, cities'],
-    ['products.csv', 'Product IDs, names, categories, prices'],
-    ['orders.csv', 'Orders with dates, statuses, and timestamps'],
-    ['order_items.csv', 'Which products were in which order, and how many'],
+    ['501', 'Ali', 'karachi', 'ali@gmail.com'],
+    ['502', 'Sara', 'Lahore', 'NULL'],
+    ['502', 'Sara', 'Lahore', 'NULL'],
+    ['503', 'Ahmed', 'KARACHI', 'ahmed@gmail.com'],
   ]}
 />
 
-
-<Paragraph>Nothing fancy, just enough to show how tables relate to each other. Customers place orders, orders contain order items, and order items reference products.</Paragraph>
-
-<H2>Step 1: Extract - Getting the Data</H2>
-
-<Paragraph>The Extract stage was the easiest to understand. All I needed was to read four CSV files into pandas DataFrames.</Paragraph>
-
-<Paragraph>I used a small dictionary to map each dataset name to its file, then looped through it:</Paragraph>
-
-<CodeSnippet
-  filename="etl.py"
-  lang="python"
-  code={`import pandas as pd
-from pathlib import Path
-
-RAW_DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "raw"
-def extract_data():
-    datasets = {
-        "customers": "customers.csv",
-        "products": "products.csv",
-        "orders": "orders.csv",
-        "order_items": "order_items.csv"
-    }
-
-    raw_data = {}
-
-    for name, filename in datasets.items():
-        file_path = RAW_DATA_PATH / filename
-        raw_data[name] = pd.read_csv(file_path)
-        print(f"Extracted {name}: {len(raw_data[name])} records")
-
-    return raw_data`}
-/>
-
-<NumberList items={[
-    "**Using pathlib instead of hard-coded paths**. The pipeline works no matter which folder I run it from.",
-    "**Printing record counts**. If a file is empty or missing rows, I see it immediately instead of discovering it later in the database",
-]}/>
-
-<Paragraph>At this stage, the goal is simply to retrieve the data. We haven't started cleaning or preparing it yet.</Paragraph>
-
-<H2>Step 2: Transform - Preparing the Data</H2>
-
-<Paragraph>This is where most of the real work happens. Real-world datasets aren't always ready to use.</Paragraph>
-<Paragraph>They can contain missing values, inconsistent formats, duplicate records, or incorrect data types.</Paragraph>
-<Paragraph>This is where the transformation stage comes in.</Paragraph>
-<Paragraph>Using Pandas, we can perform operations such as:</Paragraph>
+<Paragraph>There are a few things we might want to address:</Paragraph>
 
 <BulletList items={[
-    "Handling missing values.",
-    "Removing duplicate records.",
-    "Converting columns into appropriate data types",
-    "Standardizing text values.",
-    "Preparing records for database insertion."
+    "Customer 502 appears twice.",
+    "Some city names use lowercase while others use uppercase.",
+    "One customer has a missing email address."
 ]}/>
 
-<Paragraph>Because my raw data has these kinds of small issues, I added validation rules so the pipeline fails loudly rather than loading bad data. For example:</Paragraph>
+<Paragraph>These inconsistencies can affect reporting and analysis.</Paragraph>
+<Paragraph>The transformation stage helps us deal with these problems.</Paragraph>
 
-<CodeSnippet
-  filename="etl.py"
-  lang="python"
-  code={`customers["customer_name"] = customers["customer_name"].str.strip()
-customers["city"] = customers["city"].str.strip()
-customers["email_missing"] = customers["email"].isna()
+<H3>Common Data Transformation Operations</H3>
 
-if customers["customer_id"].duplicated().any():
-    raise ValueError("Duplicate customer IDs found")`
-}
+<NumberList items={[
+    "**Handling Missing Values** - Depending on the business requirement, we might replace missing values, leave them as NULL, or exclude certain records",
+    "**Removing Duplicate Records** - Duplicate records can lead to incorrect counts and totals",
+    "**Standardizing Values** - Make formats match. One system writes dates as 07-11-2026, another as Nov 7, 2026. We pick one style for all",
+    "**Converting Data Types** - Sometimes dates and numbers are stored as text. We can convert them into appropriate data types before performing calculations or storing them",
+    "**Combining Data (joining)** - Merge data from different sources. For example, join an order list with a customer list so each order shows the customer's name",
+    "**Calculating** - Create new useful values, like total price = quantity × price",
+    "**Filtering** - Keep only the data we need and drop the rest"
+]}
 />
+
+<TransformDiagram
+  headers={['customer_id', 'customer_name', 'city', 'email']}
+  beforeRows={[
+    ['501', 'Ali', 'karachi', 'ali@gmail.com'],
+    ['502', 'Sara', 'Lahore', 'NULL'],
+    ['502', 'Sara', 'Lahore', 'NULL'],
+    ['503', 'Ahmed', 'KARACHI', 'ahmed@gmail.com'],
+  ]}
+  afterRows={[
+    ['501', 'Ali', 'Karachi', 'ali@gmail.com'],
+    ['502', 'Sara', 'Lahore', 'NULL'],
+    ['503', 'Ahmed', 'Karachi', 'ahmed@gmail.com'],
+  ]}
+  steps={[
+    { title: 'Remove duplicates', detail: 'Customer 502 appears twice, so keep one copy.' },
+    { title: 'Standardize values', detail: 'karachi and KARACHI both become Karachi.' },
+    { title: 'Handle missing values', detail: 'The empty email is kept as NULL.' },
+  ]}
+  caption="Transform is the middle of the journey: the raw copy from Extract goes in, and clean, consistent data comes out. Nothing new is added — the same records are just fixed."
+/>
+
+<H2>Stage 3: Load - Storing the Prepared Data</H2>
+
+<Paragraph>We've collected the data and prepared it. What's next?</Paragraph>
+
+<Paragraph>Now we need somewhere to store it.</Paragraph>
+
+<Paragraph>This is the responsibility of the loading stage.</Paragraph>
+
+<Paragraph>Loading takes the transformed data and transfers it into a destination, such as:</Paragraph>
+
+<BulletList items={[
+    "A relational database (MySQL, PostgreSQL)",
+    "A data warehouse (Snowflake, BigQuery, Amazon Redshift)",
+    "A cloud storage destination (Microsoft Azure, Google Cloud, Amazon Web Services (AWS))"
+]}
+/>
+
+<Paragraph>For example, our e-commerce company might load its prepared customer and order data into a MySQL database so that analysts can query it using SQL.</Paragraph>
+
+<Paragraph>Here is that final step in one picture:</Paragraph>
+
+<LoadDiagram
+  dataRows={[
+    '501 · Ali · Karachi',
+    '502 · Sara · Lahore',
+    '503 · Ahmed · Karachi',
+  ]}
+  destinations={[
+    { icon: 'server-outline', title: 'Database', detail: 'MySQL, PostgreSQL' },
+    { icon: 'layers-outline', title: 'Data warehouse', detail: 'Snowflake, BigQuery, Redshift' },
+    { icon: 'cloud-outline', title: 'Cloud storage', detail: 'S3, Azure, Google Cloud' },
+  ]}
+  caption="Load is the last stop: the clean data from Transform is written into the destination, where people and tools can use it."
+/>
+
+<H2>Different Loading Approaches</H2>
+
+<Paragraph>Just like extraction, loading can also happen in 2 different ways.</Paragraph>
+
+<NumberList items={[
+    "Full Load",
+    "Incremental Load"
+]}
+/>
+
+<H3>Full Load</H3>
+
+<Paragraph>In a full load, the entire dataset is loaded into the destination.</Paragraph>
+
+<Paragraph>For example, every time the pipeline runs, the existing destination data might be replaced with the latest complete dataset.</Paragraph>
+
+<Paragraph>This can work well for smaller datasets or initial loads.</Paragraph>
+
+<H3>Incremental Load</H3>
+
+<Paragraph>In incremental loading, only new or modified records are inserted or updated in the destination.</Paragraph>
+
+<Paragraph>For example:</Paragraph>
+
+<BulletList items={[
+    "10,000 orders are already stored",
+    "200 new orders arrive",
+    "15 existing orders have been modified"
+]}
+/>
+
+<Paragraph>Instead of reloading everything, the pipeline processes the 200 new and 15 modified records.</Paragraph>
+
+<Paragraph>This approach is generally more efficient for large datasets.</Paragraph>
+
+<LoadApproachesDiagram
+  title="Load adds only the new rows — or rewrites the whole table."
+  modes={[
+    {
+      title: 'Incremental load',
+      icon: 'add-circle-outline',
+      subtitle: 'Old rows stay. Only the new rows are written.',
+      rows: [
+        { id: '501 · Ali', action: 'left alone', tone: 'kept' },
+        { id: '502 · Sara', action: 'left alone', tone: 'kept' },
+        { id: '503 · Ahmed', action: 'left alone', tone: 'kept' },
+        { id: '504 · Hina', action: 'added', tone: 'added' },
+      ],
+      note: 'Fast: only the new row moves.',
+    },
+    {
+      title: 'Full load',
+      icon: 'sync-outline',
+      subtitle: 'The whole table is wiped, then written again.',
+      rows: [
+        { id: '501 · Ali', action: 'reloaded', tone: 'reloaded' },
+        { id: '502 · Sara', action: 'reloaded', tone: 'reloaded' },
+        { id: '503 · Ahmed', action: 'reloaded', tone: 'reloaded' },
+        { id: '504 · Hina', action: 'reloaded', tone: 'reloaded' },
+      ],
+      note: 'Easy, but heavy: everything moves again.',
+    },
+  ]}
+/>
+
+<H1>What Happens After Loading?</H1>
+
+<Paragraph>Once the data reaches its destination, it becomes available for downstream processes.</Paragraph>
+
+<Paragraph>For example:</Paragraph>
+
+<BulletList items={[
+    "Data Analysts can query it using SQL",
+    "BI tools can connect to it to build dashboards",
+    "Data Scientists can use it for further analysis and modelling"
+]}
+/>
+
+<Paragraph>The loading stage essentially makes the prepared data accessible to the people and systems that need it.</Paragraph>
+
+<H1>ETL vs. ELT: What's the Difference?</H1>
+
+<Paragraph>While learning about ETL, you'll also come across another term: ELT (Extract, Load, Transform).</Paragraph>
+
+<Paragraph>Both approaches involve collecting data, preparing it, and making it available for analysis. The main difference is when and where the transformation happens.</Paragraph>
+
+<BulletList items={[
+    "In ETL, data is transformed before it reaches the destination",
+    "In ELT, data is first extracted and loaded into the destination. Transformation happens afterward, usually within the destination system."
+]}
+/>
+
+<Paragraph>For example, a company might load raw customer and order data directly into a cloud data warehouse and then use SQL to clean, combine, and prepare the data there.</Paragraph>
+
+<EtlVsEltDiagram
+  title="Same three steps, different order."
+  lanes={[
+    {
+      label: 'ETL — clean first, then store',
+      stages: [
+        { icon: 'download-outline', label: 'Extract' },
+        { icon: 'construct-outline', label: 'Transform' },
+        { icon: 'cloud-upload-outline', label: 'Load' },
+      ],
+      destination: 'Warehouse',
+    },
+    {
+      label: 'ELT — store first, clean later',
+      stages: [
+        { icon: 'download-outline', label: 'Extract' },
+        { icon: 'cloud-upload-outline', label: 'Load' },
+      ],
+      destination: 'Warehouse',
+      nested: { icon: 'construct-outline', label: 'Transform' },
+      nestedNote: 'happens inside the warehouse',
+    },
+  ]}
+  caption="ETL prepares the data before it is stored; ELT stores it first and prepares it inside the destination. The result is the same — only the order changes."
+/>
+
+<H1>What's next?</H1>
+
+<Paragraph>Now that the ideas are clear, it's time to get our hands dirty. In Part 2, I will show how I built a working ETL pipeline using Python – step by step, with code you can follow along with.</Paragraph>
