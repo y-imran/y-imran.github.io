@@ -1,0 +1,226 @@
+---
+interface Props {
+  title?: string;
+  caption?: string;
+}
+
+const {
+  title,
+  caption = 'Raw tables preserve what arrived; staging tables hold what we prepared.',
+} = Astro.props;
+
+const files = ['customers.csv', 'products.csv', 'orders.csv', 'order_items.csv'];
+
+const rawTables = [
+  'raw_customers',
+  'raw_products',
+  'raw_orders',
+  'raw_order_items',
+];
+
+const stagingTables = [
+  'staging_customers',
+  'staging_products',
+  'staging_orders',
+  'staging_order_items',
+];
+
+const transforms = [
+  'Dedupe',
+  'Trim text',
+  'Fix types',
+  'Validate keys',
+];
+
+---
+
+<figure class="my-5">
+  <div class="w-full rounded-[10px] border border-jet bg-eerie-black-1 p-4 md:p-6">
+
+    {title && (
+      <p class="text-center text-light-gray text-sm md:text-base font-medium leading-[1.4] mb-4">
+        {title}
+      </p>
+    )}
+
+    {/* Flow */}
+    <div class="flex flex-col gap-1.5 xl:flex-row xl:items-stretch xl:gap-2">
+
+      {/* Sources */}
+      <div class="flex min-w-0 flex-col xl:flex-[1.25]">
+        <p class="mb-1.5 text-[10px] uppercase tracking-[0.14em] text-light-gray-70">
+          Sources
+        </p>
+        <div class="flex flex-1 flex-col rounded-[8px] border border-jet bg-onyx p-2.5">
+          <div class="flex items-center gap-1.5 text-light-gray">
+            <ion-icon
+              name="folder-open-outline"
+              aria-hidden="true"
+              class="shrink-0 text-[14px] text-vegas-gold"
+            ></ion-icon>
+            <span class="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.07em]">CSV files</span>
+          </div>
+
+          <ul class="mt-2 space-y-1">
+            {files.map((file) => (
+              <li
+                title={file}
+                class="truncate rounded-[5px] border border-jet bg-eerie-black-1 px-1.5 py-0.5 font-mono text-[9px] text-light-gray"
+              >
+                {file}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Arrow: Extract */}
+      <div class="flex shrink-0 flex-col items-center justify-center gap-0.5 py-0.5 text-orange-yellow-crayola xl:px-1">
+        <span class="text-[9px] uppercase tracking-[0.12em] text-light-gray-70">Extract</span>
+        <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[20px] xl:hidden"></ion-icon>
+        <ion-icon name="arrow-forward-outline" aria-hidden="true" class="hidden text-[20px] xl:block"></ion-icon>
+      </div>
+
+      {/* Raw layer */}
+      <div class="flex min-w-0 flex-col xl:flex-[1.35]">
+        <p class="mb-1.5 text-[10px] uppercase tracking-[0.14em] text-light-gray-70">
+          Raw layer
+        </p>
+        <div class="flex flex-1 flex-col rounded-[8px] border border-jet bg-onyx p-2.5">
+          <div class="flex items-center gap-1.5">
+            <ion-icon
+              name="archive-outline"
+              aria-hidden="true"
+              class="shrink-0 text-[14px] text-light-gray-70"
+            ></ion-icon>
+            <span class="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.07em] text-light-gray">
+              Raw tables
+            </span>
+          </div>
+
+          <ul class="mt-2 space-y-1">
+            {rawTables.map((table) => (
+              <li
+                title={table}
+                class="truncate rounded-[5px] border border-jet bg-eerie-black-1 px-1.5 py-0.5 font-mono text-[9px] text-light-gray"
+              >
+                {table}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Arrow: Transform */}
+      <div class="flex shrink-0 flex-col items-center justify-center gap-0.5 py-0.5 text-orange-yellow-crayola xl:px-1">
+        <span class="text-[9px] uppercase tracking-[0.12em] text-light-gray-70">Transform</span>
+        <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[20px] xl:hidden"></ion-icon>
+        <ion-icon name="arrow-forward-outline" aria-hidden="true" class="hidden text-[20px] xl:block"></ion-icon>
+      </div>
+
+      {/* Transform */}
+      <div class="flex min-w-0 flex-col xl:flex-[1.05]">
+        <p class="mb-1.5 text-[10px] uppercase tracking-[0.14em] text-light-gray-70">
+          Transform
+        </p>
+        <div class="flex flex-1 flex-col rounded-[8px] border border-vegas-gold/40 bg-vegas-gold/5 p-2.5">
+          <div class="flex items-center gap-1.5 text-vegas-gold">
+            <ion-icon
+              name="construct-outline"
+              aria-hidden="true"
+              class="shrink-0 text-[14px]"
+            ></ion-icon>
+            <span class="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.07em]">Clean rows</span>
+          </div>
+
+          <ul class="mt-2 space-y-1">
+            {transforms.map((operation) => (
+              <li class="rounded-[5px] border border-vegas-gold/30 bg-onyx px-1.5 py-0.5 text-[9.5px] leading-[1.35] text-light-gray">
+                {operation}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Arrow: Load */}
+      <div class="flex shrink-0 flex-col items-center justify-center gap-0.5 py-0.5 text-orange-yellow-crayola xl:px-1">
+        <span class="text-[9px] uppercase tracking-[0.12em] text-light-gray-70">Load</span>
+        <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[20px] xl:hidden"></ion-icon>
+        <ion-icon name="arrow-forward-outline" aria-hidden="true" class="hidden text-[20px] xl:block"></ion-icon>
+      </div>
+
+      {/* Staging layer */}
+      <div class="flex min-w-0 flex-col xl:flex-[1.35]">
+        <p class="mb-1.5 text-[10px] uppercase tracking-[0.14em] text-light-gray-70">
+          Staging layer
+        </p>
+        <div class="flex flex-1 flex-col rounded-[8px] border border-vegas-gold/30 bg-onyx p-2.5">
+          <div class="flex items-center gap-1.5">
+            <ion-icon
+              name="sparkles-outline"
+              aria-hidden="true"
+              class="shrink-0 text-[14px] text-vegas-gold"
+            ></ion-icon>
+            <span class="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.07em] text-vegas-gold">
+              Staging tables
+            </span>
+          </div>
+
+          <ul class="mt-2 space-y-1">
+            {stagingTables.map((table) => (
+              <li
+                title={table}
+                class="truncate rounded-[5px] border border-vegas-gold/20 bg-eerie-black-1 px-1.5 py-0.5 font-mono text-[9px] text-light-gray"
+              >
+                {table}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    {/* Example */}
+    <div class="mt-4 border-t border-jet/70 pt-4">
+      <div class="rounded-[8px] border border-jet bg-onyx p-3">
+        <p class="text-[9px] uppercase tracking-[0.14em] text-light-gray-70">
+          One customer, two layers
+        </p>
+
+        <div class="mt-2 grid grid-cols-1 items-center gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+          <div class="min-w-0 rounded-[6px] border border-jet bg-eerie-black-1 px-2.5 py-2">
+            <p class="font-mono text-[9px] text-light-gray-70">raw_customers</p>
+            <p class="mt-1 break-words font-mono text-[10px] leading-[1.5] text-light-gray">
+              "  Ayesha Khan " · "" · "Karachi " · duplicate
+            </p>
+          </div>
+
+          <div class="flex items-center justify-center text-orange-yellow-crayola">
+            <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[18px] sm:hidden"></ion-icon>
+            <ion-icon name="arrow-forward-outline" aria-hidden="true" class="hidden text-[18px] sm:block"></ion-icon>
+          </div>
+
+          <div class="min-w-0 rounded-[6px] border border-vegas-gold/30 bg-eerie-black-1 px-2.5 py-2">
+            <p class="font-mono text-[9px] text-vegas-gold">staging_customers</p>
+            <p class="mt-1 break-words font-mono text-[10px] leading-[1.5] text-light-gray">
+              "Ayesha Khan" · NULL · "Karachi" · one row
+            </p>
+          </div>
+        </div>
+
+        <p class="mt-2 text-[10px] leading-[1.5] text-light-gray-70">
+          Transform trimmed the text, handled the missing email, and removed the duplicate.
+          The raw row is still available unchanged if we need to check what the source sent.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  {caption && (
+    <figcaption class="text-light-gray-70 text-xs md:text-sm font-[var(--fw-300)] text-center font-sans italic mt-3">
+      {caption}
+    </figcaption>
+  )}
+</figure>

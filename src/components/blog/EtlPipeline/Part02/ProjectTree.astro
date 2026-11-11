@@ -1,0 +1,97 @@
+---
+interface Props {
+  title?: string;
+  caption?: string;
+}
+
+const { title, caption } = Astro.props;
+
+type NodeKind = 'root' | 'folder' | 'env' | 'csv' | 'python';
+
+interface Node {
+  prefix: string;
+  name: string;
+  kind: NodeKind;
+}
+
+const nodes: Node[] = [
+  { prefix: '', name: 'ecommerce_etl/', kind: 'root' },
+  { prefix: '├─ ', name: 'config/', kind: 'folder' },
+  { prefix: '│  └─ ', name: '.env', kind: 'env' },
+  { prefix: '├─ ', name: 'data/', kind: 'folder' },
+  { prefix: '│  └─ ', name: 'raw/', kind: 'folder' },
+  { prefix: '│     ├─ ', name: 'customers.csv', kind: 'csv' },
+  { prefix: '│     ├─ ', name: 'products.csv', kind: 'csv' },
+  { prefix: '│     ├─ ', name: 'orders.csv', kind: 'csv' },
+  { prefix: '│     └─ ', name: 'order_items.csv', kind: 'csv' },
+  { prefix: '└─ ', name: 'scripts/', kind: 'folder' },
+  { prefix: '   ├─ ', name: 'db_connection.py', kind: 'python' },
+  { prefix: '   ├─ ', name: 'extract.py', kind: 'python' },
+  { prefix: '   ├─ ', name: 'transform.py', kind: 'python' },
+  { prefix: '   ├─ ', name: 'load.py', kind: 'python' },
+  { prefix: '   └─ ', name: 'main.py', kind: 'python' },
+];
+
+const iconOf: Record<NodeKind, string> = {
+  root: 'folder-open-outline',
+  folder: 'folder-outline',
+  env: 'settings-outline',
+  csv: 'grid-outline',
+  python: 'code-slash-outline',
+};
+
+const isFolder = (kind: NodeKind) => kind === 'root' || kind === 'folder';
+---
+
+<figure class="mx-auto my-5 w-fit max-w-full">
+  <div class="rounded-[10px] border border-jet bg-eerie-black-1 p-4 md:p-6">
+
+    {title && (
+      <p class="text-center text-light-gray text-sm md:text-base font-medium leading-[1.4] mb-4">
+        {title}
+      </p>
+    )}
+
+    <p class="sr-only">
+      Project structure: ecommerce_etl contains config with .env, data with raw containing
+      customers.csv, products.csv, orders.csv and order_items.csv, and scripts containing
+      db_connection.py, extract.py, transform.py, load.py and main.py.
+    </p>
+
+    <div class="mx-auto w-fit max-w-full overflow-x-auto rounded-[8px] border border-jet bg-onyx px-4 py-3 md:px-5 md:py-4">
+      <div class="space-y-0.5">
+        {nodes.map((node) => (
+          <div class="flex items-center gap-2 whitespace-nowrap font-mono text-[11px] leading-[1.9] md:text-xs">
+            <span class="whitespace-pre text-light-gray-70/50" aria-hidden="true">{node.prefix}</span>
+
+            <ion-icon
+              name={iconOf[node.kind]}
+              aria-hidden="true"
+              class={`shrink-0 text-[13px] ${
+                isFolder(node.kind) ? 'text-vegas-gold' : 'text-light-gray-70'
+              }`}
+            ></ion-icon>
+
+            <span
+              class={
+                node.kind === 'root'
+                  ? 'font-medium text-white-2'
+                  : isFolder(node.kind)
+                    ? 'text-light-gray'
+                    : 'text-light-gray-70'
+              }
+            >
+              {node.name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  {caption && (
+    <figcaption class="text-light-gray-70 text-xs md:text-sm font-[var(--fw-300)] text-center font-sans italic mt-3">
+      {caption}
+    </figcaption>
+  )}
+</figure>
