@@ -27,7 +27,11 @@ import DatabaseDiagram from '@src/components/blog/EtlPipeline/Part02/DatabaseDia
 import RawStagingDiagram from '@src/components/blog/EtlPipeline/Part02/RawStagingDiagram.astro';
 import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.astro';
 
-<Paragraph>In <Link url='https://y-imran.github.io/blog/understanding-etl-data-pipeline-basics/' linkText='Part 1'/>, we explored the concept of ETL, understood why it matters, and broke down its three essential stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>.</Paragraph>
+
+
+<Panel type='info'>
+  In <Link url='https://y-imran.github.io/blog/understanding-etl-data-pipeline-basics/' linkText='Part 1' />, We explored the concept of ETL, why it matters, and its three essential stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>.
+</Panel>
 
 <Paragraph>But what happens when we actually have a dataset in front of us and need to move it into a database, clean it, and make it ready for analysis?</Paragraph>
 
@@ -35,7 +39,7 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 
 <Paragraph>Instead of just discussing how ETL works, we're going to build our own ETL pipeline from scratch using Python and MySQL.</Paragraph>
 
-<Paragraph>For this project, we're using Python and a locally installed MySQL database. However, ETL isn't limited to these tools. We can use other programming languages, such as Java or Scala, and databases like PostgreSQL, SQL Server, or Oracle, depending on our project requirements.</Paragraph>
+<Paragraph>This project uses Python, connecting to a MySQL server that is running locally on the machine. However, ETL isn't limited to these tools. We can use other programming languages, such as Java or Scala, and databases like PostgreSQL, SQL Server, or Oracle, depending on our project requirements.</Paragraph>
 
 <Paragraph>We'll keep things simple, work locally on our machines, and gradually transform raw data from multiple sources into structured data stored in a MySQL database.</Paragraph>
 
@@ -68,11 +72,12 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
   code={`ecommerce_etl/
 ├── config/
 │   └── .env
-├── data/raw/
-│   ├── customers.csv
-│   ├── products.csv
-│   ├── orders.csv
-│   └── order_items.csv
+├── data/
+|    └── raw/
+│         ├── customers.csv
+│         ├── products.csv
+│         ├── orders.csv
+│         └── order_items.csv
 ├── logs/
 │   └── pipeline.log
 ├── scripts/
@@ -328,3 +333,110 @@ items["line_total"] = items["quantity"] * items["unit_price"]
 <Paragraph>We enrich it by left-joining each row against the products table to bring in the unit price, renaming that column to unit_price and then computing line_total as quantity × unit_price.</Paragraph>
 
 <Paragraph>We also check that every order belongs to a real customer, and that every order item points to a real order and product.</Paragraph>
+
+<H1>Stage 2: Load</H1>
+
+<Paragraph>Once the data has been extracted and transformed, the final step is to load it into our MySQL database.</Paragraph>
+
+<Paragraph>In this part, We divide the loading process into <Highlight>Raw</Highlight> and <Highlight>Staging</Highlight> tables.</Paragraph>
+
+<Paragraph>Let's break down how the loading process works.</Paragraph>
+
+<H2>Creating a Reusable UPSERT Function</H2>
+
+<Paragraph>Instead of writing separate SQL INSERT queries for every table, we create a reusable function called upsert_dataframe().</Paragraph>
+
+<Paragraph>But first, what is UPSERT?</Paragraph>
+
+<Paragraph>UPSERT combines two operations:</Paragraph>
+
+<NumberList items={[
+  "**INSERT**: If a record doesn't already exist, insert it",
+  "**UPDATE**: If a record with the same primary key already exists, update its values."
+]}
+/>
+
+<Paragraph>This is useful because running the pipeline multiple times shouldn't create duplicate records.</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`query = text(f"""
+    INSERT INTO {table_name} ({column_names})
+    VALUES ({placeholders})
+    ON DUPLICATE KEY UPDATE
+    {update_clause}
+""")
+
+connection.execute(
+    query,
+    records.to_dict("records")
+)
+`}
+/>
+
+<Paragraph>What's happening here?</Paragraph>
+
+<BulletList items={[
+  "INSERT INTO specifies the target table and columns where records should be inserted",
+  "VALUES provides placeholders for the incoming records",
+  "ON DUPLICATE KEY UPDATE updates an existing record if its primary or unique key already exists, instead of inserting a duplicate",
+  "execute() sends the query and the DataFrame records to MySQL"
+]}
+/>
+
+<Paragraph>For example, suppose customer 101 already exists in our database, but their city changes from Karachi to Lahore.</Paragraph>
+
+<Paragraph>Instead of inserting another customer record, UPSERT updates the existing record.</Paragraph>
+
+<H2>Loading Customers Data</H2>
+
+<Paragraph>With our reusable function ready, we can load customers into its respective raw and staging tables.</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`def load_customers(customers):
+
+        upsert_dataframe(
+            connection,
+            "raw_customers",
+            customers,
+            ["customer_id", "customer_name",
+             "email", "city"],
+            ["customer_name", "email", "city"]
+        )
+
+        upsert_dataframe(
+            connection,
+            "staging_customers",
+            customers,
+            ["customer_id", "customer_name",
+             "email", "city", "email_missing"],
+            ["customer_name", "email", "city",
+             "email_missing"]
+        )
+`}
+/>
+
+<Paragraph>What's happening here?</Paragraph>
+
+<BulletList items={[
+  "First, customer records are loaded into raw_customers, using the original source columns",
+  "Next, the same records are loaded into staging_customers, including the additional email_missing column created during transformation"
+]}
+/>
+
+<Paragraph>We follow the same approach for other tables, adjusting the column lists according to their respective transformations.</Paragraph>
+
+<H2>Incremental Loading of Orders</H2>
+
+<Paragraph>We'll implement incremental loading for the orders dataset.</Paragraph>
+
+<Paragraph>Why?</Paragraph>
+
+<Paragraph>Imagine having a database with thousands of orders. Every time the pipeline runs, loading all historical orders again would be unnecessary.</Paragraph>
+
+<Paragraph>Instead, we only want to load Newly created orders and existing orders that have been modified since the previous pipeline run.</Paragraph>
+
+<Paragraph>To achieve this, I used a concept called <Highlight>Watermarking</Highlight>.</Paragraph>
