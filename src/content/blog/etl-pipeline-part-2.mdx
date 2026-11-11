@@ -1,0 +1,330 @@
+---
+slug: building-etl-pipeline-python-mysql
+title: Building ETL Pipeline Using Python and MySQL
+category: python
+pubDate: 2026-11-13
+excerpt: Ever wondered what it takes to turn raw data into something meaningful? Let's find out by building ETL pipeline with Python and MySQL!
+readTimeMins: 10
+banner: "../../assets/blog/etl-pipeline/part-02/thumbnail.png"
+---
+
+{/* Components imports */}
+import Paragraph from '@components/ui/blog/Paragraph.astro';
+import Figure from '@components/ui/blog/Figure.astro'
+import Highlight from '@src/components/ui/blog/Highlight.astro';
+import H1 from '@src/components/ui/blog/H1.astro';
+import H2 from '@src/components/ui/blog/H2.astro';
+import H3 from '@src/components/ui/blog/H2.astro';
+import NumberList from '@src/components/ui/blog/NumberList.astro';
+import BulletList from '@src/components/ui/blog/BulletList.astro';
+import Link from '@src/components/ui/blog/Link.astro';
+import Panel from '@src/components/ui/blog/Panel.astro';
+import Table from '@src/components/ui/blog/Table.astro';
+import CodeSnippet from '@src/components/ui/blog/CodeSnippet.astro';
+
+{/* Blog Components imports */}
+import DatabaseDiagram from '@src/components/blog/EtlPipeline/Part02/DatabaseDiagram.astro';
+import RawStagingDiagram from '@src/components/blog/EtlPipeline/Part02/RawStagingDiagram.astro';
+import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.astro';
+
+<Paragraph>In <Link url='https://y-imran.github.io/blog/understanding-etl-data-pipeline-basics/' linkText='Part 1'/>, we explored the concept of ETL, understood why it matters, and broke down its three essential stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>.</Paragraph>
+
+<Paragraph>But what happens when we actually have a dataset in front of us and need to move it into a database, clean it, and make it ready for analysis?</Paragraph>
+
+<Paragraph>That's exactly what we're going to explore in this part.</Paragraph>
+
+<Paragraph>Instead of just discussing how ETL works, we're going to build our own ETL pipeline from scratch using Python and MySQL.</Paragraph>
+
+<Paragraph>For this project, we're using Python and a locally installed MySQL database. However, ETL isn't limited to these tools. We can use other programming languages, such as Java or Scala, and databases like PostgreSQL, SQL Server, or Oracle, depending on our project requirements.</Paragraph>
+
+<Paragraph>We'll keep things simple, work locally on our machines, and gradually transform raw data from multiple sources into structured data stored in a MySQL database.</Paragraph>
+
+<Paragraph>Let's get started!</Paragraph>
+
+<H1>What are we Building?</H1>
+
+<Paragraph>Before starting, let's understand what we're trying to achieve.</Paragraph>
+
+<Paragraph>Imagine we're working with an e-commerce business that stores its information across multiple sources. Customer details might come from an Excel workbook, product information from a CSV file, while orders and order items could be stored in separate files or systems.</Paragraph>
+
+<Paragraph>We need a systematic way to:</Paragraph>
+
+<BulletList items={[
+    "Extract data from our CSV files",
+    "Transform it into a clean and consistent format",
+    "Load the processed data into a MySQL database"
+]}
+/>
+
+<Paragraph>This is where our ETL pipeline comes in.</Paragraph>
+
+<H1>Project Folder Structure</H1>
+
+<Paragraph>We'll organize our project like this:</Paragraph>
+
+<CodeSnippet
+  filename="project structure"
+  lang="text"
+  code={`ecommerce_etl/
+├── config/
+│   └── .env
+├── data/raw/
+│   ├── customers.csv
+│   ├── products.csv
+│   ├── orders.csv
+│   └── order_items.csv
+├── logs/
+│   └── pipeline.log
+├── scripts/
+│   ├── db_connection.py
+│   ├── extract.py
+│   ├── transform.py
+│   ├── load.py
+│   └── main.py
+|
+└── run_pipeline.bat`}
+/>
+
+<H1>Understanding Our Source Data</H1>
+
+<Paragraph>Let's understand what we're working with.</Paragraph>
+
+<Paragraph>To keep things manageable, we use a simple e-commerce dataset made of four CSV files:</Paragraph>
+
+<DatabaseDiagram/>
+
+<H1>Connecting Python with MySQL</H1>
+
+<Paragraph>We need to establish communication between Python and MySQL.</Paragraph>
+
+<Paragraph>Think of Python as the tool that will perform our extraction and transformation operations, while MySQL will act as the destination where we'll store our data.</Paragraph>
+
+<Paragraph>We will begin by creating a database named <Highlight>ecommerce_etl</Highlight> on the local MySQL server.</Paragraph>
+
+<CodeSnippet
+  filename="database.sql"
+  lang="sql"
+  code={`CREATE DATABASE ecommerce_etl;`}
+/>
+
+<Paragraph>Once our database is created, we need to configure the connection details.</Paragraph>
+
+<Paragraph>Rather than directly writing our database credentials into Python scripts, we'll store them in an environment file (.env).</Paragraph>
+
+<Paragraph>For example:</Paragraph>
+
+<CodeSnippet
+  filename =".env"
+  code={`MYSQL_HOST = localhost
+MYSQL_PORT = 3306
+MYSQL_USER = <your_username>
+MYSQL_PASSWORD = <your_password>
+MYSQL_DB = ecommerce_etl`}
+/>
+
+<Paragraph>We can obtain these credentials from our local MySQL server configuration. The host and port identify our server, while the username and password are the credentials we use to access MySQL. The database name is the one we created for this project.</Paragraph>
+
+<Paragraph>Next, In db_connection.py loads these values and builds the connection xusing SQLAlchemy.</Paragraph>
+
+<CodeSnippet
+  filename="database-connection.py"
+  lang="python"
+  code={`import os
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+
+load_dotenv()
+
+connection_string = (
+    f"mysql+pymysql://{os.getenv('MYSQL_USER')}:"
+    f"{os.getenv('MYSQL_PASSWORD')}@"
+    f"{os.getenv('MYSQL_HOST')}:"
+    f"{os.getenv('MYSQL_PORT')}/"
+    f"{os.getenv('MYSQL_DB')}"
+)
+
+engine = create_engine(connection_string)
+
+with engine.connect() as connection:
+    print("Successfully connected to MySQL!")
+`}
+/>
+
+<Paragraph>Once we execute the script, we should see a successful connection message.</Paragraph>
+
+<Paragraph>And just like that, we've established communication between our Python environment and our local MySQL server!</Paragraph>
+
+<Paragraph>Now we have a place to store our data. But before loading anything, let's understand how we're going to organize it.</Paragraph>
+
+<H1>Designing Our Database: Raw and Staging Tables</H1>
+
+<Paragraph>There's one important decision we need to make: </Paragraph>
+
+<Highlight>How should we organize our incoming and processed data inside MySQL?</Highlight>
+
+<Paragraph>Rather than loading everything directly into a single set of tables, we'll maintain two separate layers: </Paragraph>
+
+<NumberList items={[
+  "Raw Tables",
+  "Staging Tables"
+]}
+/>
+
+<Highlight>But why do we need two sets of tables for the same datasets?</Highlight>
+
+<Paragraph>Let's understand.</Paragraph>
+
+<H2>Raw Tables: Preserving Incoming Data</H2>
+
+<Paragraph>Raw tables act as the initial storage layer for our incoming data.</Paragraph>
+
+<Paragraph>When we extract records from our source files, we load them into the corresponding raw tables with minimal or no modifications.</Paragraph>
+
+<Paragraph>The main idea is to preserve the original incoming information rather than immediately changing or cleaning it.</Paragraph>
+
+<Paragraph>Think of raw tables as our starting point. They help us understand what actually came into our pipeline.</Paragraph>
+
+<H2>Staging Tables: Preparing Data for Further Processing</H2>
+
+<Paragraph>Once our data is available in raw tables, we move towards the transformation stage.</Paragraph>
+
+<Paragraph>This is where staging tables come in.</Paragraph>
+
+<Paragraph>For example, we might remove duplicate records, handle missing values, standardize text, or correct data types before loading the processed records into staging tables.</Paragraph>
+
+<Paragraph>In simple terms, raw tables preserve what came in, while staging tables hold what we've prepared.</Paragraph>
+
+<RawStagingDiagram
+  title="From CSV files to raw and staging tables"
+  caption="Raw tables keep a faithful copy of the source; staging tables hold the cleaned, typed rows that are ready to use."
+/>
+
+<H1>Stage 1: Extract</H1>
+
+<Paragraph>Now that our database structure is ready, let's begin implementing the first stage of our ETL pipeline: <Highlight>Extraction</Highlight>.</Paragraph>
+
+<Paragraph>Remember, extraction is simply about retrieving data from our source systems. In our project, the source is four CSV files.</Paragraph>
+
+<Paragraph>We use Pandas to read each file into a DataFrame.</Paragraph>
+
+<CodeSnippet
+  filename='extract.py'
+  lang='python'
+  code={`from pathlib import Path
+import pandas as pd
+
+# PROJECT_ROOT is the main ecommerce_etl folder.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+# RAW_DATA_PATH is a path to the folder that holds the CSV files
+RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" → # ecommerce_etl/data/raw
+
+datasets = {
+    "customers": "customers.csv",
+    "products": "products.csv",
+    "orders": "orders.csv",
+    "order_items": "order_items.csv",
+}
+
+for name, filename in datasets.items():
+    file_path = RAW_DATA_PATH / filename
+    raw_data[name] = pd.read_csv(file_path)
+    print(f"Extracted {name}: {len(raw_data[name])} records")
+
+# raw_data is a dictionary and will hold name of the file as a key and its dataframe as a value
+# Each dataframe is 2D table with rows and columns
+raw_data = {}
+
+    for name, filename in datasets.items():
+        file_path = f"{RAW_DATA_PATH}/{filename}" → # "ecommerce_etl/data/raw/customers.csv"
+        raw_data[name] = pd.read_csv(file_path)
+        print(f"Extracted {name}: {len(raw_data[name])} records")
+
+    # Return the dictionary with all four DataFrames
+    return raw_data`}
+/>
+
+<Paragraph>The raw data is now in Python, and we know how many rows each file contains.</Paragraph>
+
+<Paragraph>But extracted data isn't necessarily ready to be used. We may encounter missing values, duplicate records, inconsistent formats, or incorrect data types.</Paragraph>
+
+<Paragraph>That's why we need the next stage.</Paragraph>
+
+<H1>Stage 2: Transform</H1>
+
+<Paragraph>Now that we've extracted our data, it's time to prepare it.</Paragraph>
+
+<Paragraph>Transformation is where we apply the necessary changes to make our data consistent, accurate, and suitable for further processing.</Paragraph>
+
+<Highlight>Clean Customers Data</Highlight>
+
+<CodeSnippet
+  filename='transform.py'
+  lang='python'
+  code={`import pandas as pd
+
+# copy() creates a separate DataFrame; raw_data stays unchanged.
+customers = raw_data["customers"].copy()
+
+# strip() removes leading and trailing spaces from text.
+customers["customer_name"] = customers["customer_name"].str.strip()
+customers["city"] = customers["city"].str.strip()
+customers["email_missing"] = customers["email"].isna()
+
+if customers["customer_id"].duplicated().any():
+    raise ValueError("Duplicate customer IDs found")
+`}
+/>
+
+<Paragraph> We remove extra spaces from names and cities, flag customers with a missing email, and check that customer IDs are unique.</Paragraph>
+
+<Highlight>Clean Orders Data</Highlight>
+
+<CodeSnippet
+  filename='transform.py'
+  lang='python'
+  code={`orders = raw_data["orders"].copy()
+
+DDMMYYYY = "%d-%m-%Y" → # format for order_date
+
+# to_datetime() converts text to datetime datatype; invalid values become NaT.
+orders["order_date"] = pd.to_datetime(
+    orders["order_date"],
+    format=DDMMYYYY,    
+    errors="coerce"
+)
+
+allowed_statuses = {"Completed", "Pending", "Cancelled", "Shipped"}
+
+if not orders["status"].isin(allowed_statuses).all():
+        raise ValueError("Invalid order status found")
+`}
+/>
+
+<Paragraph> We make sure that every order uses an allowed status and standardize the dates so they follow one consistent format. If a date is invalid or a status is unknown, the pipeline stops instead of loading bad data.</Paragraph>
+
+<Highlight>Enriching Order Items</Highlight>
+
+<Paragraph>The source CSV for order items only stores a product_id, no price and no line total. Those live elsewhere (price in products, quantity in order_items), so we'll joins them together and calculate a line total.</Paragraph>
+
+<CodeSnippet
+  filename='transform.py'
+  lang='python'
+  code={`items = raw_data["order_items"].copy()
+
+items = items.merge(
+    products[["product_id", "price"]],
+    on="product_id",
+    how="left"
+)
+
+items = items.rename(columns={"price": "unit_price"})
+
+# line_total is a new numeric column: quantity * unit_price.
+items["line_total"] = items["quantity"] * items["unit_price"]
+`}
+/>
+
+<Paragraph>We enrich it by left-joining each row against the products table to bring in the unit price, renaming that column to unit_price and then computing line_total as quantity × unit_price.</Paragraph>
+
+<Paragraph>We also check that every order belongs to a real customer, and that every order item points to a real order and product.</Paragraph>
