@@ -1,4 +1,17 @@
 ---
+interface Props {
+  block?: boolean;
+}
+
+const { block = false } = Astro.props;
 ---
 
-<span class="inline font-semibold"><slot /></span>
+<span
+  class:list={[
+    block
+      ? 'block text-light-gray text-base md:text-xl font-semibold leading-[1.6] mb-[15px]'
+      : 'inline font-semibold',
+  ]}
+>
+  <slot />
+</span>

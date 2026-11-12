@@ -3,7 +3,7 @@ slug: building-etl-pipeline-python-mysql
 title: Building ETL Pipeline Using Python and MySQL
 category: python
 pubDate: 2026-11-13
-excerpt: Ever wondered what it takes to turn raw data into something meaningful? Let's find out by building ETL pipeline with Python and MySQL!
+excerpt: Ever wondered what it takes to turn raw data into something meaningful? Let's find out by building ETL pipeline with Python and MySQL.
 readTimeMins: 10
 banner: "../../assets/blog/etl-pipeline/part-02/thumbnail.png"
 ---
@@ -30,16 +30,16 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 
 
 <Panel type='info'>
-  In <Link url='https://y-imran.github.io/blog/understanding-etl-data-pipeline-basics/' linkText='Part 1' />, We explored the concept of ETL, why it matters, and its three essential stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>.
+  In <Link url='https://y-imran.github.io/blog/understanding-etl-data-pipeline-basics/' linkText='Part 1' />, we explored the concept of ETL, why it matters, and its three essential stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>.
 </Panel>
 
-<Paragraph>But what happens when we actually have a dataset in front of us and need to move it into a database, clean it, and make it ready for analysis?</Paragraph>
+<Paragraph>What happens when we actually have a dataset in front of us and need to move it into a database, clean it, and make it ready for analysis?</Paragraph>
 
 <Paragraph>That's exactly what we're going to explore in this part.</Paragraph>
 
 <Paragraph>Instead of just discussing how ETL works, we're going to build our own ETL pipeline from scratch using Python and MySQL.</Paragraph>
 
-<Paragraph>This project uses Python, connecting to a MySQL server that is running locally on the machine. However, ETL isn't limited to these tools. We can use other programming languages, such as Java or Scala, and databases like PostgreSQL, SQL Server, or Oracle, depending on our project requirements.</Paragraph>
+<Panel type='info'>This project connects Python to a local MySQL server on Windows. Any language, database, or OS works for your own setup.</Panel>
 
 <Paragraph>We'll keep things simple, work locally on our machines, and gradually transform raw data from multiple sources into structured data stored in a MySQL database.</Paragraph>
 
@@ -47,11 +47,11 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 
 <H1>What are we Building?</H1>
 
-<Paragraph>Before starting, let's understand what we're trying to achieve.</Paragraph>
+<Paragraph>Before we start, let's understand what we're trying to achieve.</Paragraph>
 
 <Paragraph>Imagine we're working with an e-commerce business that stores its information across multiple sources. Customer details might come from an Excel workbook, product information from a CSV file, while orders and order items could be stored in separate files or systems.</Paragraph>
 
-<Paragraph>We need a systematic way to:</Paragraph>
+<Paragraph>We need a systematic way to,</Paragraph>
 
 <BulletList items={[
     "Extract data from our CSV files",
@@ -64,23 +64,24 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 
 <H1>Project Folder Structure</H1>
 
-<Paragraph>We'll organize our project like this:</Paragraph>
+<Paragraph>The tree diagrams below show the project folder structure.</Paragraph>
 
 <CodeSnippet
   filename="project structure"
   lang="text"
-  code={`ecommerce_etl/
-├── config/
+  showLineNumbers={false}
+  code={`ecommerce_etl
+├── config
 │   └── .env
-├── data/
-|    └── raw/
+├── data
+|    └── raw
 │         ├── customers.csv
 │         ├── products.csv
 │         ├── orders.csv
 │         └── order_items.csv
-├── logs/
+├── logs
 │   └── pipeline.log
-├── scripts/
+├── scripts
 │   ├── db_connection.py
 │   ├── extract.py
 │   ├── transform.py
@@ -94,9 +95,31 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 
 <Paragraph>Let's understand what we're working with.</Paragraph>
 
-<Paragraph>To keep things manageable, we use a simple e-commerce dataset made of four CSV files:</Paragraph>
+<Paragraph>To keep things manageable, we use a simple e-commerce dataset made of four CSV files.</Paragraph>
 
 <DatabaseDiagram/>
+
+<H1>Setting Up a Virtual Environment</H1>
+
+<Paragraph>The first thing we'll do is set up a virtual environment within the project folder.</Paragraph>
+
+<Paragraph>A virtual environment provides an isolated Python environment for our project. This means all the libraries and dependencies we install will remain associated with this project rather than affecting other Python projects or the system-wide Python installation.</Paragraph>
+
+<Paragraph>We'll create it by running the following command on Windows (Command Prompt) within our project folder.</Paragraph>
+
+<CodeSnippet
+  code='python -m venv .venv'
+/>
+
+<Paragraph>Here, <Highlight>.venv</Highlight> is the name of our virtual environment folder.</Paragraph>
+
+<Paragraph>To activate it on Windows (Command Prompt), run,</Paragraph>
+
+<CodeSnippet
+  code='.venv\Scripts\activate'
+/>
+
+<Paragraph>Once activated, any Python packages we install using pip will be installed in this virtual environment.</Paragraph>
 
 <H1>Connecting Python with MySQL</H1>
 
@@ -107,14 +130,12 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 <Paragraph>We will begin by creating a database named <Highlight>ecommerce_etl</Highlight> on the local MySQL server.</Paragraph>
 
 <CodeSnippet
-  filename="database.sql"
-  lang="sql"
   code={`CREATE DATABASE ecommerce_etl;`}
 />
 
 <Paragraph>Once our database is created, we need to configure the connection details.</Paragraph>
 
-<Paragraph>Rather than directly writing our database credentials into Python scripts, we'll store them in an environment file (.env).</Paragraph>
+<Paragraph>Rather than directly writing our database credentials into Python scripts, we'll store them in an environment file (<Highlight>.env</Highlight>).</Paragraph>
 
 <Paragraph>For example:</Paragraph>
 
@@ -129,45 +150,54 @@ MYSQL_DB = ecommerce_etl`}
 
 <Paragraph>We can obtain these credentials from our local MySQL server configuration. The host and port identify our server, while the username and password are the credentials we use to access MySQL. The database name is the one we created for this project.</Paragraph>
 
-<Paragraph>Next, In db_connection.py loads these values and builds the connection xusing SQLAlchemy.</Paragraph>
+<Panel type='info'>Your MySQL server will most likely be running on port 3306. However, if it is using a different port, make sure to update the port number accordingly.</Panel>
+
+<Paragraph>Next, in <Highlight>db_connection.py</Highlight> load the config values and builds the connection.</Paragraph>
 
 <CodeSnippet
-  filename="database-connection.py"
+  filename="db_connection.py"
   lang="python"
   code={`import os
+from pathlib import Path
+
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import URL, create_engine, text
 
-load_dotenv()
+#PROJECT_ROOT is the main ecommerce_etl folder
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-connection_string = (
-    f"mysql+pymysql://{os.getenv('MYSQL_USER')}:"
-    f"{os.getenv('MYSQL_PASSWORD')}@"
-    f"{os.getenv('MYSQL_HOST')}:"
-    f"{os.getenv('MYSQL_PORT')}/"
-    f"{os.getenv('MYSQL_DB')}"
-)
+# Load private settings from config/.env
+load_dotenv(PROJECT_ROOT / "config" / ".env")
 
-engine = create_engine(connection_string)
-
-with engine.connect() as connection:
+# engine is the connection pool used by every load function.
+# SQLAlchemy is a Python library used to connect and interact with databases.
+engine = create_engine(
+    URL.create(
+        "mysql+pymysql",
+        username=os.getenv("MYSQL_USER"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        host=os.getenv("MYSQL_HOST"),
+        port=int(os.getenv("MYSQL_PORT")),
+        database=os.getenv("MYSQL_DB"),
+    )
+with engine.connect():
     print("Successfully connected to MySQL!")
 `}
 />
 
-<Paragraph>Once we execute the script, we should see a successful connection message.</Paragraph>
+<Paragraph>Running the script should print a success message if the connection is working.</Paragraph>
 
-<Paragraph>And just like that, we've established communication between our Python environment and our local MySQL server!</Paragraph>
+<Paragraph>And just like that, we've established communication between our Python environment and our local MySQL server.</Paragraph>
 
 <Paragraph>Now we have a place to store our data. But before loading anything, let's understand how we're going to organize it.</Paragraph>
 
 <H1>Designing Our Database: Raw and Staging Tables</H1>
 
-<Paragraph>There's one important decision we need to make: </Paragraph>
+<Paragraph>There's one important decision we need to make,</Paragraph>
 
-<Highlight>How should we organize our incoming and processed data inside MySQL?</Highlight>
+<Highlight block>How should we organize our incoming and processed data inside MySQL?</Highlight>
 
-<Paragraph>Rather than loading everything directly into a single set of tables, we'll maintain two separate layers: </Paragraph>
+<Paragraph>Rather than loading everything directly into a single set of tables, we'll maintain two separate layers</Paragraph>
 
 <NumberList items={[
   "Raw Tables",
@@ -175,9 +205,7 @@ with engine.connect() as connection:
 ]}
 />
 
-<Highlight>But why do we need two sets of tables for the same datasets?</Highlight>
-
-<Paragraph>Let's understand.</Paragraph>
+<Highlight block>But why do we need two sets of tables for the same datasets? Let's understand.</Highlight>
 
 <H2>Raw Tables: Preserving Incoming Data</H2>
 
@@ -216,42 +244,32 @@ with engine.connect() as connection:
   filename='extract.py'
   lang='python'
   code={`from pathlib import Path
+
 import pandas as pd
 
 # PROJECT_ROOT is the main ecommerce_etl folder.
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-# RAW_DATA_PATH is a path to the folder that holds the CSV files
-RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw" → # ecommerce_etl/data/raw
-
-datasets = {
+CSV_FILES = {
     "customers": "customers.csv",
     "products": "products.csv",
     "orders": "orders.csv",
     "order_items": "order_items.csv",
 }
 
-for name, filename in datasets.items():
-    file_path = RAW_DATA_PATH / filename
-    raw_data[name] = pd.read_csv(file_path)
-    print(f"Extracted {name}: {len(raw_data[name])} records")
+def extract_data():
+    # raw_data is a dictionary
+    # It will hold name of the file as a key and its dataframe as a value
+    raw_data = {}
 
-# raw_data is a dictionary and will hold name of the file as a key and its dataframe as a value
-# Each dataframe is 2D table with rows and columns
-raw_data = {}
+    for key, filename in CSV_FILES.items():
+        raw_data[key] = pd.read_csv(PROJECT_ROOT / "data" / "raw" / filename)
 
-    for name, filename in datasets.items():
-        file_path = f"{RAW_DATA_PATH}/{filename}" → # "ecommerce_etl/data/raw/customers.csv"
-        raw_data[name] = pd.read_csv(file_path)
-        print(f"Extracted {name}: {len(raw_data[name])} records")
-
-    # Return the dictionary with all four DataFrames
-    return raw_data`}
+    return raw_data
+`}
 />
 
-<Paragraph>The raw data is now in Python, and we know how many rows each file contains.</Paragraph>
-
-<Paragraph>But extracted data isn't necessarily ready to be used. We may encounter missing values, duplicate records, inconsistent formats, or incorrect data types.</Paragraph>
+<Paragraph>The extracted data isn't necessarily ready to be used. We may encounter missing values, duplicate records, inconsistent formats, or incorrect data types.</Paragraph>
 
 <Paragraph>That's why we need the next stage.</Paragraph>
 
@@ -266,18 +284,14 @@ raw_data = {}
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`import pandas as pd
+  code={`def transform_data(raw_data):
+    customers = raw_data["customers"].copy()
+    for column in ("customer_name", "city"):
+        customers[column] = customers[column].str.strip()
+    customers["email_missing"] = customers["email"].isna()
 
-# copy() creates a separate DataFrame; raw_data stays unchanged.
-customers = raw_data["customers"].copy()
-
-# strip() removes leading and trailing spaces from text.
-customers["customer_name"] = customers["customer_name"].str.strip()
-customers["city"] = customers["city"].str.strip()
-customers["email_missing"] = customers["email"].isna()
-
-if customers["customer_id"].duplicated().any():
-    raise ValueError("Duplicate customer IDs found")
+    if customers["customer_id"].duplicated().any():
+        raise ValueError("Duplicate customer IDs found")
 `}
 />
 
@@ -290,23 +304,30 @@ if customers["customer_id"].duplicated().any():
   lang='python'
   code={`orders = raw_data["orders"].copy()
 
-DDMMYYYY = "%d-%m-%Y" → # format for order_date
+    # Convert date columns into Pandas datetime format.
+    for column in ("order_date", "created_at", "updated_at"):
+        orders[column] = pd.to_datetime(
+            orders[column], format="mixed", dayfirst=True, errors="coerce"
+        )
+    # Remove extra spaces and standardize order status capitalization.
+    orders["status"] = orders["status"].str.strip().str.title()
 
-# to_datetime() converts text to datetime datatype; invalid values become NaT.
-orders["order_date"] = pd.to_datetime(
-    orders["order_date"],
-    format=DDMMYYYY,    
-    errors="coerce"
-)
-
-allowed_statuses = {"Completed", "Pending", "Cancelled", "Shipped"}
-
-if not orders["status"].isin(allowed_statuses).all():
-        raise ValueError("Invalid order status found")
+    # Check for duplicate order IDs.
+    if orders["order_id"].duplicated().any():
+        raise ValueError("Duplicate order IDs found")
+    
+    # Check for missing or invalid dates.
+    for column in ("order_date", "created_at", "updated_at"):
+        if orders[column].isna().any():
+            raise ValueError("Invalid order dates found" if column == "order_date"
+                             else f"Invalid {column} dates found")
+        
+    if not orders["customer_id"].isin(customers["customer_id"]).all():
+        raise ValueError("Unknown customer IDs found in orders")
 `}
 />
 
-<Paragraph> We make sure that every order uses an allowed status and standardize the dates so they follow one consistent format. If a date is invalid or a status is unknown, the pipeline stops instead of loading bad data.</Paragraph>
+<Paragraph>We convert order_date, created_at, and updated_at to Pandas datetime for consistent handling, then validate by checking for duplicate order IDs, missing/invalid dates, and that every customer_id in orders exists in customers.</Paragraph>
 
 <Highlight>Enriching Order Items</Highlight>
 
@@ -342,9 +363,9 @@ items["line_total"] = items["quantity"] * items["unit_price"]
 
 <Paragraph>Let's break down how the loading process works.</Paragraph>
 
-<H2>Creating a Reusable UPSERT Function</H2>
+<H2>Insert or update, Never Duplicate</H2>
 
-<Paragraph>Instead of writing separate SQL INSERT queries for every table, we create a reusable function called upsert_dataframe().</Paragraph>
+<Paragraph>We use an upsert instead of a plain insert. This means we insert new rows and update existing rows when the primary key already exists.</Paragraph>
 
 <Paragraph>But first, what is UPSERT?</Paragraph>
 
@@ -440,3 +461,147 @@ connection.execute(
 <Paragraph>Instead, we only want to load Newly created orders and existing orders that have been modified since the previous pipeline run.</Paragraph>
 
 <Paragraph>To achieve this, I used a concept called <Highlight>Watermarking</Highlight>.</Paragraph>
+
+<H3>What is a Watermark?</H3>
+
+<Paragraph>A watermark is a reference point that tracks how far a data pipeline has processed its source data.</Paragraph>
+
+<Paragraph>In this project, we use the updated_at column to identify new or modified orders.</Paragraph>
+
+<Paragraph>For this, lets create a watermark table:</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  code={`CREATE TABLE IF NOT EXISTS etl_watermarks (
+    pipeline_name VARCHAR(100) PRIMARY KEY,
+    last_watermark DATETIME NOT NULL)
+`}
+/>
+
+<Paragraph>This table stores the last successfully processed timestamp for each pipeline.</Paragraph>
+
+<Paragraph>Before loading orders, the pipeline retrieves the previous watermark</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`last_watermark = get_watermark(connection)
+`}
+/>
+
+<Paragraph>Then, it filters the incoming orders</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`incremental_orders = orders[
+    orders["updated_at"] >= pd.Timestamp(last_watermark)
+].copy()
+`}
+/>
+
+<Paragraph>This selects only records whose updated_at timestamp is later than the previous watermark.</Paragraph>
+
+<Paragraph>For example, suppose our previous watermark is 2026-11-10 12:00:00.</Paragraph>
+
+<Table
+  headers={['order_id', 'updated_at', 'action']}
+  rows={[
+    ['501', '2026-11-09, 10:00 AM', 'Skip'],
+    ['502', '2026-11-11, 11:00 PM', 'Load'],
+    ['503', '2026-11-08, 08:00 AM', 'Skip'],
+    ['504', '2026-11-12, 12:00 PM', 'Load']
+  ]}
+/>
+
+<Paragraph>Only orders 502 and 506 are selected for loading.</Paragraph>
+
+<Paragraph>After successfully loading the selected orders into both raw and staging tables, we update the watermark</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`new_watermark = incremental_orders["updated_at"].max()
+
+connection.execute(
+    text("""
+        UPDATE etl_watermarks
+        SET last_watermark = :new_watermark
+        WHERE pipeline_name = 'orders'
+    """),
+    {"new_watermark": new_watermark.to_pydatetime()}
+)
+`}
+/>
+
+<Paragraph>Here, we find the latest updated_at timestamp among the successfully processed records and save it as the new watermark.</Paragraph>
+
+<Paragraph>This ensures that the next pipeline execution starts from the latest processed point rather than loading the same records again.</Paragraph>
+
+<H2>Handling Deleted Records</H2>
+
+<Paragraph>Another important consideration in an ETL pipeline is handling deleted records.</Paragraph>
+
+<Paragraph>For example, suppose a customer is removed from our source CSV. A normal UPSERT won't detect this deletion because it only inserts or updates records.</Paragraph>
+
+<Paragraph>To handle this, we implement <Highlight>soft deletion</Highlight>. Instead of physically deleting records from the database, we use an is_deleted column to track their status.</Paragraph>
+
+<BulletList items={[
+  "**FALSE**: The record is active",
+  "**TRUE**: The record has been marked as deleted"
+]}
+/>
+<Paragraph>First, we create a temporary table to store the IDs currently available in our source dataset.</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`
+CREATE TEMPORARY TABLE current_keys (
+    key_value INT NOT NULL PRIMARY KEY
+);
+
+`}
+/>
+
+<Paragraph>We then insert the source IDs into this temporary table</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`
+keys = dataframe[[key_column]].drop_duplicates()
+
+connection.execute(
+    text("""
+        INSERT INTO current_keys (key_value)
+        VALUES (:key_value)
+    """),
+    [
+        {"key_value": int(value)}
+        for value in keys[key_column].tolist()
+    ]
+)`}
+/>
+
+<Paragraph>Now, we compare these IDs with the records already stored in MySQL. Any database record that is missing from the source snapshot is marked as deleted.</Paragraph>
+
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`
+UPDATE raw_customers AS t
+LEFT JOIN current_keys AS c
+    ON t.customer_id = c.key_value
+SET t.is_deleted = TRUE
+WHERE c.key_value IS NULL
+  AND (t.is_deleted = FALSE OR t.is_deleted IS NULL);
+`}
+/>
+
+<Paragraph>The same operation is performed on the staging table.</Paragraph>
+
+<Paragraph>This approach preserves historical records and maintains relationships between tables. For example, an old order can still reference a customer who has been marked as deleted.</Paragraph>
+
+<Paragraph>And this is how, we've successfully built our first ETL pipeline using Python and MySQL!</Paragraph>

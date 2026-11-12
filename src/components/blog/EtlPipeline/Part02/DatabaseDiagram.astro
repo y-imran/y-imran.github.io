@@ -11,13 +11,9 @@ interface Table {
 
 interface Props {
   title?: string;
-  caption?: string;
 }
 
-const {
-  title,
-  caption = 'The four tables in the e-commerce dataset, with their columns.',
-} = Astro.props;
+const { title } = Astro.props;
 
 /*-----------------------------------*\
   #SCHEMA
@@ -134,11 +130,6 @@ const iconPaths: Record<string, string[]> = {
     </div>
   </div>
 
-  {caption && (
-    <figcaption class="text-light-gray-70 text-xs md:text-sm font-[var(--fw-300)] text-center font-sans italic mt-3">
-      {caption}
-    </figcaption>
-  )}
 </figure>
 
 <style>
