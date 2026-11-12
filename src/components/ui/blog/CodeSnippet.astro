@@ -19,7 +19,7 @@ const {
   filename,
   caption,
   theme = 'github-dark-default',
-  showLineNumbers = false,
+  showLineNumbers = true,
   highlight,
   wrap = false,
   output,
@@ -89,7 +89,11 @@ if (highlighted.size) {
   });
 }
 
-const html = await codeToHtml(source.replace(/\n$/, ''), {
+const cleanedSource = source.replace(/\n$/, '');
+const lineCount = cleanedSource.split(/\r?\n/).length;
+const lineNumbersVisible = showLineNumbers && lineCount > 1;
+
+const html = await codeToHtml(cleanedSource, {
   lang: language,
   theme,
   transformers,
@@ -97,7 +101,7 @@ const html = await codeToHtml(source.replace(/\n$/, ''), {
 
 const classes = [
   'code-snippet',
-  showLineNumbers && 'with-line-numbers',
+  lineNumbersVisible && 'with-line-numbers',
   wrap && 'wrap',
 ]
   .filter(Boolean)
