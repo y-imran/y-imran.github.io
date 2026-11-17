@@ -2,7 +2,7 @@
 slug: building-etl-pipeline-python-mysql
 title: Building ETL Pipeline Using Python and MySQL
 category: python
-pubDate: 2026-11-13
+pubDate: 2026-11-17
 excerpt: Ever wondered what it takes to turn raw data into something meaningful? Let's find out by building ETL pipeline with Python and MySQL.
 readTimeMins: 10
 banner: "../../assets/blog/etl-pipeline/part-02/thumbnail.png"
@@ -27,11 +27,7 @@ import DatabaseDiagram from '@src/components/blog/EtlPipeline/Part02/DatabaseDia
 import RawStagingDiagram from '@src/components/blog/EtlPipeline/Part02/RawStagingDiagram.astro';
 import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.astro';
 
-
-
-<Panel type='info'>
-  In <Link url='https://y-imran.github.io/blog/understanding-etl-data-pipeline-basics/' linkText='Part 1' />, we explored the concept of ETL, why it matters, and its three essential stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>.
-</Panel>
+<Paragraph>In <Link url='https://y-imran.github.io/blog/understanding-etl-data-pipeline-basics/' linkText='Part 1' />, we explored the concept of ETL, why it matters, and its three essential stages: <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight>.</Paragraph>
 
 <Paragraph>What happens when we actually have a dataset in front of us and need to move it into a database, clean it, and make it ready for analysis?</Paragraph>
 
@@ -79,8 +75,6 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 │         ├── products.csv
 │         ├── orders.csv
 │         └── order_items.csv
-├── logs
-│   └── pipeline.log
 └── scripts
         ├── db_connection.py
         ├── extract.py
@@ -242,7 +236,11 @@ def extract_data():
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`for column in ("customer_name", "city"):
+  code={`# .str lets pandas apply string methods (.title(), .strip()) to every value in the column.
+# So we write .str.strip(): .str applies strip() to each value in the Series, one by one.
+for column in ("customer_name", "city"):
+
+  # df holds the customers data.
     df[column] = df[column].str.strip().str.title()
 
 df["email"] = df["email"].str.strip().str.lower()
@@ -255,8 +253,11 @@ df["email"] = df["email"].str.strip().str.lower()
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`df["price"] = pd.to_numeric(df["price"], errors="coerce")
+  code={`# df holds the products data.
+# errors="coerce" turns any invalid or unparseable values into missing values (NaN or NaT).
+df["price"] = pd.to_numeric(df["price"], errors="coerce")
 
+# .clip(lower=0) replaces negative prices with 0.
 df["price"] = df["price"].clip(lower=0)
 `}
 />
@@ -269,8 +270,9 @@ df["price"] = df["price"].clip(lower=0)
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`for column in ("order_date", "created_at", "updated_at"):
-    df[column] = pd.to_datetime(df[column], errors="coerce")
+  code={`# df holds the orders data.
+for column in ("order_date", "created_at", "updated_at"):
+        df[column] = pd.to_datetime(df[column], format="%d-%m-%Y %H:%M:%S", errors="coerce")
 `}
 />
 <Paragraph>Dates can arrive in different formats. Converting them into consistent datetime types makes filtering, sorting, and incremental loading much easier.</Paragraph>
@@ -280,22 +282,23 @@ df["price"] = df["price"].clip(lower=0)
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`df["total_price"] = df["quantity"] * df["price"]`}
+  code={`# df holds the order_items data.
+df["total_price"] = df["quantity"] * df["price"]`}
 />
 
 <Paragraph>Transformation isn't just about cleaning existing data. Sometimes, we can create useful information from what we already have. Here, we calculate the total price of each order item.</Paragraph>
 
 <Paragraph>And just like that, our raw data gets its makeover! Next, it's time to load the cleaned data into MySQL.</Paragraph>
 
-<H1>Stage 2: Load</H1>
+<H1>Stage 3: Load</H1>
 
 <Paragraph>Once the data has been extracted and transformed, the final step is to load it into our MySQL database.</Paragraph>
 
 <Paragraph>In this part, We divide the loading process into <Highlight>Raw</Highlight> and <Highlight>Staging</Highlight> tables.</Paragraph>
 
 <BulletList items={[
-  "Raw Tables: Store the cleaned source data without calculated columns. They help preserve the original structure of the incoming data",
-  "Staging Tables: Store transformed data, including additional calculated columns. These tables are prepared for further processing and analysis."
+  "**Raw Tables**: Store the cleaned source data without calculated columns. They help preserve the original structure of the incoming data",
+  "**Staging Tables**: Store transformed data, including additional calculated columns. These tables are prepared for further processing and analysis."
 ]}
 />
 
@@ -303,12 +306,11 @@ df["price"] = df["price"].clip(lower=0)
 
 <RawStagingDiagram
   title="From CSV files to raw and staging tables"
-  caption="Raw tables keep a faithful copy of the source; staging tables hold the cleaned, typed rows that are ready to use."
 />
 
 <Paragraph>Let's break down how the loading process works.</Paragraph>
 
-<H2>Insert or update, Never Duplicate</H2>
+<H2>Insert or Update, Never Duplicate</H2>
 
 <Paragraph>We use an upsert instead of a plain insert. This means we insert new rows and update existing rows when the primary key already exists.</Paragraph>
 
@@ -340,9 +342,9 @@ connection.execute(query, records)
 <Paragraph>What's happening here?</Paragraph>
 
 <BulletList items={[
-  "INSERT INTO specifies the target table and columns where records should be inserted",
-  "VALUES provides placeholders for the incoming records",
-  "ON DUPLICATE KEY UPDATE updates an existing record if its primary or unique key already exists, instead of inserting a duplicate",
+  "**INSERT INTO** specifies the target table and columns where records should be inserted",
+  "**VALUES** provides placeholders for the incoming records",
+  "**ON DUPLICATE KEY UPDATE** updates an existing record if its primary or unique key already exists, instead of inserting a duplicate",
   "execute() sends the query and the DataFrame records to MySQL"
 ]}
 />
@@ -350,6 +352,10 @@ connection.execute(query, records)
 <Paragraph>For example, suppose customer 101 already exists in our database, but their city changes from Karachi to Lahore.</Paragraph>
 
 <Paragraph>Instead of inserting another customer record, UPSERT updates the existing record.</Paragraph>
+
+<Panel type='info'>
+  For learning purposes, this project uses both loading styles: <Highlight>orders</Highlight> are loaded incrementally, while <Highlight>customers</Highlight>, <Highlight>products</Highlight>, and <Highlight>order_items</Highlight> are loaded in full on each run.
+</Panel>
 
 <H2>Incremental Loading of Orders</H2>
 
@@ -368,6 +374,45 @@ connection.execute(query, records)
 <Paragraph>A watermark is a reference point that tracks how far a data pipeline has processed its source data.</Paragraph>
 
 <Paragraph>In this project, we use the updated_at column to identify new or modified orders.</Paragraph>
+
+<Paragraph>Before selecting new orders, the pipeline needs to know where the previous run stopped. <Highlight>get_watermark()</Highlight> reads the saved timestamp from the <Highlight>etl_watermarks</Highlight> table. If there is no saved timestamp yet, it returns 1970-01-01, so the first run loads every order.</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`# Return the newest updated_at already loaded for orders.
+  def get_watermark(connection):
+
+    result = connection.execute(text("""
+        SELECT last_watermark
+        FROM etl_watermarks
+        WHERE pipeline_name = 'orders'
+    """)).scalar()
+
+    # No bookmark yet: start from 1970 so the first run loads every order.
+    return pd.Timestamp(result) if result else pd.Timestamp("1970-01-01")
+`}
+/>
+
+<Paragraph>After loading the new orders, <Highlight>save_watermark()</Highlight> moves the bookmark forward. It stores the newest <Highlight>updated_at</Highlight> value, and <Highlight>ON DUPLICATE KEY UPDATE</Highlight> replaces the existing bookmark instead of creating a second row. The <Highlight>to_pydatetime()</Highlight> call converts the pandas timestamp into a normal Python datetime for MySQL.</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`# Move the bookmark forward to the newest loaded updated_at.
+  def save_watermark(connection, watermark):
+
+    connection.execute(text("""
+        INSERT INTO etl_watermarks (pipeline_name, last_watermark)
+        VALUES ('orders', :watermark)
+        ON DUPLICATE KEY UPDATE last_watermark = :watermark
+    """), {
+        "watermark": watermark.to_pydatetime()
+    })
+`}
+/>
+
+<Paragraph>With these two helpers ready, we can use them in the incremental loading steps below.</Paragraph>
 
 <CodeSnippet
   filename='load.py'
@@ -427,8 +472,7 @@ save_watermark(connection, new_watermark)
 <CodeSnippet
   filename='load.py'
   lang='python'
-  code={`
-UPDATE {table_name} t
+  code={`UPDATE {table_name} t
 LEFT JOIN current_keys c
     ON t.{key_column} = c.key_value
 SET t.is_deleted = TRUE
@@ -441,8 +485,7 @@ WHERE c.key_value IS NULL
 <CodeSnippet
   filename='load.py'
   lang='python'
-  code={`
-UPDATE {table_name} t
+  code={`UPDATE {table_name} t
 JOIN current_keys c
     ON t.{key_column} = c.key_value
 SET t.is_deleted = FALSE
@@ -454,10 +497,39 @@ WHERE t.is_deleted = TRUE
 
 <H1>Bringing Everything Together</H1>
 
-<Paragraph>Finally, I connected all three stages — Extract, Transform, and Load in a single main.py file.</Paragraph>
+<Paragraph>Finally, we connect all three stages — <Highlight>Extract</Highlight>, <Highlight>Transform</Highlight>, and <Highlight>Load</Highlight> in a single <Highlight>main.py</Highlight> file.</Paragraph>
 
-<Paragraph>This means I don't have to run each script separately. With just one command, the pipeline extracts the data, transforms it, and loads the results into MySQL.</Paragraph>
-<Paragraph>And that's it! We now have a complete ETL pipeline built with Python and MySQL, handling data extraction, cleaning, loading, updates, and deletions in one automated workflow.</Paragraph>
+<Paragraph><Highlight>main.py</Highlight> is the entry point. It imports one function from each stage and calls them in order. <Highlight>extract_data()</Highlight> returns the source dataFrames, <Highlight>transform_data()</Highlight> returns the raw and staging tables, and the load functions write those tables into MySQL.</Paragraph>
+
+<CodeSnippet
+  filename='main.py'
+  lang='python'
+  code={`from extract import extract_data
+from transform import transform_data
+from load import load_all, load_incremental
+
+
+def run_pipeline(load_mode="full"):
+    # 1. Extract: read the CSV files.
+    raw_data = extract_data()
+
+    # 2. Transform: build the raw and staging tables.
+    raw_tables, staging_tables = transform_data(raw_data)
+
+    # 3. Load: write the tables into MySQL.
+    if load_mode == "incremental":
+        load_incremental(raw_tables, staging_tables)
+    else:
+        load_all(raw_tables, staging_tables)
+
+
+if __name__ == "__main__":
+    run_pipeline()
+`}
+/>
+
+<Paragraph>This means we don't have to run each script separately. With just one command, the pipeline extracts the data, transforms it, and loads the results into MySQL.</Paragraph>
+<Paragraph>And that's it! We now have a complete ETL pipeline built with Python and MySQL, handling data extraction, cleaning, loading, updates, and deletions.</Paragraph>
 
 <Paragraph>I've also created a GitHub repository for this ETL project. If you'd like to explore the complete implementation and follow the process step by step, you can clone the repository and try it yourself!</Paragraph>
 
