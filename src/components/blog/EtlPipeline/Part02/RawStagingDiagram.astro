@@ -188,30 +188,71 @@ const transforms = [
           One customer, two layers
         </p>
 
-        <div class="mt-2 grid grid-cols-1 items-center gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-          <div class="min-w-0 rounded-[6px] border border-jet bg-eerie-black-1 px-2.5 py-2">
-            <p class="font-mono text-[9px] text-light-gray-70">raw_customers</p>
-            <p class="mt-1 break-words font-mono text-[10px] leading-[1.5] text-light-gray">
-              "  Ayesha Khan " · "" · "Karachi " · duplicate
-            </p>
+        <div class="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-stretch">
+
+          {/* Raw example */}
+          <div class="min-w-0 overflow-hidden rounded-[6px] border border-jet bg-eerie-black-1">
+            <div class="border-b border-jet/70 px-2 py-1">
+              <p class="font-mono text-[9px] text-light-gray-70">raw_customers</p>
+            </div>
+
+            <div class="p-2">
+              <div class="grid grid-cols-[1.8rem_1.2fr_0.9fr_0.9fr] gap-x-1.5 font-mono text-[8px] uppercase tracking-[0.06em] text-light-gray-70">
+                <span>id</span>
+                <span>name</span>
+                <span>email</span>
+                <span>city</span>
+              </div>
+
+              <div class="mt-0.5 grid grid-cols-[1.8rem_1.2fr_0.9fr_0.9fr] gap-x-1.5 font-mono text-[9px] leading-[1.8] text-light-gray">
+                <span>1001</span>
+                <span class="whitespace-pre">" Ayesha Khan "</span>
+                <span>""</span>
+                <span class="whitespace-pre">"Karachi "</span>
+              </div>
+
+              <div class="grid grid-cols-[1.8rem_1.2fr_0.9fr_0.9fr] gap-x-1.5 font-mono text-[9px] leading-[1.8] text-light-gray">
+                <span>1001</span>
+                <span class="whitespace-pre">" Ayesha Khan "</span>
+                <span>""</span>
+                <span class="whitespace-pre">"Karachi "</span>
+              </div>
+            </div>
           </div>
 
+          {/* Arrow */}
           <div class="flex items-center justify-center text-orange-yellow-crayola">
-            <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[18px] sm:hidden"></ion-icon>
-            <ion-icon name="arrow-forward-outline" aria-hidden="true" class="hidden text-[18px] sm:block"></ion-icon>
+            <ion-icon name="arrow-down-outline" aria-hidden="true" class="text-[18px] lg:hidden"></ion-icon>
+            <ion-icon name="arrow-forward-outline" aria-hidden="true" class="hidden text-[18px] lg:block"></ion-icon>
           </div>
 
-          <div class="min-w-0 rounded-[6px] border border-vegas-gold/30 bg-eerie-black-1 px-2.5 py-2">
-            <p class="font-mono text-[9px] text-vegas-gold">staging_customers</p>
-            <p class="mt-1 break-words font-mono text-[10px] leading-[1.5] text-light-gray">
-              "Ayesha Khan" · NULL · "Karachi" · one row
-            </p>
+          {/* Staging example */}
+          <div class="min-w-0 overflow-hidden rounded-[6px] border border-vegas-gold/30 bg-eerie-black-1">
+            <div class="border-b border-vegas-gold/20 px-2 py-1">
+              <p class="font-mono text-[9px] text-vegas-gold">staging_customers</p>
+            </div>
+
+            <div class="p-2">
+              <div class="grid grid-cols-[1.8rem_1.2fr_0.9fr_0.9fr] gap-x-1.5 font-mono text-[8px] uppercase tracking-[0.06em] text-light-gray-70">
+                <span>id</span>
+                <span>name</span>
+                <span>email</span>
+                <span>city</span>
+              </div>
+
+              <div class="mt-0.5 grid grid-cols-[1.8rem_1.2fr_0.9fr_0.9fr] gap-x-1.5 font-mono text-[9px] leading-[1.8] text-light-gray">
+                <span>1001</span>
+                <span class="text-vegas-gold">"Ayesha Khan"</span>
+                <span class="text-vegas-gold">NULL</span>
+                <span class="text-vegas-gold">"Karachi"</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <p class="mt-2 text-[10px] leading-[1.5] text-light-gray-70">
-          Transform trimmed the text, handled the missing email, and removed the duplicate.
-          The raw row is still available unchanged if we need to check what the source sent.
+          Two identical rows arrive. Staging keeps one, trims the name and city, and turns the
+          empty email into NULL.
         </p>
       </div>
     </div>

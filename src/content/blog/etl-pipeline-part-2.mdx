@@ -81,14 +81,13 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 │         └── order_items.csv
 ├── logs
 │   └── pipeline.log
-├── scripts
-│   ├── db_connection.py
-│   ├── extract.py
-│   ├── transform.py
-│   ├── load.py
-│   └── main.py
-|
-└── run_pipeline.bat`}
+└── scripts
+        ├── db_connection.py
+        ├── extract.py
+        ├── transform.py
+        ├── load.py
+        └── main.py
+`}
 />
 
 <H1>Understanding Our Source Data</H1>
@@ -148,7 +147,7 @@ MYSQL_PASSWORD = <your_password>
 MYSQL_DB = ecommerce_etl`}
 />
 
-<Paragraph>We can obtain these credentials from our local MySQL server configuration. The host and port identify our server, while the username and password are the credentials we use to access MySQL. The database name is the one we created for this project.</Paragraph>
+<Paragraph>We can obtain these credentials from our local MySQL server configuration. The <Highlight>host</Highlight> and <Highlight>port</Highlight> identify our server, while the <Highlight>username</Highlight> and <Highlight>password</Highlight> are the credentials we use to access MySQL. The database name is the one we created for this project.</Paragraph>
 
 <Panel type='info'>Your MySQL server will most likely be running on port 3306. However, if it is using a different port, make sure to update the port number accordingly.</Panel>
 
@@ -190,47 +189,6 @@ with engine.connect():
 <Paragraph>And just like that, we've established communication between our Python environment and our local MySQL server.</Paragraph>
 
 <Paragraph>Now we have a place to store our data. But before loading anything, let's understand how we're going to organize it.</Paragraph>
-
-<H1>Designing Our Database: Raw and Staging Tables</H1>
-
-<Paragraph>There's one important decision we need to make,</Paragraph>
-
-<Highlight block>How should we organize our incoming and processed data inside MySQL?</Highlight>
-
-<Paragraph>Rather than loading everything directly into a single set of tables, we'll maintain two separate layers</Paragraph>
-
-<NumberList items={[
-  "Raw Tables",
-  "Staging Tables"
-]}
-/>
-
-<Highlight block>But why do we need two sets of tables for the same datasets? Let's understand.</Highlight>
-
-<H2>Raw Tables: Preserving Incoming Data</H2>
-
-<Paragraph>Raw tables act as the initial storage layer for our incoming data.</Paragraph>
-
-<Paragraph>When we extract records from our source files, we load them into the corresponding raw tables with minimal or no modifications.</Paragraph>
-
-<Paragraph>The main idea is to preserve the original incoming information rather than immediately changing or cleaning it.</Paragraph>
-
-<Paragraph>Think of raw tables as our starting point. They help us understand what actually came into our pipeline.</Paragraph>
-
-<H2>Staging Tables: Preparing Data for Further Processing</H2>
-
-<Paragraph>Once our data is available in raw tables, we move towards the transformation stage.</Paragraph>
-
-<Paragraph>This is where staging tables come in.</Paragraph>
-
-<Paragraph>For example, we might remove duplicate records, handle missing values, standardize text, or correct data types before loading the processed records into staging tables.</Paragraph>
-
-<Paragraph>In simple terms, raw tables preserve what came in, while staging tables hold what we've prepared.</Paragraph>
-
-<RawStagingDiagram
-  title="From CSV files to raw and staging tables"
-  caption="Raw tables keep a faithful copy of the source; staging tables hold the cleaned, typed rows that are ready to use."
-/>
 
 <H1>Stage 1: Extract</H1>
 
@@ -279,87 +237,74 @@ def extract_data():
 
 <Paragraph>Transformation is where we apply the necessary changes to make our data consistent, accurate, and suitable for further processing.</Paragraph>
 
-<Highlight>Clean Customers Data</Highlight>
+<Highlight block>Standardizing Text</Highlight>
 
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`def transform_data(raw_data):
-    customers = raw_data["customers"].copy()
-    for column in ("customer_name", "city"):
-        customers[column] = customers[column].str.strip()
-    customers["email_missing"] = customers["email"].isna()
+  code={`for column in ("customer_name", "city"):
+    df[column] = df[column].str.strip().str.title()
 
-    if customers["customer_id"].duplicated().any():
-        raise ValueError("Duplicate customer IDs found")
+df["email"] = df["email"].str.strip().str.lower()
 `}
 />
+<Paragraph>We clean up extra spaces in customer names and cities. Small inconsistencies cause real problems, "karachi," "Karachi," and "KARACHI" should all be the same city. Standardizing text keeps things consistent.</Paragraph>
 
-<Paragraph> We remove extra spaces from names and cities, flag customers with a missing email, and check that customer IDs are unique.</Paragraph>
-
-<Highlight>Clean Orders Data</Highlight>
+<Highlight block>Handling Numeric Values</Highlight>
 
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`orders = raw_data["orders"].copy()
+  code={`df["price"] = pd.to_numeric(df["price"], errors="coerce")
 
-    # Convert date columns into Pandas datetime format.
-    for column in ("order_date", "created_at", "updated_at"):
-        orders[column] = pd.to_datetime(
-            orders[column], format="mixed", dayfirst=True, errors="coerce"
-        )
-    # Remove extra spaces and standardize order status capitalization.
-    orders["status"] = orders["status"].str.strip().str.title()
-
-    # Check for duplicate order IDs.
-    if orders["order_id"].duplicated().any():
-        raise ValueError("Duplicate order IDs found")
-    
-    # Check for missing or invalid dates.
-    for column in ("order_date", "created_at", "updated_at"):
-        if orders[column].isna().any():
-            raise ValueError("Invalid order dates found" if column == "order_date"
-                             else f"Invalid {column} dates found")
-        
-    if not orders["customer_id"].isin(customers["customer_id"]).all():
-        raise ValueError("Unknown customer IDs found in orders")
+df["price"] = df["price"].clip(lower=0)
 `}
 />
 
-<Paragraph>We convert order_date, created_at, and updated_at to Pandas datetime for consistent handling, then validate by checking for duplicate order IDs, missing/invalid dates, and that every customer_id in orders exists in customers.</Paragraph>
+<Paragraph>Not everything that looks like a number is stored as one. We convert prices into numeric values and replace negative values with 0.</Paragraph>
+<Paragraph>However, handling negative values depends on business requirements and the context of the dataset. In some cases, they may need to be replaced with NULL or handled differently rather than simply set to zero.</Paragraph>
 
-<Highlight>Enriching Order Items</Highlight>
-
-<Paragraph>The source CSV for order items only stores a product_id, no price and no line total. Those live elsewhere (price in products, quantity in order_items), so we'll joins them together and calculate a line total.</Paragraph>
+<Highlight>Working with Dates</Highlight>
 
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`items = raw_data["order_items"].copy()
-
-items = items.merge(
-    products[["product_id", "price"]],
-    on="product_id",
-    how="left"
-)
-
-items = items.rename(columns={"price": "unit_price"})
-
-# line_total is a new numeric column: quantity * unit_price.
-items["line_total"] = items["quantity"] * items["unit_price"]
+  code={`for column in ("order_date", "created_at", "updated_at"):
+    df[column] = pd.to_datetime(df[column], errors="coerce")
 `}
 />
+<Paragraph>Dates can arrive in different formats. Converting them into consistent datetime types makes filtering, sorting, and incremental loading much easier.</Paragraph>
 
-<Paragraph>We enrich it by left-joining each row against the products table to bring in the unit price, renaming that column to unit_price and then computing line_total as quantity × unit_price.</Paragraph>
+<Highlight>Creating New Information</Highlight>
 
-<Paragraph>We also check that every order belongs to a real customer, and that every order item points to a real order and product.</Paragraph>
+<CodeSnippet
+  filename='transform.py'
+  lang='python'
+  code={`df["total_price"] = df["quantity"] * df["price"]`}
+/>
+
+<Paragraph>Transformation isn't just about cleaning existing data. Sometimes, we can create useful information from what we already have. Here, we calculate the total price of each order item.</Paragraph>
+
+<Paragraph>And just like that, our raw data gets its makeover! Next, it's time to load the cleaned data into MySQL.</Paragraph>
 
 <H1>Stage 2: Load</H1>
 
 <Paragraph>Once the data has been extracted and transformed, the final step is to load it into our MySQL database.</Paragraph>
 
 <Paragraph>In this part, We divide the loading process into <Highlight>Raw</Highlight> and <Highlight>Staging</Highlight> tables.</Paragraph>
+
+<BulletList items={[
+  "Raw Tables: Store the cleaned source data without calculated columns. They help preserve the original structure of the incoming data",
+  "Staging Tables: Store transformed data, including additional calculated columns. These tables are prepared for further processing and analysis."
+]}
+/>
+
+<Paragraph>Keeping them separate allows us to retain the source data while working with an enriched version independently.</Paragraph>
+
+<RawStagingDiagram
+  title="From CSV files to raw and staging tables"
+  caption="Raw tables keep a faithful copy of the source; staging tables hold the cleaned, typed rows that are ready to use."
+/>
 
 <Paragraph>Let's break down how the loading process works.</Paragraph>
 
@@ -383,16 +328,12 @@ items["line_total"] = items["quantity"] * items["unit_price"]
   filename='load.py'
   lang='python'
   code={`query = text(f"""
-    INSERT INTO {table_name} ({column_names})
-    VALUES ({placeholders})
-    ON DUPLICATE KEY UPDATE
-    {update_clause}
+    INSERT INTO {table_name} ({columns})
+    VALUES ({placeholders}) AS new_values
+    ON DUPLICATE KEY UPDATE {update_clause}
 """)
 
-connection.execute(
-    query,
-    records.to_dict("records")
-)
+connection.execute(query, records)
 `}
 />
 
@@ -409,46 +350,6 @@ connection.execute(
 <Paragraph>For example, suppose customer 101 already exists in our database, but their city changes from Karachi to Lahore.</Paragraph>
 
 <Paragraph>Instead of inserting another customer record, UPSERT updates the existing record.</Paragraph>
-
-<H2>Loading Customers Data</H2>
-
-<Paragraph>With our reusable function ready, we can load customers into its respective raw and staging tables.</Paragraph>
-
-<CodeSnippet
-  filename='load.py'
-  lang='python'
-  code={`def load_customers(customers):
-
-        upsert_dataframe(
-            connection,
-            "raw_customers",
-            customers,
-            ["customer_id", "customer_name",
-             "email", "city"],
-            ["customer_name", "email", "city"]
-        )
-
-        upsert_dataframe(
-            connection,
-            "staging_customers",
-            customers,
-            ["customer_id", "customer_name",
-             "email", "city", "email_missing"],
-            ["customer_name", "email", "city",
-             "email_missing"]
-        )
-`}
-/>
-
-<Paragraph>What's happening here?</Paragraph>
-
-<BulletList items={[
-  "First, customer records are loaded into raw_customers, using the original source columns",
-  "Next, the same records are loaded into staging_customers, including the additional email_missing column created during transformation"
-]}
-/>
-
-<Paragraph>We follow the same approach for other tables, adjusting the column lists according to their respective transformations.</Paragraph>
 
 <H2>Incremental Loading of Orders</H2>
 
@@ -468,37 +369,28 @@ connection.execute(
 
 <Paragraph>In this project, we use the updated_at column to identify new or modified orders.</Paragraph>
 
-<Paragraph>For this, lets create a watermark table:</Paragraph>
-
 <CodeSnippet
   filename='load.py'
-  code={`CREATE TABLE IF NOT EXISTS etl_watermarks (
-    pipeline_name VARCHAR(100) PRIMARY KEY,
-    last_watermark DATETIME NOT NULL)
-`}
-/>
-
-<Paragraph>This table stores the last successfully processed timestamp for each pipeline.</Paragraph>
-
-<Paragraph>Before loading orders, the pipeline retrieves the previous watermark</Paragraph>
-
-<CodeSnippet
-  filename='load.py'
-  lang='python'
   code={`last_watermark = get_watermark(connection)
+
+orders = clean_data["orders"]
+
+orders = orders[
+    orders["updated_at"].notna()
+    & (orders["updated_at"] >= last_watermark)]
 `}
 />
 
-<Paragraph>Then, it filters the incoming orders</Paragraph>
+<Paragraph>After loading the selected records, the watermark is updated.</Paragraph>
 
 <CodeSnippet
   filename='load.py'
-  lang='python'
-  code={`incremental_orders = orders[
-    orders["updated_at"] >= pd.Timestamp(last_watermark)
-].copy()
+  code={`new_watermark = orders["updated_at"].max()
+save_watermark(connection, new_watermark)
 `}
 />
+
+<Paragraph>This way, the pipeline focuses on new or modified orders instead of processing the entire orders dataset again.</Paragraph>
 
 <Paragraph>This selects only records whose updated_at timestamp is later than the previous watermark.</Paragraph>
 
@@ -516,29 +408,7 @@ connection.execute(
 
 <Paragraph>Only orders 502 and 506 are selected for loading.</Paragraph>
 
-<Paragraph>After successfully loading the selected orders into both raw and staging tables, we update the watermark</Paragraph>
-
-<CodeSnippet
-  filename='load.py'
-  lang='python'
-  code={`new_watermark = incremental_orders["updated_at"].max()
-
-connection.execute(
-    text("""
-        UPDATE etl_watermarks
-        SET last_watermark = :new_watermark
-        WHERE pipeline_name = 'orders'
-    """),
-    {"new_watermark": new_watermark.to_pydatetime()}
-)
-`}
-/>
-
-<Paragraph>Here, we find the latest updated_at timestamp among the successfully processed records and save it as the new watermark.</Paragraph>
-
-<Paragraph>This ensures that the next pipeline execution starts from the latest processed point rather than loading the same records again.</Paragraph>
-
-<H2>Handling Deleted Records</H2>
+<H2>Soft Deletion</H2>
 
 <Paragraph>Another important consideration in an ETL pipeline is handling deleted records.</Paragraph>
 
@@ -551,57 +421,44 @@ connection.execute(
   "**TRUE**: The record has been marked as deleted"
 ]}
 />
-<Paragraph>First, we create a temporary table to store the IDs currently available in our source dataset.</Paragraph>
+
+<Paragraph>If a record is missing from the source. </Paragraph>
 
 <CodeSnippet
   filename='load.py'
   lang='python'
   code={`
-CREATE TEMPORARY TABLE current_keys (
-    key_value INT NOT NULL PRIMARY KEY
-);
-
-`}
-/>
-
-<Paragraph>We then insert the source IDs into this temporary table</Paragraph>
-
-<CodeSnippet
-  filename='load.py'
-  lang='python'
-  code={`
-keys = dataframe[[key_column]].drop_duplicates()
-
-connection.execute(
-    text("""
-        INSERT INTO current_keys (key_value)
-        VALUES (:key_value)
-    """),
-    [
-        {"key_value": int(value)}
-        for value in keys[key_column].tolist()
-    ]
-)`}
-/>
-
-<Paragraph>Now, we compare these IDs with the records already stored in MySQL. Any database record that is missing from the source snapshot is marked as deleted.</Paragraph>
-
-
-<CodeSnippet
-  filename='load.py'
-  lang='python'
-  code={`
-UPDATE raw_customers AS t
-LEFT JOIN current_keys AS c
-    ON t.customer_id = c.key_value
+UPDATE {table_name} t
+LEFT JOIN current_keys c
+    ON t.{key_column} = c.key_value
 SET t.is_deleted = TRUE
 WHERE c.key_value IS NULL
-  AND (t.is_deleted = FALSE OR t.is_deleted IS NULL);
 `}
 />
 
-<Paragraph>The same operation is performed on the staging table.</Paragraph>
+<Paragraph>If a previously deleted record appears again:</Paragraph>
 
-<Paragraph>This approach preserves historical records and maintains relationships between tables. For example, an old order can still reference a customer who has been marked as deleted.</Paragraph>
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`
+UPDATE {table_name} t
+JOIN current_keys c
+    ON t.{key_column} = c.key_value
+SET t.is_deleted = FALSE
+WHERE t.is_deleted = TRUE
+`}
+/>
 
-<Paragraph>And this is how, we've successfully built our first ETL pipeline using Python and MySQL!</Paragraph>
+<Paragraph>This allows us to retain historical records instead of permanently removing them. It also gives us a way to identify records that have disappeared and those that have returned.</Paragraph>
+
+<H1>Bringing Everything Together</H1>
+
+<Paragraph>Finally, I connected all three stages — Extract, Transform, and Load in a single main.py file.</Paragraph>
+
+<Paragraph>This means I don't have to run each script separately. With just one command, the pipeline extracts the data, transforms it, and loads the results into MySQL.</Paragraph>
+<Paragraph>And that's it! We now have a complete ETL pipeline built with Python and MySQL, handling data extraction, cleaning, loading, updates, and deletions in one automated workflow.</Paragraph>
+
+<Paragraph>I've also created a GitHub repository for this ETL project. If you'd like to explore the complete implementation and follow the process step by step, you can clone the repository and try it yourself!</Paragraph>
+
+<Link url= "https://github.com/y-imran/ETL-Pipeline" linkText='Clone the repository'/>
