@@ -108,6 +108,7 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 <Paragraph>To activate it on Windows (Command Prompt), run,</Paragraph>
 
 <CodeSnippet
+  lang='bat'
   code='.venv\Scripts\activate'
 />
 
@@ -240,7 +241,7 @@ for column in ("customer_name", "city"):
     # .str lets pandas apply string methods to every value in the column.
     df[column] = df[column].str.strip().str.title()
 
-      df["email"] = df["email"].str.strip().str.lower()
+df["email"] = df["email"].str.strip().str.lower()
 `}
 />
 <Paragraph>We clean up extra spaces in customer names and cities. Small inconsistencies cause real problems, "karachi," "Karachi," and "KARACHI" should all be the same city. Standardizing text keeps things consistent.</Paragraph>
@@ -269,7 +270,7 @@ df["price"] = df["price"].clip(lower=0)
   lang='python'
   code={`# df = raw_data["orders"]
 for column in ("order_date", "created_at", "updated_at"):
-      df[column] = pd.to_datetime(df[column], format="%d-%m-%Y %H:%M:%S", errors="coerce")
+    df[column] = pd.to_datetime(df[column], format="%d-%m-%Y %H:%M:%S", errors="coerce")
 `}
 />
 <Paragraph>Dates can arrive in different formats. Converting them into consistent datetime types makes filtering, sorting, and incremental loading much easier.</Paragraph>
@@ -362,7 +363,7 @@ connection.execute(query, records)
 
 <Paragraph>Imagine having a database with thousands of orders. Every time the pipeline runs, loading all historical orders again would be unnecessary.</Paragraph>
 
-<Paragraph>Instead, we only want to load Newly created orders and existing orders that have been modified since the previous pipeline run.</Paragraph>
+<Paragraph>Instead, we only want to load nnewly created orders and existing orders that have been modified since the previous pipeline run.</Paragraph>
 
 <Paragraph>To achieve this, I used a concept called <Highlight>Watermarking</Highlight>.</Paragraph>
 
@@ -376,7 +377,7 @@ connection.execute(query, records)
   filename='load.py'
   lang='python'
   code={`# Return the newest updated_at already loaded for orders.
-  def get_watermark(connection, oldest_order_created_at):
+def get_watermark(connection, oldest_order_created_at):
     """Return the newest updated_at already loaded for orders."""
 
     result = connection.execute(text("""
@@ -386,7 +387,7 @@ connection.execute(query, records)
     """)).scalar()
 
     if result:
-      return pd.Timestamp(result)
+        return pd.Timestamp(result)
 
     return pd.Timestamp(oldest_order_created_at)
 `}
@@ -414,8 +415,6 @@ connection.execute(query, records)
 
 <Paragraph><Highlight>get_oldest_order_date()</Highlight> finds the earliest created_at value in raw_orders. This gives the pipeline a sensible starting point when no watermark exists yet. If raw_orders is empty, it raises an error because there is no date to start from.</Paragraph>
 
-<Paragraph>After loading the new orders, <Highlight>save_watermark()</Highlight> moves the bookmark forward. It stores the newest <Highlight>updated_at</Highlight> value, and <Highlight>ON DUPLICATE KEY UPDATE</Highlight> replaces the existing bookmark instead of creating a second row. The <Highlight>to_pydatetime()</Highlight> call converts the pandas timestamp into a normal Python datetime for MySQL.</Paragraph>
-
 <CodeSnippet
   filename='load.py'
   lang='python'
@@ -432,7 +431,9 @@ connection.execute(query, records)
 `}
 />
 
-<Paragraph>With these two helpers ready, we can use them in the incremental loading steps below.</Paragraph>
+<Paragraph>After loading the new orders, <Highlight>save_watermark()</Highlight> moves the bookmark forward. It stores the newest <Highlight>updated_at</Highlight> value, and <Highlight>ON DUPLICATE KEY UPDATE</Highlight> replaces the existing bookmark instead of creating a second row. The <Highlight>to_pydatetime()</Highlight> call converts the pandas timestamp into a normal Python datetime for MySQL.</Paragraph>
+
+<Paragraph>With the above two helper functions, we can use them in the incremental loading steps below.</Paragraph>
 
 <CodeSnippet
   filename='load.py'
