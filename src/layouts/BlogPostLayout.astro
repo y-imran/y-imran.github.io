@@ -72,6 +72,22 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
   .prose p {
     margin-bottom: 15px;
   }
+
+  /* Standalone highlights should match paragraph text. */
+  .prose > :global(span.inline.font-semibold) {
+    display: block;
+    color: var(--color-light-gray);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 15px;
+  }
+
+  @media (min-width: 580px) {
+    .prose > :global(span.inline.font-semibold) {
+      font-size: 1.25rem;
+    }
+  }
   .prose ul {
     margin-bottom: 15px;
     padding-left: 20px;

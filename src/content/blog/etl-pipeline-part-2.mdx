@@ -63,7 +63,6 @@ import ProjectTree from '@src/components/blog/EtlPipeline/Part02/ProjectTree.ast
 <Paragraph>The tree diagrams below show the project folder structure.</Paragraph>
 
 <CodeSnippet
-  filename="project structure"
   lang="text"
   showLineNumbers={false}
   code={`ecommerce_etl
@@ -182,15 +181,15 @@ with engine.connect():
 
 <Paragraph>And just like that, we've established communication between our Python environment and our local MySQL server.</Paragraph>
 
-<Paragraph>Now we have a place to store our data. But before loading anything, let's understand how we're going to organize it.</Paragraph>
+<Paragraph>Now we have a place to store our data.</Paragraph>
 
 <H1>Stage 1: Extract</H1>
 
-<Paragraph>Now that our database structure is ready, let's begin implementing the first stage of our ETL pipeline: <Highlight>Extraction</Highlight>.</Paragraph>
+<Paragraph>Let's begin implementing the first stage of our ETL pipeline: <Highlight>Extraction</Highlight>.</Paragraph>
 
 <Paragraph>Remember, extraction is simply about retrieving data from our source systems. In our project, the source is four CSV files.</Paragraph>
 
-<Paragraph>We use Pandas to read each file into a DataFrame.</Paragraph>
+<Paragraph>We use <Highlight>Pandas</Highlight> to read each file into a DataFrame.</Paragraph>
 
 <CodeSnippet
   filename='extract.py'
@@ -227,42 +226,40 @@ def extract_data():
 
 <H1>Stage 2: Transform</H1>
 
-<Paragraph>Now that we've extracted our data, it's time to prepare it.</Paragraph>
+<Paragraph>Now that we've extracted our data, let's clean and prepare it for loading.</Paragraph>
 
 <Paragraph>Transformation is where we apply the necessary changes to make our data consistent, accurate, and suitable for further processing.</Paragraph>
 
-<Highlight block>Standardizing Text</Highlight>
+<Highlight>Standardizing Text</Highlight>
 
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`# .str lets pandas apply string methods (.title(), .strip()) to every value in the column.
-# So we write .str.strip(): .str applies strip() to each value in the Series, one by one.
-for column in ("customer_name", "city"):
+  code={`def transform_customers(df):
+      for column in ("customer_name", "city"):
+        # .str lets pandas apply string methods (.title(), .strip()) to every value in the column.
+          df[column] = df[column].str.strip().str.title()
 
-  # df holds the customers data.
-    df[column] = df[column].str.strip().str.title()
-
-df["email"] = df["email"].str.strip().str.lower()
+      df["email"] = df["email"].str.strip().str.lower()
 `}
 />
 <Paragraph>We clean up extra spaces in customer names and cities. Small inconsistencies cause real problems, "karachi," "Karachi," and "KARACHI" should all be the same city. Standardizing text keeps things consistent.</Paragraph>
 
-<Highlight block>Handling Numeric Values</Highlight>
+<Highlight>Handling Numeric Values</Highlight>
 
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`# df holds the products data.
-# errors="coerce" turns any invalid or unparseable values into missing values (NaN or NaT).
-df["price"] = pd.to_numeric(df["price"], errors="coerce")
+  code={`def transform_products(df):
+  # errors="coerce" turns any invalid or unparseable values into missing values (NaN or NaT).
+      df["price"] = pd.to_numeric(df["price"], errors="coerce")
 
 # .clip(lower=0) replaces negative prices with 0.
-df["price"] = df["price"].clip(lower=0)
+      df["price"] = df["price"].clip(lower=0)
 `}
 />
 
-<Paragraph>Not everything that looks like a number is stored as one. We convert prices into numeric values and replace negative values with 0.</Paragraph>
+<Paragraph>Not every value that looks like a number is actually stored in a numeric format. We convert prices into numeric values and replace negative values with 0.</Paragraph>
 <Paragraph>However, handling negative values depends on business requirements and the context of the dataset. In some cases, they may need to be replaced with NULL or handled differently rather than simply set to zero.</Paragraph>
 
 <Highlight>Working with Dates</Highlight>
@@ -270,9 +267,9 @@ df["price"] = df["price"].clip(lower=0)
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`# df holds the orders data.
-for column in ("order_date", "created_at", "updated_at"):
-        df[column] = pd.to_datetime(df[column], format="%d-%m-%Y %H:%M:%S", errors="coerce")
+  code={`def parse_dates(df):
+      for column in ("order_date", "created_at", "updated_at"):
+          df[column] = pd.to_datetime(df[column], format="%d-%m-%Y %H:%M:%S", errors="coerce")
 `}
 />
 <Paragraph>Dates can arrive in different formats. Converting them into consistent datetime types makes filtering, sorting, and incremental loading much easier.</Paragraph>
@@ -282,8 +279,8 @@ for column in ("order_date", "created_at", "updated_at"):
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`# df holds the order_items data.
-df["total_price"] = df["quantity"] * df["price"]`}
+  code={`def transform_order_items(df):
+      df["total_price"] = df["quantity"] * df["price"]`}
 />
 
 <Paragraph>Transformation isn't just about cleaning existing data. Sometimes, we can create useful information from what we already have. Here, we calculate the total price of each order item.</Paragraph>
@@ -297,7 +294,7 @@ df["total_price"] = df["quantity"] * df["price"]`}
 <Paragraph>In this part, We divide the loading process into <Highlight>Raw</Highlight> and <Highlight>Staging</Highlight> tables.</Paragraph>
 
 <BulletList items={[
-  "**Raw Tables**: Store the cleaned source data without calculated columns. They help preserve the original structure of the incoming data",
+  "**Raw Tables**: Store the original source data as received, preserving its values without applying transformation or adding calculated columns.",
   "**Staging Tables**: Store transformed data, including additional calculated columns. These tables are prepared for further processing and analysis."
 ]}
 />
@@ -373,9 +370,9 @@ connection.execute(query, records)
 
 <Paragraph>A watermark is a reference point that tracks how far a data pipeline has processed its source data.</Paragraph>
 
-<Paragraph>In this project, we use the updated_at column to identify new or modified orders.</Paragraph>
+<Paragraph>In this project, we use the <Highlight>updated_at</Highlight> column to identify new or modified orders.</Paragraph>
 
-<Paragraph>Before selecting new orders, the pipeline needs to know where the previous run stopped. <Highlight>get_watermark()</Highlight> reads the saved timestamp from the <Highlight>etl_watermarks</Highlight> table. If there is no saved timestamp yet, it returns 1970-01-01, so the first run loads every order.</Paragraph>
+<Paragraph>Before selecting new orders, the pipeline needs to know where the previous run stopped. <Highlight>get_watermark()</Highlight> reads the saved timestamp from the <Highlight>etl_watermarks</Highlight> table. If there is no saved timestamp yet, it returns 2026-11-01, so the first run loads every order.</Paragraph>
 
 <CodeSnippet
   filename='load.py'
@@ -389,8 +386,8 @@ connection.execute(query, records)
         WHERE pipeline_name = 'orders'
     """)).scalar()
 
-    # No bookmark yet: start from 1970 so the first run loads every order.
-    return pd.Timestamp(result) if result else pd.Timestamp("1970-01-01")
+    # No bookmark yet: start from 2026-11-01 so the first run loads every order.
+    return pd.Timestamp(result) if result else pd.Timestamp("2026-11-01")
 `}
 />
 
@@ -453,7 +450,7 @@ save_watermark(connection, new_watermark)
 
 <Paragraph>Only orders 502 and 506 are selected for loading.</Paragraph>
 
-<H2>Soft Deletion</H2>
+<H2>Handling Deleted Records</H2>
 
 <Paragraph>Another important consideration in an ETL pipeline is handling deleted records.</Paragraph>
 
@@ -533,4 +530,4 @@ if __name__ == "__main__":
 
 <Paragraph>I've also created a GitHub repository for this ETL project. If you'd like to explore the complete implementation and follow the process step by step, you can clone the repository and try it yourself!</Paragraph>
 
-<Link url= "https://github.com/y-imran/ETL-Pipeline" linkText='Clone the repository'/>
+<Link url= "https://github.com/y-imran/ETL-Pipeline" linkText='Project repository'/>
