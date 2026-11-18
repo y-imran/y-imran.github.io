@@ -235,10 +235,10 @@ def extract_data():
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`def transform_customers(df):
-      for column in ("customer_name", "city"):
-        # .str lets pandas apply string methods (.title(), .strip()) to every value in the column.
-          df[column] = df[column].str.strip().str.title()
+  code={`# df = raw_data["customers"]
+for column in ("customer_name", "city"):
+    # .str lets pandas apply string methods to every value in the column.
+    df[column] = df[column].str.strip().str.title()
 
       df["email"] = df["email"].str.strip().str.lower()
 `}
@@ -250,12 +250,12 @@ def extract_data():
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`def transform_products(df):
-  # errors="coerce" turns any invalid or unparseable values into missing values (NaN or NaT).
-      df["price"] = pd.to_numeric(df["price"], errors="coerce")
+  code={`# df = raw_data["products"]
+  # errors="coerce" turns any invalid or unparseable values into missing values (NaN).
+  df["price"] = pd.to_numeric(df["price"], errors="coerce")
 
 # .clip(lower=0) replaces negative prices with 0.
-      df["price"] = df["price"].clip(lower=0)
+df["price"] = df["price"].clip(lower=0)
 `}
 />
 
@@ -267,9 +267,9 @@ def extract_data():
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`def parse_dates(df):
-      for column in ("order_date", "created_at", "updated_at"):
-          df[column] = pd.to_datetime(df[column], format="%d-%m-%Y %H:%M:%S", errors="coerce")
+  code={`# df = raw_data["orders"]
+for column in ("order_date", "created_at", "updated_at"):
+      df[column] = pd.to_datetime(df[column], format="%d-%m-%Y %H:%M:%S", errors="coerce")
 `}
 />
 <Paragraph>Dates can arrive in different formats. Converting them into consistent datetime types makes filtering, sorting, and incremental loading much easier.</Paragraph>
@@ -279,8 +279,8 @@ def extract_data():
 <CodeSnippet
   filename='transform.py'
   lang='python'
-  code={`def transform_order_items(df):
-      df["total_price"] = df["quantity"] * df["price"]`}
+  code={`# df = raw_data["order_items"]
+df["total_price"] = df["quantity"] * df["price"]`}
 />
 
 <Paragraph>Transformation isn't just about cleaning existing data. Sometimes, we can create useful information from what we already have. Here, we calculate the total price of each order item.</Paragraph>
@@ -372,13 +372,12 @@ connection.execute(query, records)
 
 <Paragraph>In this project, we use the <Highlight>updated_at</Highlight> column to identify new or modified orders.</Paragraph>
 
-<Paragraph>Before selecting new orders, the pipeline needs to know where the previous run stopped. <Highlight>get_watermark()</Highlight> reads the saved timestamp from the <Highlight>etl_watermarks</Highlight> table. If there is no saved timestamp yet, it returns 2026-11-01, so the first run loads every order.</Paragraph>
-
 <CodeSnippet
   filename='load.py'
   lang='python'
   code={`# Return the newest updated_at already loaded for orders.
-  def get_watermark(connection):
+  def get_watermark(connection, oldest_order_created_at):
+    """Return the newest updated_at already loaded for orders."""
 
     result = connection.execute(text("""
         SELECT last_watermark
@@ -386,10 +385,34 @@ connection.execute(query, records)
         WHERE pipeline_name = 'orders'
     """)).scalar()
 
-    # No bookmark yet: start from 2026-11-01 so the first run loads every order.
-    return pd.Timestamp(result) if result else pd.Timestamp("2026-11-01")
+    if result:
+      return pd.Timestamp(result)
+
+    return pd.Timestamp(oldest_order_created_at)
 `}
 />
+
+<Paragraph>Before loading new or updated orders, the pipeline needs to identify where the previous run stopped. <Highlight>get_watermark()</Highlight> retrieves the last saved timestamp from the <Highlight>etl_watermarks</Highlight> table. If no watermark exists, it uses the earliest created_at timestamp from the source data to ensure the first run captures all orders.</Paragraph>
+
+<CodeSnippet
+  filename='load.py'
+  lang='python'
+  code={`def get_oldest_order_date(connection):
+    """Return the oldest created_at found in raw_orders"""
+
+    result = connection.execute(text("""
+        SELECT MIN(created_at)
+        FROM raw_orders
+    """)).scalar()
+
+    if not result:
+        raise ValueError("No orders founds")
+
+    return result
+`}
+/>
+
+<Paragraph><Highlight>get_oldest_order_date()</Highlight> finds the earliest created_at value in raw_orders. This gives the pipeline a sensible starting point when no watermark exists yet. If raw_orders is empty, it raises an error because there is no date to start from.</Paragraph>
 
 <Paragraph>After loading the new orders, <Highlight>save_watermark()</Highlight> moves the bookmark forward. It stores the newest <Highlight>updated_at</Highlight> value, and <Highlight>ON DUPLICATE KEY UPDATE</Highlight> replaces the existing bookmark instead of creating a second row. The <Highlight>to_pydatetime()</Highlight> call converts the pandas timestamp into a normal Python datetime for MySQL.</Paragraph>
 
@@ -413,13 +436,14 @@ connection.execute(query, records)
 
 <CodeSnippet
   filename='load.py'
-  code={`last_watermark = get_watermark(connection)
+  code={`oldest_order_date = get_oldest_order_date(connection)
+last_watermark = get_watermark(connection, oldest_order_date)
 
-orders = clean_data["orders"]
+# Keep only orders modified after the last watermark.
+orders = staging_tables["orders"]
+orders = orders[orders["updated_at"].notna()
+           & (orders["updated_at"] > last_watermark)]
 
-orders = orders[
-    orders["updated_at"].notna()
-    & (orders["updated_at"] >= last_watermark)]
 `}
 />
 
