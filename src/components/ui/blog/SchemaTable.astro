@@ -1,0 +1,105 @@
+---
+import { tableSchemas, type SchemaColumn, type TableName } from '@data/data-tables';
+
+interface Props {
+  /** Which data table to render (defaults to the main VOTD table). */
+  table?: TableName;
+  /** Render an ad-hoc list instead of a preset table. */
+  columns?: SchemaColumn[];
+  /** Table name shown in the header chip (defaults to `table`). */
+  name?: string;
+  /** Small label above the table name. */
+  label?: string;
+  /**
+   * How many side-by-side groups the fields are split into.
+   * Left out, it picks a sensible split (≈7 rows per group, max 4).
+   */
+  groups?: 1 | 2 | 3 | 4;
+  /** Optional footnote under the table. */
+  note?: string;
+}
+
+const {
+  table = 'viz_of_the_day',
+  columns,
+  name,
+  label = 'Data table',
+  groups,
+  note,
+} = Astro.props;
+
+const rows: SchemaColumn[] = columns ?? tableSchemas[table];
+const tableName = name ?? table;
+const groupCount = groups ?? Math.min(4, Math.max(1, Math.ceil(rows.length / 7)));
+
+const perGroup = Math.ceil(rows.length / groupCount);
+const groupsOfRows = Array.from({ length: groupCount }, (_, i) =>
+  rows.slice(i * perGroup, (i + 1) * perGroup),
+).filter((group) => group.length > 0);
+
+const gridClass =
+  groupsOfRows.length >= 4
+    ? 'sm:grid-cols-2 xl:grid-cols-4'
+    : groupsOfRows.length === 3
+      ? 'sm:grid-cols-2 xl:grid-cols-3'
+      : groupsOfRows.length === 2
+        ? 'sm:grid-cols-2'
+        : '';
+
+// theme accents (mirrors --color-vegas-gold / --color-orange-yellow-crayola)
+const ACCENT = 'hsl(192, 85%, 57%)';
+const ACCENT_BG = 'hsla(192, 85%, 47%, 0.12)';
+const ACCENT_LINE = 'hsla(192, 85%, 47%, 0.35)';
+---
+
+<div
+  class="schema-table my-[20px] overflow-hidden rounded-[12px] border border-jet bg-eerie-black-1"
+>
+  <!-- header -->
+  <div
+    class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-jet px-3 py-1.5 md:px-3.5"
+  >
+    <div class="flex items-center gap-2">
+      <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-light-gray-70">{label}</span>
+      <span
+        class="rounded-[5px] border px-1.5 py-0.5 font-mono text-[11px] leading-none text-white-2"
+        style={`border-color:${ACCENT_LINE}; background:${ACCENT_BG};`}>{tableName}</span>
+    </div>
+    <span class="text-[10px] uppercase tracking-[0.12em] text-light-gray-70">
+      {rows.length} fields
+    </span>
+  </div>
+
+  <!-- groups of name + type pairs -->
+  <div class:list={['grid gap-x-4', gridClass]}>
+    {groupsOfRows.map((group) => (
+      <table class="w-full border-collapse text-left">
+        <tbody>
+          {group.map((col) => (
+            <tr class="border-b border-jet/40 transition-colors last:border-b-0 hover:bg-jet/25">
+              <td class="w-[1%] whitespace-nowrap py-[6px] pl-3 pr-2.5 align-middle md:pl-3.5">
+                <span class="font-mono text-[11.5px] font-medium text-white-2">{col.name}</span>
+              </td>
+              <td class="whitespace-nowrap py-[6px] pr-3 align-middle md:pr-3.5">
+                <span
+                  class="inline-block rounded-full px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.03em]"
+                  style={`color:${ACCENT}; background:${ACCENT_BG};`}
+                >
+                  {col.type}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ))}
+  </div>
+
+  {note && (
+    <div
+      class="border-t border-jet px-3 py-1.5 text-[11px] font-light leading-[1.5] text-light-gray-70 md:px-3.5"
+    >
+      {note}
+    </div>
+  )}
+</div>
