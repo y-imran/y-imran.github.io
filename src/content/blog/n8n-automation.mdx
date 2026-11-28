@@ -14,6 +14,7 @@ import Figure from '@components/ui/blog/Figure.astro'
 import Highlight from '@src/components/ui/blog/Highlight.astro';
 import H1 from '@src/components/ui/blog/H1.astro';
 import H2 from '@src/components/ui/blog/H2.astro';
+import H3 from '@src/components/ui/blog/H3.astro';
 import NumberList from '@src/components/ui/blog/NumberList.astro';
 import BulletList from '@src/components/ui/blog/BulletList.astro';
 import Link from '@src/components/ui/blog/Link.astro';
@@ -40,8 +41,8 @@ import Part2 from "../../assets/blog/n8n-automation/part-2-workflow.png"
 <Paragraph>There are a couple of ways we can build this automation.</Paragraph>
 
 <BulletList items={[
-  "**Using a script**: We can write a script in Python, R, or any other programming language to fetch the latest Viz of the Day, generate its summary, and publish it on LinkedIn. We can then schedule the script to run automatically",
-  "**Using an automation platform**: We can use a tool like n8n to automate the entire process by connecting different services and defining each step of the workflow visually"
+  "**Using a script**: We can write a script in **Python**, **JavaScript**, or any other programming language to fetch the latest Viz of the Day, generate its summary, and publish it on LinkedIn. We can then schedule the script to run automatically",
+  "**Using an automation platform**: We can use a tool like **n8n** to automate the entire process by connecting different services and defining each step of the workflow visually"
 ]}
 />
 
@@ -50,13 +51,14 @@ import Part2 from "../../assets/blog/n8n-automation/part-2-workflow.png"
 <Paragraph>Why? Because it provides a visual, node-based approach to workflow automation, making it easier to understand, design, and manage the entire process. Its low-code approach also allows us to build automation without writing code for every step, making it accessible to non-technical users as well.</Paragraph>
 
 <Panel type='info'>
-Before we begin, let's assume you already have n8n installed locally (via npm or Docker) and running successfully.
+Before we begin, let's assume you already have n8n running locally either via npm or Docker.
 </Panel>
 
 <H1>From Idea to Implementation</H1>
 
-<Paragraph>let's first brainstorm the data we need to manage throughout this automation.</Paragraph>
-<Paragraph>For this automation, we'll use two tables.</Paragraph>
+<H2>Brainstorm Data</H2>
+
+<Paragraph>Let's first brainstorm the data we'll need. For this automation, we'll use two tables.</Paragraph>
 
 <BulletList items={[
     "**viz_of_the_day**: Stores information about each Tableau Viz of the Day, including visualization details and engagement statistics",
@@ -71,38 +73,18 @@ Before we begin, let's assume you already have n8n installed locally (via npm or
 />
 <SchemaTable table="summary_posting" />
 
-<Panel type='info'>
-The n8n's Data Table node automatically manages the `id`, `createdAt`, and `updatedAt` columns, so we don't need to add them manually. It creates and maintains these columns for us.
-</Panel>
+<H1>Web scraping vs. Tableau Public API</H1>
 
-<Paragraph>Keeping these records separate makes it easier to manage VOTD information and the LinkedIn publishing process independently.</Paragraph>
+<Paragraph>To fetch the data we need from Tableau Public, we'll use a collection of <Link url='https://github.com/wjsutton/tableau_public_api' linkText='unofficial APIs'/> I found a useful GitHub repository that documents many Tableau related APIs, along with example requests, response structures, and usage details.</Paragraph>
 
-<H1>Tableau Scraping / APIs</H1>
 
-<Paragraph>To fetch the data we need from Tableau Public, we'll use a collection of unofficial API endpoints. I found a useful GitHub repository that documents many of these APIs, along with example requests, response structures, and usage details.</Paragraph>
-
-<Panel type='info'>
-These endpoints are not officially documented or supported by Tableau, so their structure and availability may change in the future. 
-</Panel>
-
-<Paragraph>For our workflow, we'll use the following endpoint.</Paragraph>
-
-<Table
-  headers={["APIs", "Purpose"]}
-  rows={[
-    ["Viz of the Day API", "Fetches the latest Viz of the Day, including its workbook information and relevant metadata"],
-    ["Workbook API", "Retrieves workbook metadata, including details that can help us understand the visualization"],
-    ["Author Profile API", "Fetches the author's Tableau Public profile information"],
-    ["Single Workbook API", "Retrieves additional workbook information. We'll use its response to extract hashtags included in the workbook description."],
-  ]}
-/>
 <H1>Step 1: Fetching and Preparing VOTD Data</H1>
 
-<Paragraph>Once the Data Tables were ready, the next step is to build the main workflow.</Paragraph>
+<Paragraph>Once the data tables are brainstormed, the next step is to build the main workflow.</Paragraph>
 
 <Figure src={Part1}/>
 
-<Paragraph>These three nodes handle the retrieval and preparation of Tableau VOTD data. Let's look at how each node contributes to this process.</Paragraph>
+<Paragraph>These nodes handle the retrieval and preparation of Tableau VOTD data. Let's look at how each node contributes to this process.</Paragraph>
 
 <Highlight>1. HTTP Request – Get VOTD Request</Highlight>
 
@@ -112,13 +94,12 @@ These endpoints are not officially documented or supported by Tableau, so their 
 
 <CodeSnippet
   lang="http"
-  filename="Request URL"
   showLineNumbers={false}
   code={`https://public.tableau.com/public/apis/bff/discover/v2/vizzes/viz-of-the-day?limit=1
-# Set limit=1 to returns only the latest Viz of the Day`}
+# Set limit=1 to return only the latest Viz of the Day`}
 />
 
-<Paragraph>After executing the HTTP Request node, the following response returned.</Paragraph>
+<Paragraph>After executing the HTTP Request node, we get the following response.</Paragraph>
 
 <CodeSnippet lang="json">
 ```json
@@ -156,17 +137,15 @@ These endpoints are not officially documented or supported by Tableau, so their 
 ```
 </CodeSnippet>
 
-<Paragraph>Looking at the response, one of the most important fields for our workflow is `curatedAt`. It tells us when a Viz of the Day was curated by Tableau Public. We'll use this field to identify new Vizzes and track changes over time.</Paragraph>
+<Paragraph>One of the most important fields for our workflow is <Highlight>curatedAt</Highlight>. It tells us when a Viz of the Day was curated by Tableau Public. We'll use this field to identify new Vizzes and track changes over time.</Paragraph>
 
-<Paragraph>The value is returned in datetime format (e.g., 2026-11-27T14:32:34.000Z). Since we only need the date for our tracking purposes, we'll format it accordingly in a later step of the workflow and store it as a date.</Paragraph>
-
-<Paragraph>Another important part of the response is the engagement metrics. We have fields such as `viewCount`, `numberOfFavorites`, and `reactionCounts`, which provide information about how the community is engaging with a Viz.</Paragraph>
+<Paragraph>Another important part of the response is the engagement metrics. We have fields such as <Highlight>viewCount</Highlight>, <Highlight>numberOfFavorites</Highlight>, and <Highlight>reactionCounts</Highlight>, which provide information about how the community is engaging with a Viz.</Paragraph>
 
 <Highlight>2. Split Out – Separating Array Items</Highlight>
 
 <Paragraph>The API request returns its response in an array containing multiple records. To break this array into individual items for separate processing, the <Highlight>Split Out</Highlight> node is used.</Paragraph>
 
-<Paragraph>Since I only needed to split the content array and didn't need the rest of the information, I passed only the `content` array to the Split Out node. The resulting output is shown below.</Paragraph>
+<Paragraph>Since I only needed to split the content array and didn't need the rest of the information, I passed only the <Highlight>content</Highlight> array to the Split Out node. The resulting output is shown below.</Paragraph>
 
 <CodeSnippet lang="json">
 
@@ -197,21 +176,13 @@ These endpoints are not officially documented or supported by Tableau, so their 
 ```
 </CodeSnippet>
 
-<Highlight>3. Edit Fields (Set) – Organizing the Data</Highlight>
+<Highlight>3. Edit Fields (Set) – Sanitize the Data</Highlight>
 
 <Paragraph>After splitting the API response, the next step is to organize the extracted information using the <Highlight>Edit Fields (Set)</Highlight> node.</Paragraph>
 
-<Paragraph>The API response contains several fields, but not all of them are required for this project.</Paragraph>
+<Paragraph>The API response contains several fields, but not all of them are required for this project. We will select the relevant fields, rename them, and standardize their naming conventions to make the data more structured and consistent for downstream processing.</Paragraph>
 
-<Paragraph>This node helps prepare a cleaner and more structured output by:</Paragraph>
-
-<BulletList items={[
-    "Selecting only the required fields",
-    "Renaming fields to make them more meaningful",
-    "Mapping incoming API values to the preferred field names",
-]}
-/>
-<Paragraph>The output of this node returned as follow.</Paragraph>
+<Paragraph>The following is the output returned by this node.</Paragraph>
 
 <CodeSnippet lang="json">
 
@@ -236,41 +207,41 @@ These endpoints are not officially documented or supported by Tableau, so their 
 ```
 </CodeSnippet>
 
-<Paragraph>I've also added an additional field called `descriptive_curated_at`, which we'll later use in our AI-generated LinkedIn summary.</Paragraph>
+<Paragraph>I've also added an additional field called <Highlight>`descriptive_curated_at`</Highlight>, which we'll later use in our AI-generated LinkedIn summary.</Paragraph>
 
 <Paragraph>At this stage, the workflow has successfully retrieved the VOTD data, separated individual records, and organized the required fields.</Paragraph>
 
-<H1>Part 2: Storing VOTD Records and Tracking Engagement</H1>
+<H1>Step 2: Storing VOTD Records and Tracking Engagement</H1>
 
-<Paragraph>Once the VOTD data has been prepared, the next step is to maintain its records in the `viz_of_the_day` Data Table.</Paragraph>
+<Paragraph>Once the VOTD data has been prepared, the next step is to maintain its records in the <Highlight>viz_of_the_day</Highlight> table.</Paragraph>
 
 <Figure src={Part2}/>
 
-<Paragraph>The workflow then proceeds to maintain VOTD records and their engagement statistics by checking whether a visualization's curated date already exists and determining whether its record needs to be updated or newly inserted.</Paragraph>
+<Paragraph>The workflow then proceeds to maintain VOTD records and their engagement statistics by checking whether a visualization's curated date already exists or not.</Paragraph>
 
-<Paragraph>Let's break down how this works.</Paragraph>
+<Paragraph>Let's break it down one by one.</Paragraph>
 
-<Highlight>4. Get VOTD Rows – Checking Existing Records</Highlight>
+<Highlight>4. Get row(s) – Checking Existing Record</Highlight>
 
-<Paragraph>The Get VOTD Rows Data Table node retrieves records from the `viz_of_the_day` table using the `curated_at` field.</Paragraph>
+<Paragraph>The Data table (Get rows) node retrieves records from the <Highlight>viz_of_the_day</Highlight> table using the <Highlight>curated_at</Highlight> field.</Paragraph>
 
-<Paragraph>Here, `curated_at` represents the date on which a visualization was featured as Viz of the Day.</Paragraph>
+<Paragraph>The node uses the current VOTD's <Highlight>curated_at</Highlight> value as a filter to find whether a record for that date already exists in the table or not.</Paragraph>
 
-<Paragraph>The node uses the current VOTD's `curated_at` value as a filter to find whether a record for that date already exists in the table.</Paragraph>
+<Panel type='info'>
+Enable <Highlight>Always Output Data</Highlight> in the Settings tab to ensure the workflow continues even when no matching record is found.
+</Panel>
 
-<Paragraph>This helps identify whether the current visualization has already been recorded.</Paragraph>
+<Highlight>5. Summarize – Counting Existing VOTD Records</Highlight>
 
-<Highlight>5. Count – Counting Existing VOTD Records</Highlight>
+<Paragraph>THe <Highlight>Summarize</Highlight> node will count the number of <Highlight>id</Highlight> values returned by the previous step.</Paragraph>
 
-<Paragraph>After retrieving the matching records, by using <Highlight>Summarize</Highlight> node we count the number of id values returned by the previous step.</Paragraph>
-
-<Paragraph>The purpose is to determine how many matching VOTD records already exist.</Paragraph>
+<Paragraph>The purpose is to determine if VOTD records already exist.</Paragraph>
 
 <Paragraph>For example</Paragraph>
 
 <BulletList items={[
     "If the count is 1, a matching record exists",
-    "If the count is 0, no matching record was found"
+    "If the count is 0, no matching record was found (this is only possible if **Always Output Data** is enabled in the previous node). "
 ]}
 />
 
@@ -278,7 +249,7 @@ These endpoints are not officially documented or supported by Tableau, so their 
 
 <Paragraph>Now comes the conditional part of the workflow.</Paragraph>
 
-<Paragraph>The <Highlight>If</Highlight> node checks whether the `id` count is greater than zero (id > 0).</Paragraph>
+<Paragraph>The <Highlight>If</Highlight> node checks whether the <Highlight>id</Highlight> count is greater than zero (id > 0).</Paragraph>
 
 <Paragraph>Based on this condition, the workflow follows one of two paths</Paragraph>
 
@@ -290,11 +261,15 @@ These endpoints are not officially documented or supported by Tableau, so their 
 
 <Paragraph>This conditional check ensures that existing records are updated instead of creating duplicate entries.</Paragraph>
 
-<Highlight>6a. Update VOTD Stats – Tracking Engagement Over Time</Highlight>
+<Highlight>6a. Insert row(s)</Highlight>
+
+<Paragraph>When no matching record exists, the Data table (Insert rows) node creates a new entry in the `viz_of_the_day` table.</Paragraph>
+
+<Highlight>6b. Update row(s) – Tracking Engagement Over Time</Highlight>
 
 <Paragraph>When a VOTD record already exists, the workflow updates its latest engagement statistics rather than overwriting the entire record.</Paragraph>
 
-<Paragraph>To support future analysis, the Data Table contains separate columns for initial and latest engagement values. Initial values are preserved, while the latest values are refreshed whenever the scheduled workflow runs and retrieves updated statistics.</Paragraph>
+<Paragraph>To support future analysis, the table contains separate columns for initial and latest engagement values. Initial values are preserved, while the latest values are refreshed whenever the scheduled workflow runs and retrieves updated statistics.</Paragraph>
 
 <Paragraph>For example, columns such as initial_view_count and initial_reactions_love retain the engagement figures recorded when the VOTD was first added. Meanwhile, last_view_count and last_reactions_love are updated with the latest available values.</Paragraph>
 
@@ -302,8 +277,46 @@ These endpoints are not officially documented or supported by Tableau, so their 
 
 <Paragraph>This allows the historical data to capture how engagement evolves over time</Paragraph>
 
-<Highlight>6b. Insert VOTD Record</Highlight>
-
-<Paragraph>When no matching record exists, the Insert VOTD Record node creates a new entry in the `viz_of_the_day` Data Table.</Paragraph>
-
 <H1>Part 3: Generating a Summary with AI</H1>
+
+<Paragraph>Before sending data to the AI Agent, we need to make sure we haven't already generated a summary for the same Viz of the Day.</Paragraph>
+
+<Paragraph>For this, we'll use a Data table (Get rows) node. It checks the summary_posting table using the <Highlight>curated_at</Highlight> field to determine whether a summary for the current Viz already exists or not.</Paragraph>
+
+<Paragraph>We'll use this check to control the workflow.</Paragraph>
+
+<BulletList items={[
+  "**Matching record exists**: The summary has already been generated, so the workflow stops without executing the AI Agent",
+  "**No matching record exists**: The workflow continues to the AI Agent, which generates a new summary. Once generated, we'll insert a new row into the **summary_posting** table to store the summary and curated_at"
+]}
+/>
+
+<Paragraph>This check prevents duplicate summaries and ensures that we only generate content for new Vizzes of the Day.</Paragraph>
+
+<H2>Equipping the AI Agent with Model and Tools</H2>
+
+<Paragraph>Now let's look at how we can help our AI Agent understand each visualization.</Paragraph>
+
+<H3>AI Model</H3>
+
+<Paragraph>For the AI model, I'm using Ollama with, which allows us to run language models locally. I used <Highlight>glm-5.3</Highlight> as a language model. I've connected an Ollama Chat Model to the AI Agent, which will handle the summary generation using the information retrieved through the tools.</Paragraph>
+
+<H3>AI Agent Tools</H3>
+
+<Paragraph>We want the agent to understand what the visualization is about, explore its underlying data, and gather relevant information about its author.</Paragraph>
+
+<Paragraph>For this, we'll connect several HTTP Request tools to our AI Agent. These tools allow the agent to retrieve additional information from Tableau Public whenever needed.</Paragraph>
+
+<BulletList items= {[
+  "**get-workbook-views**: This tool retrieves workbook metadata, including available worksheets, dashboards, and stories."
+]}/>
+
+<CodeSnippet
+  lang="http"
+  showLineNumbers={false}
+  code={`https://public.tableau.com/profile/api/workbook/{workbook_repo_url}`}
+/>
+ <Paragraph>The response contains information about available views. Our agent can use this information to identify a relevant worksheet and retrieve its underlying data.</Paragraph>
+
+
+

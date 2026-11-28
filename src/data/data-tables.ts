@@ -4,7 +4,7 @@
  * Edit these lists to change what <SchemaTable /> renders:
  * - name: column name (rendered as-is, monospace)
  * - type: data type shown in the pill (INT, String, Number, DATETIME…)
- * - comment: optional note rendered under the row (small muted line)
+ * - comment: optional note rendered inline, right after the column name
  * - ellipsis: renders a "…" placeholder row (use it to hide columns)
  *
  * Usage:
@@ -17,11 +17,13 @@ export interface SchemaColumn {
   comment?: string;
   /** Render a "…" placeholder row instead of a field. */
   ellipsis?: boolean;
+  /** Tint the row (accent wash + accent borders) to call the field out. */
+  highlight?: boolean;
 }
 
 export const tableSchemas = {
   viz_of_the_day: [
-    { name: 'id', type: 'INT' },
+    { name: 'id', type: 'INT' , comment:'# Auto managed by n8n'},
     { name: 'author_profile', type: 'String' },
     { name: 'author_name', type: 'String' },
     { name: 'viz_url', type: 'String' },
@@ -29,23 +31,24 @@ export const tableSchemas = {
       name: 'engagement metrics',
       type: 'Number',
       comment:
-        'Every reaction is stored twice — the count from when the viz was first tracked and the count from the latest check — so engagement growth can be compared.',
+        '# The count from when the viz was first tracked and the count from the latest check — so engagement growth can be compared.',
     },
     {
       name: 'curated_at',
       type: 'String',
+      highlight: true,
       comment:
-        'The date of the Viz of the Day. Our workflow filters on this column to tell whether a viz is new or already being tracked.',
+        '# The date of the Viz of the Day. Our workflow filters on this column to tell whether a viz is new or already being tracked.',
     },
-    { name: 'createdAt', type: 'DATETIME' },
-    { name: 'updatedAt', type: 'DATETIME' },
+    { name: 'createdAt', type: 'DATETIME', comment:'# Auto managed by n8n'},
+    { name: 'updatedAt', type: 'DATETIME', comment:'# Auto managed by n8n'},
   ],
   summary_posting: [
-    { name: 'id', type: 'INT' },
-    { name: 'summary', type: 'String' },
-    { name: 'curated_at', type: 'String' },
-    { name: 'createdAt', type: 'DATETIME' },
-    { name: 'updatedAt', type: 'DATETIME' },
+    { name: 'id', type: 'INT', comment:'# Auto managed by n8n'},
+    { name: 'summary', type: 'String'},
+    { name: 'curated_at', type: 'String', highlight: true, comment: "# The date of the Viz of the Day"},
+    { name: 'createdAt', type: 'DATETIME', comment:'# Auto managed by n8n'},
+    { name: 'updatedAt', type: 'DATETIME', comment:'# Auto managed by n8n'},
   ],
 } satisfies Record<string, SchemaColumn[]>;
 

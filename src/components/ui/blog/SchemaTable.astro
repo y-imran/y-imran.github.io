@@ -8,8 +8,8 @@ interface Props {
   columns?: SchemaColumn[];
   /** Table name shown in the header chip (defaults to `table`). */
   name?: string;
-  /** Small label above the table name. */
-  label?: string;
+  /** Show the data-type pill next to each field (off by default). */
+  showTypes?: boolean;
   /**
    * How many side-by-side groups the fields are split into.
    * Defaults to `1` (one row per field); pass 2–4 to fan them out.
@@ -25,7 +25,7 @@ const {
   table = 'viz_of_the_day',
   columns,
   name,
-  label = 'Data table',
+  showTypes = false,
   groups,
   flush = false,
   note,
@@ -64,15 +64,10 @@ const ACCENT_LINE = 'hsla(192, 85%, 47%, 0.35)';
   <div
     class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-jet px-3 py-1.5 md:px-3.5"
   >
-    <div class="flex items-center gap-2">
-      <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-light-gray-70">{label}</span>
-      <span
-        class="rounded-[5px] border px-1.5 py-0.5 font-mono text-[11px] leading-none text-white-2"
-        style={`border-color:${ACCENT_LINE}; background:${ACCENT_BG};`}>{tableName}</span>
-    </div>
+    <span class="font-mono text-[11.5px] font-medium leading-none text-light-gray">{tableName}</span>
   </div>
 
-  <!-- groups of name + type pairs -->
+  <!-- one row per field: name, optional type pill, inline comment -->
   <div class="overflow-x-auto">
     <div class:list={['grid gap-x-4', gridClass]}>
       {groupsOfRows.map((group) => (
@@ -89,21 +84,23 @@ const ACCENT_LINE = 'hsla(192, 85%, 47%, 0.35)';
                   <td class="w-[1%] whitespace-nowrap py-[3px] pl-3 pr-2.5 align-middle md:pl-3.5">
                     <span class="font-mono text-[11px] tracking-[0.3em] text-light-gray-70/55">...</span>
                   </td>
-                  <td class="whitespace-nowrap py-[3px] pr-3 align-middle md:pr-3.5" />
+                  {showTypes && (
+                    <td class="whitespace-nowrap py-[3px] pr-3 align-middle md:pr-3.5" />
+                  )}
+                  <td class="w-full py-[3px]" aria-hidden="true" />
                 </tr>
               ) : (
-                <>
-                  <tr
-                    class:list={[
-                      'transition-colors hover:bg-jet/25',
-                      col.comment ? '' : 'border-b border-jet/40',
-                      'last:border-b-0',
-                    ]}
-                  >
-                    <td class="w-[1%] whitespace-nowrap py-[6px] pl-3 pr-2.5 align-middle md:pl-3.5">
-                      <span class="font-mono text-[11.5px] font-medium text-white-2">{col.name}</span>
-                    </td>
-                    <td class="whitespace-nowrap py-[6px] pr-3 align-middle md:pr-3.5">
+                <tr
+                  class:list={[
+                    'transition-colors border-b border-jet/40 last:border-b-0',
+                    col.highlight ? 'field-hl field-hl-start field-hl-end' : 'hover:bg-jet/25',
+                  ]}
+                >
+                  <td class="w-[1%] whitespace-nowrap py-[7px] pl-3 pr-2.5 align-baseline md:pl-3.5">
+                    <span class="font-mono text-[11.5px] font-medium text-white-2">{col.name}</span>
+                  </td>
+                  {showTypes && (
+                    <td class="whitespace-nowrap py-[7px] pr-2.5 align-baseline">
                       <span
                         class="inline-block rounded-full px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.03em]"
                         style={`color:${ACCENT}; background:${ACCENT_BG};`}
@@ -111,18 +108,14 @@ const ACCENT_LINE = 'hsla(192, 85%, 47%, 0.35)';
                         {col.type}
                       </span>
                     </td>
-                  </tr>
-                  {col.comment && (
-                    <tr class="border-b border-jet/40 last:border-b-0">
-                      <td
-                        colspan="2"
-                        class="py-[2px] pb-[8px] pl-3 pr-3 align-top text-[10px] font-light leading-[1.45] text-light-gray-70/70 md:pl-3.5 md:pr-3.5"
-                      >
-                        {col.comment}
-                      </td>
-                    </tr>
                   )}
-                </>
+                  {col.comment && (
+                    <td class="py-[7px] pr-3 align-baseline text-[10.5px] font-light leading-[1.55] text-light-gray-70/70 md:pr-3.5">
+                      {col.comment}
+                    </td>
+                  )}
+                  <td class="w-full py-[7px]" aria-hidden="true" />
+                </tr>
               )
             )}
           </tbody>
@@ -138,4 +131,25 @@ const ACCENT_LINE = 'hsla(192, 85%, 47%, 0.35)';
       {note}
     </div>
   )}
+<style>
+  /* Highlighted field (e.g. curated_at): accent wash + accent borders. */
+  .field-hl > td {
+    background: hsla(46, 100%, 62%, 0.1);
+  }
+  .field-hl > td:first-child {
+    border-left: 2px solid hsla(46, 100%, 66%, 0.55);
+  }
+  .field-hl > td:last-child {
+    border-right: 1px solid hsla(46, 100%, 66%, 0.4);
+  }
+  .field-hl-start > td {
+    border-top: 1px solid hsla(46, 100%, 66%, 0.4);
+  }
+  .field-hl-end > td {
+    border-bottom: 1px solid hsla(46, 100%, 66%, 0.4);
+  }
+  .field-hl-start > td:first-child span {
+    color: hsl(46, 100%, 78%);
+  }
+</style>
 </div>
