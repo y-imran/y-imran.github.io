@@ -4,16 +4,19 @@
  * Edit these lists to change what <SchemaTable /> renders:
  * - name: column name (rendered as-is, monospace)
  * - type: data type shown in the pill (INT, String, Number, DATETIME…)
- * - desc: optional one-line explanation — not rendered by the table anymore
+ * - comment: optional note rendered under the row (small muted line)
+ * - ellipsis: renders a "…" placeholder row (use it to hide columns)
  *
  * Usage:
  *   <SchemaTable />                          → viz_of_the_day
  *   <SchemaTable table="summary_posting" />  → the other table
  */
 export interface SchemaColumn {
-  name: string;
-  type: string;
-  desc?: string;
+  name?: string;
+  type?: string;
+  comment?: string;
+  /** Render a "…" placeholder row instead of a field. */
+  ellipsis?: boolean;
 }
 
 export const tableSchemas = {
@@ -21,22 +24,19 @@ export const tableSchemas = {
     { name: 'id', type: 'INT' },
     { name: 'author_profile', type: 'String' },
     { name: 'author_name', type: 'String' },
-    { name: 'workbook_repo_url', type: 'String' },
     { name: 'viz_url', type: 'String' },
-    { name: 'initial_view_count', type: 'String' },
-    { name: 'last_view_count', type: 'Number' },
-    { name: 'initial_favorites_count', type: 'Number' },
-    { name: 'last_favorites_count', type: 'Number' },
-    { name: 'initial_reactions_sad', type: 'Number' },
-    { name: 'last_reactions_sad', type: 'Number' },
-    { name: 'initial_reactions_insightful', type: 'Number' },
-    { name: 'last_reactions_insightful', type: 'Number' },
-    { name: 'initial_reactions_nominate', type: 'Number' },
-    { name: 'last_reactions_nominate', type: 'Number' },
-    { name: 'initial_reactions_love', type: 'Number' },
-    { name: 'last_reaction_love', type: 'Number' },
-    { name: 'thumbnail_url', type: 'String' },
-    { name: 'curated_at', type: 'String' },
+    {
+      name: 'engagement metrics',
+      type: 'Number',
+      comment:
+        'Every reaction is stored twice — the count from when the viz was first tracked and the count from the latest check — so engagement growth can be compared.',
+    },
+    {
+      name: 'curated_at',
+      type: 'String',
+      comment:
+        'The date of the Viz of the Day. Our workflow filters on this column to tell whether a viz is new or already being tracked.',
+    },
     { name: 'createdAt', type: 'DATETIME' },
     { name: 'updatedAt', type: 'DATETIME' },
   ],
