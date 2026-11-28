@@ -20,6 +20,7 @@ import Link from '@src/components/ui/blog/Link.astro';
 import Panel from '@src/components/ui/blog/Panel.astro';
 import SchemaTable from '@components/ui/blog/SchemaTable.astro';
 import CodeSnippet from '@src/components/ui/blog/CodeSnippet.astro';
+import Table from '@src/components/ui/blog/Table.astro';
 
 import AutomationFlow from "../../assets/blog/n8n-automation/automation-flow.png"
 import Part1 from "../../assets/blog/n8n-automation/part-1-workflow.png"
@@ -28,46 +29,37 @@ import Part2 from "../../assets/blog/n8n-automation/part-2-workflow.png"
 
 <Paragraph>Every day, Tableau Public features a new <Highlight>Viz of the Day</Highlight> (VOTD), showcasing creative and insightful data visualizations from the Tableau community.</Paragraph>
 
-<Paragraph>Lets build something that would automatically fetch each new Viz of the Day, generate a meaningful summary, and publish it on my LinkedIn account.</Paragraph>
-
 <H1>Ideation</H1>
 
 <Paragraph>The idea is very simple.</Paragraph>
 
+<Paragraph>Lets build something that would automatically fetch each new Viz of the Day, generate a meaningful summary, and publish it on my LinkedIn account.</Paragraph>
+
 <Figure src={AutomationFlow}/>
 
-<Paragraph>A scheduled workflow scans Tableau Public daily for the latest Viz of the Day. New visualizations are stored, summarized by an AI agent, and automatically published to LinkedIn, while previously tracked vizzes have their engagement metrics updated.</Paragraph>
-
-<Paragraph>That's how this project started.</Paragraph>
-
-<H1>Why Did I Choose n8n?</H1>
-
-<Paragraph>I chose n8n because it provides a visual, node-based approach to workflow automation.</Paragraph>
-
-<Paragraph>Instead of writing an entire application from scratch, we could connect different services, APIs, databases, and AI models through individual nodes.</Paragraph>
-
-<Paragraph>What made n8n particularly interesting for this project was its flexibility.</Paragraph>
+<Paragraph>There are a couple of ways we can build this automation.</Paragraph>
 
 <BulletList items={[
-    "It supports HTTP requests to interact with external APIs",
-    "It provides integrations with AI models and tools",
-    "It allows conditional logic and data transformation",
-    "It supports scheduled workflows",
-    "It can connect directly to platforms such as LinkedIn"
-]}/>
+  "**Using a script**: We can write a script in Python, R, or any other programming language to fetch the latest Viz of the Day, generate its summary, and publish it on LinkedIn. We can then schedule the script to run automatically",
+  "**Using an automation platform**: We can use a tool like n8n to automate the entire process by connecting different services and defining each step of the workflow visually"
+]}
+/>
 
-<Paragraph>Most importantly, we could build the workflow visually while still having the flexibility to write expressions and custom logic wherever needed.</Paragraph>
+<Paragraph>For this project, let's build it using n8n.</Paragraph>
 
-<H1>n8n Setup</H1>
+<Paragraph>Why? Because it provides a visual, node-based approach to workflow automation, making it easier to understand, design, and manage the entire process. Its low-code approach also allows us to build automation without writing code for every step, making it accessible to non-technical users as well.</Paragraph>
 
-<Paragraph>Before we begin, let's assume you already have n8n installed locally (via npm or Docker) and running successfully.</Paragraph>
+<Panel type='info'>
+Before we begin, let's assume you already have n8n installed locally (via npm or Docker) and running successfully.
+</Panel>
 
-<H1>Setting Up Data Tables</H1>
+<H1>From Idea to Implementation</H1>
 
-<Paragraph>Before building the automation logic, two separate Data Tables were created using n8n's <Highlight>Data Table</Highlight> nodes (Create a data table) to organize and manage the information based on its purpose.</Paragraph>
+<Paragraph>let's first brainstorm the data we need to manage throughout this automation.</Paragraph>
+<Paragraph>For this automation, we'll use two tables.</Paragraph>
 
 <BulletList items={[
-    "**viz_of_the_day**: Stores information about each Tableau Viz of the Day, including visualization details and engagement statistics"
+    "**viz_of_the_day**: Stores information about each Tableau Viz of the Day, including visualization details and engagement statistics",
 ]}
 />
 
@@ -77,22 +69,40 @@ import Part2 from "../../assets/blog/n8n-automation/part-2-workflow.png"
     "**summary_posting**: Stores AI-generated summaries and the time of summary generation to track which visualizations have already been processed and published"
 ]}
 />
-
 <SchemaTable table="summary_posting" />
 
 <Panel type='info'>
-The Data Table automatically manages the `id`, `createdAt`, and `updatedAt` columns, so we don't need to add them manually. It creates and maintains these columns for us.
+The n8n's Data Table node automatically manages the `id`, `createdAt`, and `updatedAt` columns, so we don't need to add them manually. It creates and maintains these columns for us.
 </Panel>
 
 <Paragraph>Keeping these records separate makes it easier to manage VOTD information and the LinkedIn publishing process independently.</Paragraph>
 
-<H1>Part 1: Fetching and Preparing VOTD Data</H1>
+<H1>Tableau Scraping / APIs</H1>
+
+<Paragraph>To fetch the data we need from Tableau Public, we'll use a collection of unofficial API endpoints. I found a useful GitHub repository that documents many of these APIs, along with example requests, response structures, and usage details.</Paragraph>
+
+<Panel type='info'>
+These endpoints are not officially documented or supported by Tableau, so their structure and availability may change in the future. 
+</Panel>
+
+<Paragraph>For our workflow, we'll use the following endpoint.</Paragraph>
+
+<Table
+  headers={["APIs", "Purpose"]}
+  rows={[
+    ["Viz of the Day API", "Fetches the latest Viz of the Day, including its workbook information and relevant metadata"],
+    ["Workbook API", "Retrieves workbook metadata, including details that can help us understand the visualization"],
+    ["Author Profile API", "Fetches the author's Tableau Public profile information"],
+    ["Single Workbook API", "Retrieves additional workbook information. We'll use its response to extract hashtags included in the workbook description."],
+  ]}
+/>
+<H1>Step 1: Fetching and Preparing VOTD Data</H1>
 
 <Paragraph>Once the Data Tables were ready, the next step is to build the main workflow.</Paragraph>
 
 <Figure src={Part1}/>
 
-<Paragraph>The first three nodes handle the retrieval and preparation of Tableau VOTD data. Let's look at how each node contributes to this process.</Paragraph>
+<Paragraph>These three nodes handle the retrieval and preparation of Tableau VOTD data. Let's look at how each node contributes to this process.</Paragraph>
 
 <Highlight>1. HTTP Request – Get VOTD Request</Highlight>
 
@@ -105,37 +115,36 @@ The Data Table automatically manages the `id`, `createdAt`, and `updatedAt` colu
   filename="Request URL"
   showLineNumbers={false}
   code={`https://public.tableau.com/public/apis/bff/discover/v2/vizzes/viz-of-the-day?limit=1
-# limit=1 -> the API returns only the latest Viz of the Day`}
+# Set limit=1 to returns only the latest Viz of the Day`}
 />
 
-<Paragraph>After executing the Tableau API Request node, the following response returned.</Paragraph>
+<Paragraph>After executing the HTTP Request node, the following response returned.</Paragraph>
 
-<CodeSnippet
-  lang="json"
-  filename="Output"
-  code={`[
+<CodeSnippet lang="json">
+```json
+[
   {
     "contents": [
       {
-        "authorProfileName": "kylli.esko",
-        "authorDisplayName": "Külli Esko",
-        "title": "Talking Turkey",
-        "description": "<p>Today's #VizOfTheDay by Külli Esko uses an autumnal palette and a vertical Sankey flow to map out U.S. turkey production and export markets. Explore the viz.</p>",
-        "workbookRepoUrl": "TalkingTurkeyMakeoverMonday2026W46",
-        "defaultViewRepoUrl": "TalkingTurkeyMakeoverMonday2026W46/sheets/USTurkeys",
+        "authorProfileName": "blake.feiza",
+        "authorDisplayName": "Blake Feiza",
+        "title": "By Hour 48, Four in Five Runners Were Gone",
+        "description": "<p>Today's #VizOfTheDay by Blake Feiza uses a unit chart and interactive clock to track the drop-off in a long-distance race. Explore the viz.</p>",
+        "workbookRepoUrl": "ByHour48FourinFiveRunnersWereGoneMakeoverMonday",
+        "defaultViewRepoUrl": "ByHour48FourinFiveRunnersWereGoneMakeoverMonday/sheets/ByHour48FourinFiveRunnersWereGone",
         "showInProfile": true,
-        "viewCount": 513,
-        "numberOfFavorites": 9,
+        "viewCount": 115,
+        "numberOfFavorites": 1,
         "reactionCounts": {
-          "NOMINATE": 5,
-          "FAVORITE": 9,
           "SAD": 0,
-          "INSIGHTFUL": 6,
-          "LOVE": 12
+          "LOVE": 4,
+          "INSIGHTFUL": 2,
+          "NOMINATE": 1,
+          "FAVORITE": 1
         },
-        "curatedImageUrl": "https://www.tableau.com/sites/default/files/2026-11/votd-3443-votd.jpg",
-        "curatedImageAltText": "Turkey production and export markets",
-        "curatedAt": "2026-11-26T14:32:34.000Z"
+        "curatedImageUrl": "https://www.tableau.com/sites/default/files/2026-11/votd-3384-votd.jpg",
+        "curatedImageAltText": "Long distance race running visualizatoin",
+        "curatedAt": "2026-11-27T14:32:34.000Z"
       }
     ],
     "startIndex": 0,
@@ -143,8 +152,15 @@ The Data Table automatically manages the `id`, `createdAt`, and `updatedAt` colu
     "next": 1,
     "current": 0
   }
-]`}
-/>
+]
+```
+</CodeSnippet>
+
+<Paragraph>Looking at the response, one of the most important fields for our workflow is `curatedAt`. It tells us when a Viz of the Day was curated by Tableau Public. We'll use this field to identify new Vizzes and track changes over time.</Paragraph>
+
+<Paragraph>The value is returned in datetime format (e.g., 2026-11-27T14:32:34.000Z). Since we only need the date for our tracking purposes, we'll format it accordingly in a later step of the workflow and store it as a date.</Paragraph>
+
+<Paragraph>Another important part of the response is the engagement metrics. We have fields such as `viewCount`, `numberOfFavorites`, and `reactionCounts`, which provide information about how the community is engaging with a Viz.</Paragraph>
 
 <Highlight>2. Split Out – Separating Array Items</Highlight>
 
@@ -152,37 +168,38 @@ The Data Table automatically manages the `id`, `createdAt`, and `updatedAt` colu
 
 <Paragraph>Since I only needed to split the content array and didn't need the rest of the information, I passed only the `content` array to the Split Out node. The resulting output is shown below.</Paragraph>
 
-<CodeSnippet
-  lang="json"
-  filename="Output"
-  code={`[
+<CodeSnippet lang="json">
+
+```json
+[
   {
-    "authorProfileName": "kylli.esko",
-    "authorDisplayName": "Külli Esko",
-    "title": "Talking Turkey",
-    "description": "<p>Today's #VizOfTheDay by Külli Esko uses an autumnal palette and a vertical Sankey flow to map out U.S. turkey production and export markets. Explore the viz.</p>",
-    "workbookRepoUrl": "TalkingTurkeyMakeoverMonday2026W46",
-    "defaultViewRepoUrl": "TalkingTurkeyMakeoverMonday2026W46/sheets/USTurkeys",
+    "authorProfileName": "blake.feiza",
+    "authorDisplayName": "Blake Feiza",
+    "title": "By Hour 48, Four in Five Runners Were Gone",
+    "description": "<p>Today's #VizOfTheDay by Blake Feiza uses a unit chart and interactive clock to track the drop-off in a long-distance race. Explore the viz.</p>",
+    "workbookRepoUrl": "ByHour48FourinFiveRunnersWereGoneMakeoverMonday",
+    "defaultViewRepoUrl": "ByHour48FourinFiveRunnersWereGoneMakeoverMonday/sheets/ByHour48FourinFiveRunnersWereGone",
     "showInProfile": true,
-    "viewCount": 513,
-    "numberOfFavorites": 9,
+    "viewCount": 115,
+    "numberOfFavorites": 1,
     "reactionCounts": {
-      "NOMINATE": 5,
-      "FAVORITE": 9,
       "SAD": 0,
-      "INSIGHTFUL": 6,
-      "LOVE": 12
+      "LOVE": 4,
+      "INSIGHTFUL": 2,
+      "NOMINATE": 1,
+      "FAVORITE": 1
     },
-    "curatedImageUrl": "https://www.tableau.com/sites/default/files/2026-11/votd-3443-votd.jpg",
-    "curatedImageAltText": "Turkey production and export markets",
-    "curatedAt": "2026-11-26T14:32:34.000Z"
+    "curatedImageUrl": "https://www.tableau.com/sites/default/files/2026-11/votd-3384-votd.jpg",
+    "curatedImageAltText": "Long distance race running visualizatoin",
+    "curatedAt": "2026-11-27T14:32:34.000Z"
   }
-]`}
-/>
+]
+```
+</CodeSnippet>
 
 <Highlight>3. Edit Fields (Set) – Organizing the Data</Highlight>
 
-<Paragraph>After splitting the API response, the next step is to organize the extracted information using the <Highlight>Edit Fields (Set)</Highlight> node which I named as Main fields.</Paragraph>
+<Paragraph>After splitting the API response, the next step is to organize the extracted information using the <Highlight>Edit Fields (Set)</Highlight> node.</Paragraph>
 
 <Paragraph>The API response contains several fields, but not all of them are required for this project.</Paragraph>
 
@@ -194,27 +211,32 @@ The Data Table automatically manages the `id`, `createdAt`, and `updatedAt` colu
     "Mapping incoming API values to the preferred field names",
 ]}
 />
-<CodeSnippet
-  lang="json"
-  filename="Output"
-  code={`[
+<Paragraph>The output of this node returned as follow.</Paragraph>
+
+<CodeSnippet lang="json">
+
+```json
+[
   {
-    "author_profile": "kylli.esko",
-    "author_name": "Külli Esko",
-    "workbook_repo_url": "TalkingTurkeyMakeoverMonday2026W46",
-    "viz_url": "https://public.tableau.com/app/profile/kylli.esko/viz/TalkingTurkeyMakeoverMonday2026W46/USTurkeys",
-    "view_count": "513",
-    "favorites_count": "9",
+    "author_profile": "blake.feiza",
+    "author_name": "Blake Feiza",
+    "workbook_repo_url": "ByHour48FourinFiveRunnersWereGoneMakeoverMonday",
+    "viz_url": "https://public.tableau.com/app/profile/blake.feiza/viz/ByHour48FourinFiveRunnersWereGoneMakeoverMonday/ByHour48FourinFiveRunnersWereGone",
+    "view_count": "115",
+    "favorites_count": "1",
     "reactions_sad": "0",
-    "reactions_insightful": "6",
-    "reactions_nominate": "5",
-    "reactions_love": "12",
-    "thumbnail_url": "https://www.tableau.com/sites/default/files/2026-11/votd-3443-votd.jpg",
-    "curated_at": "2026-11-26",
-    "descriptive_curated_at": "26 November 2026"
+    "reactions_insightful": "2",
+    "reactions_nominate": "1",
+    "reactions_love": "4",
+    "thumbnail_url": "https://www.tableau.com/sites/default/files/2026-11/votd-3384-votd.jpg",
+    "curated_at": "2026-11-27",
+    "descriptive_curated_at": "27 November 2026"
   }
-]`}
-/>
+]
+```
+</CodeSnippet>
+
+<Paragraph>I've also added an additional field called `descriptive_curated_at`, which we'll later use in our AI-generated LinkedIn summary.</Paragraph>
 
 <Paragraph>At this stage, the workflow has successfully retrieved the VOTD data, separated individual records, and organized the required fields.</Paragraph>
 
@@ -283,3 +305,5 @@ The Data Table automatically manages the `id`, `createdAt`, and `updatedAt` colu
 <Highlight>6b. Insert VOTD Record</Highlight>
 
 <Paragraph>When no matching record exists, the Insert VOTD Record node creates a new entry in the `viz_of_the_day` Data Table.</Paragraph>
+
+<H1>Part 3: Generating a Summary with AI</H1>
